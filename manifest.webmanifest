@@ -1,0 +1,14 @@
+{
+  "name": "球場実況",
+  "short_name": "球場実況",
+  "description": "少年野球の試合をボタンで記録し、スコア・打順・走者を自動計算してLINE速報文まで作るアプリ",
+  "start_url": ".",
+  "scope": ".",
+  "display": "standalone",
+  "background_color": "#f4f5f2",
+  "theme_color": "#1f5c39",
+  "icons": [
+    { "src": "icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any maskable" },
+    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable" }
+  ]
+}

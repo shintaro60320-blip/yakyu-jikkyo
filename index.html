@@ -1,0 +1,1400 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#1f5c39">
+<link rel="icon" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAMAAAADACAMAAABlApw1AAAAwFBMVEX///////7//v7+/v7+/f39/f79/f39/fz8/f3+/Pz9/P39/Pz9/Pv8/Pz8/Pv8+/v7/Pz6+/v6+vr5+vr29vbn7ezb3Nu4y8ahtK+WmJdaiXk+c2V2RUgWV0QQVzsQVjoPUEAOVTkNVDgNQlAMVTgMVDkMVDgMVDcMVDYMUzgMUzcMUzYMRUgKVTgLVDcLVDYKVDcLUzgLUzcLUzYKUzYLUjYGUDMCTC8ASiwARykKNlsLM2ELM2AKM2EIMF4BJFPUingAAABBqUlEQVR42oW9iXbiyLYtqm1IUKGrbfo2LYZ0vVEhRlEnBQK8cfP/f/XmnCtCEs4671KVTifGsFbE6tsg7DWPbu8fHj/8N4P6qUH8/SU/8Kp4NB49BXrM5vPFcrlare2xWi0Xi/lsZD+MJ6Nhr9tt3vj7Zw96//z4p+d/BPXzg++vDXvhP/9ujH/G9VMDIhCOJj0CN5ktlqv15uUlvVyvNz7c18s5edms18vFfMrXdUZA4v/xGLT+/4dHt0Yg/gZj1OsD+vgB4IH/cf/h/aLeAGcfj4c69gVAT65vbwT3uEvx2PKBv9I0K86X6w0/O71sVos5LyMej/z7dHpxRBAGfMsaln4Ytj5zYD/oDwZtaDtBr4VkpFc8nHrsv4nsrQ3qFg7DUc+A37xc326XKiPIr3mev2YOBXx9zbJ8l+tHh8vt7bbdrJdzXcTwHwmlBUXPf9qg74EkFkCrbwgMHM4P98SnIvf6sKGxP4hP+4XhKAYY8+X65Xq7ngFttsvxNdlmpwtoyMiHBHQ5nzLdRpZlaZKegGuyWc1xc71J/Z6DgQETua96Loqi+gDxXxS5O3FfeoEjkt6g/pW+XhX36jchriEumbgP6mcjHD6hX21ecfIgk2xHDC6C+pK9vGz4WK/1F5mCBHQ9ZwnQA5ZpdX27AAe8xWjUomG8eRj16uvuRbH+EfXi+oOj9mUFhlzcppGHu4ha1xJFxAXnRNrk4c+Wm+R2zZMUB5+kZ9D/xVgVMmc66QTu8TSazuaLxRLYvFyARYWr2AHd7PpWbZYzXMPIwOnH9oG4dg8NvvW3EvmTi1pUE9j5R4aq/YBf4uao/0mQhaT8+frldi2S7R7UAeBvgH25mA1rsLtRPBwNh3HY7frnRpBS4PTb27XEbb2mSXa9vawX5Iaw9yjp3PFFzY23CVxfagRax+ypDPfYMG39Lh6BUTfoLNbnt8s2Lfbb7eVGil7MBGNnOMIjbh5hGEdxGPPZkS7labZYb9Lb7bzd7nbbpLpdNssRriluUU3Pn3tDHHFLjDQyMqBMj3p2Tz3/4qh5hxYSlK+8NoA/XG6ut2xblOkWNPFiMgWUMB7FAwdr3H3y5x50wuF4gqf6cTycSGx1yPm3G4gJ15Beb5vlNOiMTUZ2Wxdgh9m+lQe4dAN9vDD0lGXsG1KJxd/4wB3/aBj0lpvbNU0LYHB7AwXw6HtjEAFIZjzwUPcm05keU1NyfIREEdw/+kHZu1wnb1fAn/ESN8sJftyrBWgNp8EhRRFGDaE3CETxwzMPmLSeNc0XQ/IsCH4GiX9xPBgMARXOPRaQ0zm18Vqyxx6SRiuvhQGmkBgKh83ldk5SiCWiACaJve7SocahI6iWJoqiNksEHtwofAA5av4KWywC8OebK8Hfp1cc/txDP45NGYNFX5KLl/7+YQrhsjU2D+yXujFxAC+9vF2StBAKYOdR7zduDaPeNz5u/mliNI51VbHjm8ihGbfFErVuHMzW55sDX4cf6zBrZXwh3Kc0gbCHAs4ygCWFnG75TEFMLi+O33uTIa4NvzpbeRSul/XM0VH/Qd44Lgxb+qEhoe8yKqrpL64pcEDuxfEvX96KtCoc11EFSaA+zZe0JKSMAfcue4UxccyLKr1ek9OhLHPZFhkxS03iiu0B/w+qw+ny5XZJsmKbvr2Qjvrkyyh8MLoib9N8Z+JBv5G1Nec0DF8rQBz/fA0yKArQPjnuSYdvyngHHbtNYPQcd6+7Vz52u3xfbG+bzS2piiLPd8TqFabGDixLtZw5NTzsxobC23mb77bnt808CIe9wTeCaVRX1L4VfwOtY6cIisLo203p+JPbdl+lFU5pAs0TESeyYXG77hLADqBfHfy7HRFIbpvpZPO2rQ55mfOHfDY/FvkhS7fF9S11VNiLJ08iJIi1bHtLV51g8jvN91vWhuhEVBa0nZPwt9/ydxOOQP3QPEWa3pLVDOADJa+MYUrkPOJc8AMBA7UA/HjldPOWHMpCP9+RlPJCX4FDebu98BrisQ5otr5cYQZuK14CNfPAlFfkLEtvHoe9liwN2rrqdxYhnrBdh71g8XLbgkgvN0oegt+BANmcpYry1+MxPxJAQqn/8l0l+IfDp+nmtq0EtP04J3vw73JHyZPRkqAxJAFNOsIlgBN6tYkXD8AAfUqjgRF3FIUPYlSImTKIzMQY0Koa1KwxCkYrUH+VgsfwaeO4A4yojKmFDKSdoMpBRviWJE/6nwnTAHewPRR4GAZ2DUSnPBZpkt+ulJ4xNQlUZHIjM59v6wl+2Uuhb8Z+5L7GbSkUtQ2R0Hk/5kNMgtnmDbKTx88zFetSGdOWAST7Y77DHztk/l2U4PTry8xkOjG4JcCgzP31GJLHo6TTNruZAohBmBQUp/SUpW9Af+wcqrhF4Y47YV1JNHaDf7acDbs+7X+cC8gnqfZbHb+/a4CfSrjoNMuj/hwlPIvqBPkp+PkpnSEOAFR0OBA3oVmQgOzVR6ABxrp6ysTR7K9AN7nh00YP4hEk5HRVVLvr3WDwXVS1RFBIT2YYLCuST/GG44fkBPHPyW1psSuL3RGkfywBxBGgFX+CWcvTqarS2wv40DurI2FwIhnp8Il0KVYo8H95LIlChbePQZyQ1rzv0/ZyWQbDuD5VGnpx22tpPLIGn+g3yRv3ghXuFORzXQWBpMVwldzSLT67KAB+SToQ/RzzsjweAP2pAv3M2zaBYVAZH+DQa1FEuirKsqxKHJB0GCl2un7DR6an2yoIH4y3PskpfFRkg392GJz5P+z01m9Z8WvLCw3jLpgX51NBmwFYAH/8VQoUIHHCU8WpKA4V6WdukvwRA7uDI64Jv0NGwRng6oDAqTxJP85x5p1hxy69SN/W5Iu+E+dSBIPGVIhaCEQtf6blugx5GAk4kiw16XV4/P8DWV3isPHxu6OYgPDsSN2A51Qe/gH+3g9g8HLdnnjiJaE3Xifd4Y0KYlCScxNdgrHdtqq2bxJGZhfRtGCgZRBZWMg828DbF2FjODlu7hN+6lG88XpKjhzx+PNtqcMWIM2jlFQBGFV6SQD/8DHUFk+C+csVZhRphn94CSA/YJIXh6I8EAf8Khlt7ATf9lTi5KaeFiOxQEgT22moqEbAgI68oRTZBUh64PyztxUcxQ7YATZXQuDLXztegTEizR7eCGmjJBDbRQBDL65jUYjewOYgBhdgUIqVQX05eUi4Q2zhUHAsp71oNQ5x17j7bUFtWGPQc/Zc3G/ZCIGCSL97zl0nvyl+bkuqGZIPLLYKnwM4cdyAmAZO7hSTwCrL7HIg/Is5D9IZhV1cHZ+cb4EBDvvE66MEBRPwPoqqwgEcyEFHSYunYWfU6azf0vxEDJ6GdZTI8UITygp+Z1372h12qH+qfQVpNiL581IzUavIF2gUO6dad6aGj2WVVRfBf3FiKPIs/LbAHSz2l6wSoBC2FL98K/zjUJ1OYgN8T3mNQ+9S/nkMOj6AF0ZNoK3nNXH4aIzqSxc/HOEOYXtel6Zg5iSfgp+C48dR6x52+aszIwqK0zKrru6oL40gJStdi8oQAwYnegi8ROlsUFNxOPG5A+8QzyQUGcBgCAyy7O/kth6F3i0x6u4/emSPj754AwJ0beePkyMNLJJrUvKTJH+ofMi2JH8jITwB+AugOxWxQ5M6U8JEwfacCYMrLqniBZx4AqJ83QBPnwiVpyPMcIqxLk5tBfcPCK2DoSePsB2lG3gEol7vMa6E36X83PJAR3yn5eUCIXiCkipIKjg3kpEIRzaNGGOf3Rz8SVGZMdTtGCmCNCicpsHyeoCqAMQmPSlSyQVQgIfieKCEOObQwlv3uas3GLtbSJERzRsFmbxZFPUeb8A913fwLwH/ngc66eL8lzdQBz5PFER4nTaFOjM+pEjfEX6Jy2252x3tDsIOXJqE6KWkKmDwVuyhrisK471EEpngIJI8UE2QntKLbl4YJPkhfVtKsdThq37PB/yDXst5M0krAbS4Mo6M37NzuO33uOWyMsrHWZeUQEfTpKf8xI+G4lwBQCossneJOyAtj9bknV8gORkYE2CQFcSgMA7mH9h5h9Ph4MiTByXeExWBE0/FgZTQtnQGYb++AUdQoUUiByb1tmfYPwBoQiW6ojFNBKTyC28558QFHy8yprrGy6U6yp1OttzyDgQ/zYXSqGpKsoDgxPuRdoQACelkj7L8mwIJnGIYDIlBlZH+Rgz+OtEc+nN3mlgWnWODbvyDpyjeGRk1pZTUFNbH0mCRUZbLLCPZUjCmgp+qg/6vbAaqIXx86X6pNIwmxKBqrkAPYHM6EYm8NMOiRBIB99+JwwmtKNzmtDeyKEOk1I1ZdbiBuPGSfdKFp4YPX4fDUPSfOQD2AktGg7PgzJjhecNsCSYdwW8IFGQWhB+gfHNRHv5UctOmDgOznswzwMtJQI4naKuUKSXgqAt74OWyPbjjNEHJ2Hnfi1EZ/b2wMbHFOLDIoD9iGCXLa5HpCEWe+rswU0bCUx9n8I9C8etRnqOoA4ZFIn7VnSFOVMHTmnYmIgsRZS4k+KBkpbV6zA90KojBeQu6IUHDRQNBUyGZyTN4DO4ysyOeiPpigAVCh0Z0nTFUD5RBURi5mx7mx+oZKQJ8W5HcesPhkHDRTMp3Os0//z5BOVfiWBD54SRXjcaNYXCQRS2iwYP/OpXerKKs3kobiggQSS4uYuSw12sFDZ0YHcS1eh52cGPpPr0tDPnEGWClk/06LH01NuA/K+jOEcI7hEocAhLTgeJEIcyy/R5JPl4AzR5Y/bPJMORraYZCIotgjhQQwDEnldql5AUpH2aEaALhwJcptUD/wf63qEQceUvPazCqji6RoUw06Skn4CTJgT97esBwwvCkTMbQ6ELw//rF1yDwA+ZXso9ZPkYds/0FeTFEsyYjhSoOdhrGtfp6kHajWtfRgBER0wmHI/KWkakj/rgVG41aSQTKnC1DIvi93jCkABD/yXvK7SrcLZCE+A9yZkPXzsrJFD58u24t2YckH3N8lwoaNkDaIAh+SD9XkP2VIZA7HHB3tFXtk/KEso2W5MsF0Zbb0jGyz1gMKIXiQSOCQDOg+OzyMuvEXbs5I9DimDshQXbTHfxJLi2dZKFsxHkDGvj0e6bvrohCL+ezf1tm49+z+RLRa0Cw3Nzv983y37JuaZkKZ2Bugup0qOS0QblBfxWgZQpTMCbYALp8JjFa56GAwCCsk2m4l2G8gdzzDEDeMfhzEz7UN6Kh0t+99KuT7WbWV7CgEKtaLf6togkkO1Aqgbyl0gLz6eLr8/Pz4+trLZ2NwC8vgALpdDIFQ7/GfwJ+lFUpHGXTyEZEj6GH4CHoJQKq9DJEc+ZJlTkJodiDmS1mtisYIvq5Ogsn1VFCzPyNCAkJBfmC+/3zyz9w7KgxCBb45v7+fv9aU8DDyTxJuJlm1vcm6fBu1A1FSUamFTeFbCl0tM4nqxGIGGDXtZBpmbsgt4cQ6te09I9CVKqoA7/KEeTJpQ7+W5bBUiqQdwL48+Bpsb4D6M/Pe/3AwX99vd8Xazz9gX9/LXqy+8C2lSEA8qto1pmopqnN27Fj70i6g4iIjYio7+JCcb/haqpgBLhpOHVMnQHGk1GnYglEQzbRUf5vUdU2crYnHNS8CI1MV4Dewf7x8f6Bh079/vmxFi+8E7n5cGJSmm8qdWdHjw+s/Jnp7/RqFE3xSKYeOfO/T30WSAPEzvMjp3gCAsJ7EGh9HJILRyPR0qnm9JIuBD/UDF4LekJc5AngE3oBDsh53AD+4/39azOfre935MmQSlsyHxgs/nOWXWQYULU571KGI8QqhIfxbtyjgsqqZAbNoLKHnotKeFcmjqcbqDB7NUgO9Fk6Ri2d3SXb096Z36eV8xOrjPqYQRAQ+Ybgv9vBCwM93u8fX6vO8vPrA5R0X6/mU2Y3/hUs/gd34B8nWni4kcPJPldHdfzFM4WbTx8lr/k4riNzLvjxw5wYL7akKb0dad/ktOqdPUFUUufAnysKq6pQGGpF8AH9u7uADw//58diuvmyfwKHjwXYGakS+qr1HZxobJCUTjqnyiQgyirkDsS9DYzk9NJELWMLq7jQE20IwL9BggoEBL1ROQFKK0UxiGMtPKtiVzgHeJGcU4knns1s80WaeScKAN7Bj3/eP9/nszt/6Ijq83O+BK6rqWK5hcdA0Mv6c94BfLvdkQZUSCV1ySAl1kHcBFaEQNdiNyvGX2UxhWNIoMIp4NzxUumIiLKORs7eO8BbaTcPP46eAN/d+eMqyL+Af37/JC/c3QV93YP11+cXMgMIYdHTNy6uvJwwzaAI/vEo3hUfb42nWz6xmLirC/g7a1Fb4Q04Rl8VQ3AWhHywQv6mg39HfUD4ccQGvJ3yhyHyjiv5nM8hU2uOME0wBUpQabNgWZCMFJuQTD3JydNF5MpcGe8OO/MEhVPXzVNch4KAALyz2AIACdUeC19keZBWEH7O7QokhpwZisfeOZAMQOxBT7xknr8RjUkffwe4ka/l7P5Zk5SepCZYEuGv+4JBp61YwIKkpB4hUJRKvKGoxSkDAOk4woWIAufF8ALAhqCvoWygrV2AYj7UWKXFAF1ks4H/upX3IoW/0fm3hKe4gczwte4Kfg++scjXZiSUPz9XFsvlPUupubSBeMAwyDPSNqE8iwuGNQ/0LdYo3Pa8qBgXpSiyCU9wrgU8ZHkeGD0p9ns5kPjUa6LwouzE1ZfEfSM5dRV87nMDcndEVf+ARERJhPsBgh3FwalkeBGlLBWnyMxsh8n4FCtAkuyyswRR18QoYy1doZaajFUcwMSNxcqcVjFS0jXUDnBy3IPLEFPeBItPRxvv/vRrcL/msoDamIm5vzbkAr3CZcSLQqrAG79mhimRYwaCCEVXMGoyNJESkXQDqmyOeqtgXhWN+Jf9diobbVDIOkGEgPDDz9+XOUpv5lOjkZpIahRAKqvpvf28ffNO2TRffZmc/dpMEEAFBrJoGXg3cU33lYFA6OPbphObv5Wdk5lFrAcDcykZPrvoAobOIJJhKbfu9KepXqceCwmcYTyaIHRxLH7tilwMAUiM9I1/HZgQQEBsuv56hN+REFCb+598rX9QdOD8q5OL3HhDkkELbxKRvo8Zpeq4HdylqQdpQh2HV/ynsHClE/5mOBtJngT/ZhKTzhjAYl4Y/s90VvNvmwmEztfSoPxoTp/nL222kXASe3+tAYQCXiKh0odiyp1SsQW5ABpM5wvriCGTJrAV61m8IHSxPMF7qBQ1KC3Yp8BWYQ4wHUjlahgaheO6Mib9eJRBOmdewOa3C/Ac8jlfi/X5j68lvTpZRIxRF0dDIjfP9eS4wIImCfyCcaPIhnIktzcvqOS20BiXjyF7guq9cg6kd4DL3S9mNngB808zHGrLwZPQuyeTFlo1Lu+mChzPf7zPYxgAZpiWPPXSYh90phCvKIzEe0PwSsPGQR3K0rVYQFtHzXi3+ehKwR0sDVc7wNvCbFVEofG+vIBab314aGlVfL7PeMgfjyLIo2PYOQH7tenOyQXVQRosZ+z6yOilo2FkzFDpAHlzExubRSQEHAvD3Bh0puSkQmY51Xole+Rk1pwL+psDj7feK1haJjDTzGqwW6jNUCPt2edHI1ONwz88EX2JCTzTg4gU2rAwuDSoZ0AZeQIxfqLET2DIjKkJAsfCMOiPcJ7H9GlEKqQYRhkofOwNQP+WAabVV8vZI3KwJoI+vPi/ezlEK+hLkvJBvdVmEiXU7N64nfgX3WSe3EkeSFkHjY4U5Rkcyo6FbmG6uFoJF8tyLExuTquyFju6T1NjciC9A7y3t/5VVjucRbj5pFQhy94bI9qs6E0Lwm9crJeYAeWQ+lopPcU49dG53biCQylDFawsn57nvUVsn8EKIRCLbBQ7RVVi4gKJ9iANnSyzUTYOcJo5HGEF7f96mUoJ85Tf9Z+3GXQBy8WXnffHdwlkhz5ffzUqGlcQLOCnil6P5Z+1Y4D4xN94krc9FLypJS9EQkZBZJBYYRXRu1Mklgsi/MzAK02nAIQhh6B0shULM9jjxPu7iXjHqR7Aj4+H868fX4v1Vwujr2WHecCUyb/d8aTjO51cagtkAH+XUJJirlDMfYfAyigIXN1RKOVU2yGKLNuXOgNcZUfFKlD1fUYFNzLraD3ZKAIkLIjC3ZG9p6CP+8ejKdQgsKoRoG2xgYheXA7ZqVRWoTqd6R1417BU0stUwQn2r3MpIX3lnkygD3aHnXfjGwT42FsGePHXkfQDexp1DerCQGyhVxfW1+EUc4pB1IuvlofzvyHw7gMvH3dl0W6wzxUCNAo+yYmlaysaCgOjIQVKA2qx15x2XBCOeRf14fuAkx5FJQdyUZ3TkrHPC2KfaxZNThHCuqM2eqWaYhbWM+pwd+B81RT0z/AbAhQA77LuKEkl6TPLvJ2qk5coinntPQ3BcLCUTaAQKIKxG2bnA7r9MqTpHCEXeXIYoOBD8G8v2S7Zo2EGNesTds/ozBV0A9jW2oM62E+LrIB65s5I/f9FwBjErmwdhIpUZoUVH1jAuqxMoIiGxha1heJ94g0IHfE0ZBDMCIdvYVUdhoHLoNIBzlAeDej/FQwWArQVPGTE5/O+XoxRxLoRLX2t518mne73/wcCdH2I8oZ1IlKVh1PZRDYRiFfuIKUNYcJSPhoQ6EwgRFNnJ93SwvukTnvLw9t6+BP1C4DiQTifFuP8drgKWy26AYOjn19Ler062v8FBUkpFwlQ8PE+W9S52BNY2OShpCm9QhpeT2EIYZOZIA3AArCIL4kXT6b6KsUni8oiuOZAIhKLviPWfCty++mAfzTS3j0Oc1yDWADW0MfH/yKDajH7cbdYEp+YIT9u5qKPubsgEfMR5hvrhngZcTcYiwXg7dCqBl7mdskxdTmHyjvAb+m6JvF3k/ku+lD78JI+PMivz83yCdTw/nWvA3WPoL87zbUxJjZPnzQ1fVEms7t2uVjFeS1OcchVNzERrfAygh4QwAvlDA9FWc6TKS3az1ok/LAz6QB+BD5nS0bNQfkE0oWdH93FDwcrAtCMHCJS+nU3Kvq4f/PqaWncLdxiJ3GXGPoXWrU202E4crlYBWMrGvan0/HIcx+KCbLDK6yJAOSEIsrb0rOAZawsM89AjRywIRzgt1VnvGQnCbs9SUJO8H0z8sWyPHJeQxuFh0vgj9/lzAMBw84FsWEOIdbxtkb/lgIVijda4PrEyLLOHZWN0LiCOqBSyHaIUwwtHGSpkZLOwIE4sOwuDPFea4SSQf/RM5uTkH65M11hOHj30TsBcoV1pl/v65mPV7+3MPCSycTUe4tDiMCNEcKniYVaKhbn2E0wZZAXjKmMaZEqAQiaPtOnYtUsLVELvVVSwS4DOeuw4gS8M6OqfX//7//dSIUt1hT37w0KLpJ1d4FpSZV3obC8exTeawag6jJb76MdMdINZDXf3eihqZrWJCMKGVnTQ5M+kZMckG5oGPUGT3Br9lQB9NyZbyT9qzrjCei+LSb3r+bxX4qjOaTRhwj8vRWLM9AlV2QTfTEELRQgkN7dXemealPoo4l6OQQ8Bi/Ox7SSLlr14leZ1Mg34QJIN3ouZlLPkqiknYMi/ubAIABBTbb++u9/P5us3X8pKnELxqNmg35YLO6jFX14Fwo/JsrbyFR1TMKHSdH7gz0avDA4UetOw4AlXifmSBkfosCZvx5T+pWBCaGVIcVEEZNtVaWSJOcAkDVohEzWFEAefn4DFOZE4d1QILTvLmLijeq7aYb7Ush+OIFkv/DNIXs3BCCFGKBrtH/mWOCk6ASsngkyYLTnmOsIZEiYELK6oEoFBZUcMJWAWgZY5VeUKCZG+f9/PxUbF4/WGAiFu4FotG52MhMB/r78+ZOHP9/vD84C9EBykU+1N/trvr9Y+oMhFmZKzZ+n2ZYA7oDyKL3IkKApWvmUWGUVi5YBBkKnlH0hUGPr+38bVvi/989V1xG4O1VRt2MLE7PvTrcBBVDMl3kMIiZZ2+74P7xqnl1AMLQAYOAsrVTTMDgxSEVdPCe04EtSjooQGBuXjZq6jCrPf1/IgKYDbLn09GK9b0q/M/++Wn/NGTPBy1aOjtxFiIs/HFFIO4tjkaVEQunLUt3K0rjYqOB/N9k0m5OHZUOkzge5SpCyqI6VksrijSWGwLugMfrqkqIbQ0CeQ7nbqwRxeWOVJHUCCpvR/5aomdB6IiFIgyfUPgguHu27x8GJUMsu+W+EwtpQ+LDY7vts89lIUD11Hy9umRiRXnj1t3mxLgWINPsppyczGdP5ZXgL3MwaiumTKTcfjzwVVum4+Ovsr48VoykKSVGC8vriGs6hIsY/f66YLapZwdG3F6OGyd1fzNcnUDANQj08b0lQ44qNiy+Wyriml2rRYejcoCgYd5eAlQlHgcR0JNRA94f8tMzXtlkJYmeGClRjoMryBYgRo5swO6sKCG80DuY/f/5rDgoCNbZZwey3dw96/dAtTKRBvt6dGnOX5NgaYjG16CL9wOTthZFMQ4raLFcayfxiAD5ikAQCJohVW5e5rLzVeyBXY5XCJxdlPSKWfmSnXqZHNUdZ/c+fix/TBY4fma5a1jcX0f5GwoiW9tNiEXSWMGppbUttv99rtjY9Jg/sUO0vyQKJ+bFhoLKBg+IPUASXPENVhxCggTeSgcd8wslK+IZhT/liSKNDpQoY5DLQtYGUIfs1KI878SBY/Rx3Zj9/zoECM6a+zOB32L2v0yEFfUqRI/PXfrXuZwH/Stl6CRIVLrIMSDFHFt2VOc79qWeVgGRejwAU8X8OGX2GA+5tPbQaZRYt4g5U5bHbs3+KGbH8F6qcxSQxmuSfgQQYYQ4KIgpL8yYfyAZGBKEn1HRzvn7+NC1ortF7Q0HvEkIHV4m/Z+noRHUFcYcYEAFIw83oSba/EEB9uPMG5mfLoMqA7rmeA8PA5YxdsbqqLgvKXjSEDp4DXABR+DlbfRGFwJXaeLtN1sfnZr2YMoSBl6yF7sas7enShQD0AA8vRSxWpkpBaKUEzyrpZD2Y8ikBKf6cnWHpOAQYE7pYbSEzAE91NYIKR1NLrub5r3yvDiQIJEXCkCF8nq5+rjDO5udPO947a/oQXXn/bFc6zdRCD1Dh8y9+zjvq4qVm0KX4SxMP3yxHimozK/lWJh7ta+ongRitEYACS4gAe3yIAORRts/rHkIbcNMfjGoMmDNHBaXh4mOTz8ESoHfmQSeCtJDL9qkxAWytZ6mZGulnupW7zHByzPN0jLEAsZ5lkGDuKowQWlR4H1H7XYrEzySK4++9aCIcIZC2EBgRAfRi71wPm587gS8Uwwfywd71faIfuFTx1xjFRs+d+U8Q82o1Dp6fwWzBWFCBYjjcY4KrQYETSeoutOaT57EaoTuDmKM/pryWe80O9ylYoGD4Yf+qSI/rvyUg6uRKD3laI9C+AQjW+RkFu+lZxbJquEEpV986CZcXdUFa1l95HzsGXRKAeZ6CBQBEpxOPn0Qs95bNCu5F/SKgfQoXP5GUZ8BiNVaX8sQmG5j/HC42sNkRWoPJ9ld6tRsW9KEvqcSp5wDRI3AWAqm7gfn/ZNmOOgEB7IfWRIRbqzxTtTRana2bUwkGa5V8jkwOAYV/dXlSnLcwmS9swFM9jeHHeDx+Aqcs53O+ehY8q2RYs4kcO/CGthQZEBepBJBywTjFiE09iKsjk5SlDQ8wX7GsSWj+FxBA0h21svUoB9biTKwkqyx8wxWpiMGBsWsTf6Y6Xi0A1UJQYUjDKHh4xJPxkJOgnoOFk1jzungSOGCWxtDYYcXADprx0fB9vC5MhPZdeV8sNs4fEaAeyFykYp7k6c7VocdN5y6yTqmaJ3EJQoHTj46Oh631iXJ0PH+GdAmeI/dpo/FkMtYDYzAi38z/3DHw1QDd1EAPxQ5QcNeLiqeY2k7PJZVY3yMah+oFIQIPegCKTBJRgdEUtUXWclPXZY5ZWYiSoH1uLf+gIhoV9IHGdkdjHut4YNNV/KyjfjMXoudm7XAo2PMA3AIPYvz82DU7wMwV/Dr5EtX3JdXN0Voa/av+HT/Bs+UJ0oP/QU38t+4CsmdLnz6WMce+ksJLSPb4jVxJEzsFXq2fXEzgy6ZULTWdT7sBZMv0uTU8zBd2RnXPGoahQW0vVkFkmD721XI6CAhIsWhe9dG6hkYPbVVUVM50m8sKhUGCwUz07mMGJVIWaB2tG8n3ECKia3X2vIJXNT/CoLPQsKtcozkxJwd0ntmKjw6RfujP3br6bTJUpzsN/piTVecdN4Umfuh4VYZRJc7ocCxKr5KigaWRcg1OSEjxY1mjiIg2Dk3vX/AHfpH8yiyz9j21f6D/bSfRw+btfKf+q9csZ3hp4Bld8IM2pqxcULfpIGwfbhiqCxLCCl7lM1/7Rz+KPHVFan63Q04Zg7ZPQWbVDxYw+FU/95oRgTH9gUQOjRQaWj2elSegucnWl9NZtX89lTS5tlvTYnhrUlKZ6nZNQEcdiqElubP7/H1ChYai9UMp7RWl6MJe9/tALCFQnayrRv11bKSchWqEQQS61NntEgvvLhmaW5tTL3pQlFd2P3LwaF+BEAtJd38rV8UWZt6ruj4h5Eoz5SJegInR6XwGowhyNNIluN5xN5Csz861fuT0BW7qcViT3qaFAGdUHFVhQBhpjyEYbX34sBUshrKy2GITVplYitU6lUu1r0x6VH0H6/pBW0t+cvCj+EJF8cYDtCbQBMzQ+6wTWYt+tzUti8oiEhv8QcPp5zKIxoZaGA98F5VH4MCmJxIrP498vLC8Zbqz2Qk4PEvGKDi6VGArYb2MBactR0yi2VpW3mPAqJLGotiX3YE80HeNBwhQdoJoNTU5qkONqUb6IX8cg6l9iwVIF/CPg6DVydNv5m/YDdgwnCPV5aWqa4PJhBr8QIIfMi6UsOiGocWEbEFVXFmdHRMheZFYXcciO2cn695Wx617e1Gdr+L/8TwOaFRDa1F0+fFMviq7mW3XoRhlPHbeiVz9c9yMGjQpVKndWv5rVl7UhYy2wtw06DE3a/rfisxRkjC4u5UiCMnPSg+Y6V8oFmd2xIGddgc59SdFBnIaoxNQdmxzW5wUelYJ3iByhOMMyYGrNI8642nwYz4Grj+DmolDKQx1ADCwTm/YtYdLGE5Vol9qZojw8i5x8rekZyCFYHKUafqT61kDCvvE2u5gbMDJEyOwSQ0//JMGB1RF37f8j8mclC7Tzv/x4jNsTfjSBcQR7AjwuizXp2c/CjHWGBu2h3VGVGQKQ7MTa9+qDZZmU3dZXkenLahucnR/VqkNxTCKvawFCvC66jJWRxT5n3xT60PBHUhbOwsnCqZeCv38o+5uj32FPxofrc/FDCFJ26AeXten0yQ1QGPmoo7rI2std9u6OfZEHaSQSHlUXGukqidRfsBzb8RQauefmeOIajh4x1afZZW7pUQZpJHVfEXWuzII2Fg1H0erVddbX0AAwnMQhlJSphf6Rmk/ZXRoehBkPDtUB/2uCt8YRrdCRdecabW1+fHX8a8ja0lZYnhVmpJCiC5b4L41Lr5kNkQnd8KGLYY0s1ZsWqOKPLgqPFpUox+xm3/wIyIp/iRB/jBbqC+Q+7Ukjc1I/YO8/tOZfXHcGuI3sKoZdhKp8jtPXG0tBsXo4HcqXTy6bFK3B7tH9pjCn4mZc0805wqTYPTfQXbWz66k7YHAQ8ucpJMzledID7GAOaCTstLBdl1lecim2UHfLAlv08MEgDEHZOed575rixw4SaBKDUDP3Ao/F1XoapbT3R89AuThgWISaUVUArqSWUYvLbaS1x1jP2ybPKrhkzc5tlrMAwnUWxXbxhylItMD/kzHwWQtsppAEDbdy5zvN57TrXdVk3HdF6zW51t6sGQeaTdGcykdABV3Ho9OhdbJGPIwVGkQ6ty3RlhoG8j8mILCtIk5OMOO7uBw+LtGwNnc3sZZ0cYRc4YDbw5xoE6/7+zSfq8bYT7GrDOXS2DzBa2508wJ2fNWnkLp0VNqS3rnWKj4lWrMau91WcaGrWIPZskUGrJ6d0Ma96BW7SHTzlAHBz+eiTJs4IYcdsMZ7KEZQ0Pdf3utFdp0un4zmgyjjqksFiu+7rke+uWEFRtMrMK/SqCBngR/4SoXCYzOVR69SXzzqQKr+wY4IUrY5RLQ4ju6eU26A2GgaWXV4e/M+8VVQYNa7tTzH+oyxEXIVQ9tttLAZmPGfqZIi9YQRQo6fghTZMa0hGCltm9f25ns6gL2moKulqhHWK7ayaQQ5mi9TE0T3BJPQvY7qo1WiKyrBto//Uibo1RZrHgBo1grnCr6pwf92E/2lc9FM5QKu2/DaDy3g5bG3ci7E5C2YBUmWFjj75ob69rOsnTAH2VLu5oCljiFVvRnZa90wsQbBLrUPDvT3WD9zAZecGDB6eDdA9GQeQNLM5KDcSdy80JtdvGAU8bCvut4Z7v48zNHK867U97Csx+oiN+C7zRn2O1Qbn1tZ5qpBpyU/Ep3loS0K19VUwCVm5rrHvSMWZT1doK0mRtkqCO1eZBVYjOONJyJzfSVLGqLCq3wZ9Z7bk+qkwiKIEKNkAinekYY2YJN8RzV7r51MFDZNLWpkDIUnHBqjjagjvNDSoajYtVdFnsTg1Z2iQup6oqhqvChXLID76AZ+vLCHoWDWNkpY3DA/3lG0my2lDejBseWt973Jqlj5c4YvDJneDQYRw8DdkEHGQeYbA3+XXqUS2Oj3PwEAl9sA2HDUu/QBmPIHNpaMRqS3QdlclpuJE0HV3RJy4qy6PSniqfQcdPrumnrzz99WCh0Q4D6nNEXCiE39Tq221rSdZM2rkNDTg2nZ5tOdNmlPPLjNwygE+bumO34ur702BJmMeWQ0vUn+WXtEVTOt6Btq3wtzkNsHCHyvIBknFO9AoHID1CuB316i5RM/Py08HJovpp2bNaXGmlpkmHoitWm/jpvd9K9ugPzxOhjCsjQKnfVtN0Uf2OOIsRiLA1RMTJw8FOb7CLgJlvn6iK7ZAdFessd+0Z9XBRTrMZBa2w35wTWbaY9zfeycvnnORXBH38YG9f+PMWHS03DgdkKXqmi8s+jm4WCmP7N170WKhvyY5td8fTK3LKKdtsxr2/Aj6BylRPm4NC0LU39IRGwoA6LWypL3mK/PUcz1PCWGLpAwVzapVETmYhDpvYaB0D9hwpMsA1CAlFuIIl2KBnkOyAC81RBVKhtn3SsGQV229Hmv9gkEqcUnIBbXA80+Q6wraAWOz/UK7/w1k30OP6nDjnU+YYBTdfZlCGicadphUdHUVMbifM3t17alLZcXosNeY5NZNB1cCDAWGx96eWWv1DaRE2LxfxpOPj+ebholk+mrTqdTmeL2ZjeGCKLkVO+oRuI3nMufmyDD8kJwHZOw2nW6Tx3bJpUj3LRVwgR/mJXD2KUEDnKiiyssIwdHCxZaTo48Jkbl6zsOTYubDRoYQZF4QY5uek0mnYgGoN34XmSCET1jOLHgVGhm3FnjrGx8U/EE/A73ptn4UPPHJjS6GfXUkVHfwGxemiyxpQMfLQDNLSv1AeHbxXGUsnp0QczdAWnpoUmc7LpZUEdtngK6lBJGD4OUHeOfc+PBerqN5iqQVAbRp2GRsiAHoZTa27kZyEOC9nxKm1mWiltupiYmhnK2whsPjOboTPrRJSQskxqcbRJkIoISJMo1qfU/3avnLGie3NGGZ4HNmcG6jYMQzfJK7K56D7CpYSJJpeD85Vveg5smgums0xjc2CYSnSyW6kIfxM0OF0fmSkBN/0+MneOh6qmXbsCa37WNBgXz3JxgcTP10lsgCuUwRxaeG4xRYiTcPB9Z0bknXcXPnmmRQQ3GsrjaTrFNEjYua62EO+6K46egJrxsEdRkC5gvkf4nFGpQWvKGU5hvj2ZJA27uoJCI2oUrBY3ewuVGExiczYs0PTXz+n0p9IdpgN0ATUFRX5rhBvnrgZIXgDN0hlKLUJGOVWbx8FwcF1+2Wkpp/7KQXavltSCA+b69GQRuWk2wcBPRdJoQ8pZG++hhl7mO/VOYgkGSPE3qCaUQQh3GxmR7C8M8ZtNbUQsdIECPaHLX8Tm19CQGMT1DPexU34/wQYrCpWLry2UpdiMIyXsrzbO14Z6xDho1lK6CgQjIaGihvtcQdIehVr6p+I/0ge7QlK1sMjYUQGD0XBknydGrhMpoP1+3K/HRcWNDNKGjZ5FWRCOX9H+WDFpj4jsJbPawkRdyzZ7T6z7yht45WdyWkEvNqtnDxkKMwvjzXEofjyPlb3uzoldwc0FgjSSc9dYUxxJrmALYu8aBUxTN7VItp9VKq7lFdjUpTDiSKzQ/Rcbz7nsJdhgealsOgWb68h3RxuDKxFuoxBzxgJ9L2v2tzVc9frfBuXJRnVjJzTAgXxsU3JbBgXvM8+yxDmZt+2f/AlIeOFzln6KGr7vKtQeavRw36Srn38dIQ48lzT96z+uttB0y7Fw4wPNlKlnaZqSkhXBdriej8i0ptvEalA9FdYTjYQyvKNalnkcNHscGDQz5Qqla2joxcOeO38CHbfD0qEfQdzzpQ/PDEficamsNFHaPS8sN4Obtr9qLZYdU4PrbGOSxu0hYQ4VdXJXJmEtJYiCHSXnDYt6qDdHq2dpPRTAHOQzZwpPuiZ2dOYaMdvsD7KJ/LFyGRbKmE+n679ezVtdwLop/NTP/MEjlDVtzBnT5oYImoTht2GRrpiiHjsR22CGk5LzTA87HCSeNdw7S5u5kNQPaaapzhhUG9XMC3oHQ3MCU2SCNWpWq3THNp45kQG3+HXSEGsd+q8GgZ15tKUmexhvqh1x3OyPClrrETpMfpPCQjfer3AjxuVSW4KMaUKOh8+zerKl7qBE9pOFsZPYD4GL3Tj0gUJdsc1cjs1V7iKlGK+QQLfyYjRH0YDeecp3lPuXSdAjEcCphpqRRB0wrKfXcjyPm0rtc5lm5Du9wLIURzpHp1U0aAPflZl5T8rjczrc0Q+Wj5utQvTjfbq+L+dLOdihzYkvlWacOAeAZ3PcPUQTdoxH+BFJbljb/tKMjaz30HS9V6H5PCWjDTbNx+ZcuwSrvhMeSneXfrhNymJHpZe3Gu2PyJ8bY9evz8bCpUoWRyMu8uDs8IJBcRnQWwUDX/96PX4jH2aVmOkDAbEm7rXwYf16nnLQuB6hTUiCxNrEQ+fkcWwdzuHX7lXDjTM7GukWVMQ4Dxxl7ppegSKFEgsFgEJ34raZRJbyDv0AeKxKeSL4CWpkLALtpmsoh21JMJbZm/H1KlFkaUkUhOCFmpU0qkeYD76PrJVhbgFgm2NyKp1q53jjeneAs7H8EFcMI8hOQmGXJWc2mnElymjCdUAiJ9MP3Bin7pV1hq0FrzkjuKOORPHOpNtOQ0xPZj7unBYoEw8OZnrIKf7RKHmYto3d5WYMoW6LISugPOR4PcmYnV9/4BFw11xH0WzoKG4FGza4mmi1UJHTE8ZP6DGCJxgY9Nj8lZO7FIEe2jhbkialxOtDaFziDoNjN8OhhDxnC22wxMrmRcZ+rkRch8cG5pxuD6lNRlO86ET4cTZ+OPORhFSTaVKPoWV9OBHg3jSMybu8sEh80ip6ggG6IvQXbC1gJ7IM6JjTKfh7UC7H178k32wWve4Ef0g0nWEo9szKzKwu2VUmhjDlzK1mUiDTpE/l2Z4ZcpmgO3Kvghwq+nNUhA9JbIirhC6db1tkkbLl8u2aaAOQCvW5X+eqvWUZbRQfgQb8HIGo6DmRoHwwY05uPaW1pI6fAOlGFQ7oXfDMf4CE3Bodx8lDU2GKR3es0bUovVRztSoau146LJJrPaehsFnkRzM3MBtSa/huGLL4xv06lW2Mo65ylQyCnzOAALd2vwB8VfRoxD8R2Csa3VNtChhg0xEBxQoYuy0o/bi9/2EgSZSBKXlZxsiw6HbOsWR4mCK/sFjT8VXlOxurL9+6VDKvy60J4eYcLLJLuD8nKxTo+UXItirGUgmQEOJpGwak/FdpHd7zPnHzduZcAMIgzsgnES2N1Xdj2tqlL2NJH5f71tUpUnps8lRKN9joYC5soZOpYZ3JwaoEXmW/4PF3gQzj30h68R+c9wyBTFrZnn1zjkUMaUEb/Nxio2nofAfO3NgMKcrAANs9Xcqx5U36fjmiE6MPpTuxpA874CYh96Exvefji7Vn4G1Ffi4dnOHQDXE9aawYvBxuYkr11f2lnlolKdLcGdCkKDPgDHS+GVfYaDI+BehNY3Px1leb8TeJ+rGtmew3e2jqsez1yFHNfC0Ts8A73m/JTTLXIRb5aJLeDE08QUOtWZ2tBMiu4kbEqz3cN+fKRn4BN29Ap5aMI9V4Jtg5s5dcJgEx7KlrL1fYBdFuHD2XhMTOk+z5OsPQFY7YuKrFOU9zG2s4DHysw5tB5i/llvKGbYePNBdNI3eVBSyzzW+PRKVMcM63zoB+Ffy7owseG/nYFicN9nJF0BZHI0n/yyQQTNyo/w+jy+sAiKqlmSuz6vGR91uaMIe+Qpb/me906a+vut/e1PYuKfkQfHsweEgMMmdAH6st7XRGrqjljyJ+v8UJeLpFJBpb/ArV6gIpsA5tZvPABTuCOPq+RE0YcNRlpfr9jmFAln21o9K+H5TfmHYm4YKKbt7JPFhJT4f8Y1mNAT1uJa/wM2tBnSfn7c4KUWXGyRJ1F/CqwWTWBdmbaOppUc9sjnyIxof/gvD3ZYpaXKeB4UwsTQZaRpS07cSdTcA390a0WzuZXIJjPb9EYMCIehQPHAJF0RjQAtzvnjoaHplZE8gyGvwdK/ssmlpcBMdUtRAq+DQYNOP7owcUYmuYUGIJYeBgslYOv9ZoLlhnBpKOTS6aMNiqr8scDV+/6xDYJz4CjZKGzFAw6Z8b+ZgY3ZXJzdE/UVUQfPiwtUsLPqOo2QwaNQhYfYxJn5N66dCPwoUYWap4Y+6tLdO4ggG70rAN1w/vTxwCfR2UiQghQPg7dk273AMv9LFtzahJX/baATF2588poJDog4E731ASx2/S9VmhMPRLKY2mnKHOOyAfhCHE3nnbhFncDEQcXEpBlOIU03r9QyIEnJyzCJ1q3KgwaEBfE5FM/tpGwXEwV8e55S1ulUG9hMOMiL72e9VLUYJ6dev3jY9smMDUaY3Rhzq0JRZoDz8oWnQ0b98WwKWvWmbnFBQWcJwdCdWFf0KAUdWh4mEg+ldPLrku0GkyimDGB4ZPo47oJ6l89a4bU2uMEPpyzl7g6hj8Slfph/6gxiBBe7StRNIWHUSwDydXurU77rwCTQVDvmXBL100s0N8cgAyj32CpRwAjqdzy+3o8tLPTv0SPNLkHntcloGqdRegf8XzIUBjc64t3qpCYLcsByvtan8gDMP2WlMnP08ZTqQjiTxd3yquYZEWEBMYAWQZQhWUJem5sPZTz8RN/InTIugNcryUWQtHtwbPKEm2Lvp0bI0Xzws7X+rzj3qDsNekzpmBdntWVScZ+ZXM4cN2PqfDNHN/JpWGJU83lQ3BA8vL17yh4kyHePSJ9ko3YHFqRdyBgDkAoB9DNj/unBFqbgz9STZB86OgRNC3c6Y14Kq/I7+KzyLHjfAPQssixuGDVV1v8NF88UrTgCeqy9tAGqF2ywtSR0SZU0hH72SqHk0FZyHDWUBgMzf4M2ujkFGrW9xJEyqhmGAN0FDiB/bPLrW1fqO6+mWg6AzilioZNpEfxG4/TT/uxb9vDrWVSBnnMS+MMCcrri6kMc19ma9GAFlmtwAw5GSOgvqUnMbvTOX2gH4cwf/SKi0rrpI7X3CrGsgHjvmYKxhhqia2xMoONQwHTca/2a4ZkDtUrmNRTa2Di2zHhaVuAmqAE1ck9aQRGJI6bXOnEcwEdoJEtGAly516GbbrcXgKbBwfXvIXRRBXKdITgAow7QvvlCv/4LHwnjlVFM1JGJ/bdeQfe4ngkm+eiS2jHrqkROTi9yErJW21aawlOtzptZm7LYerFLUVnHRiToLRUOaEoXMyXSA0rDfbxDx/J3gziU/T5Bm/K3bb0lb+dd1WPsTNIP16Q6mv0Mo2Q5ctacR9VyQUudpHXUyocGC9aaFn282uCXssFfy0pXxX0JF6LYwITAy5W7CMl4up2/kBrImTP15nvYqGnPhErUmG6ndJH8k6eM3VsrYf+j17G+/+ttaQBwM7e37ts5LWaqv6fZeXtmo2sC62RSZnrXUMBxbaxLSn8s/cb11taVNm9BdN0qneh7VF3KQxQUFCCgNlDGJc3b5OHM7i5Y0bPG+WM5FEkeZlynbgaznbKywGyhf3nU8Wx2HfCds49g6/nQp6iPxmx2eYd9gGyxXdqlQ2+jF7mMopOfvj872Aompnvdlfcp15gyied3spY5In6dWC9ZOmxMJ58uTXdkkJvgbulCx6GfoCE3PQar8HB7MEGSELeOECyd7oB57RTt5tKscyM0GKLxmj769bqe+hu/WJEWG9uNUcd8G/F/gYj6dwLPddpukuuVxW2s1XL5gZyA929VMPW1iDeolvHNpq7t7DonFXExnbOr7kkJITJtxoO2Qr6uaGUTrMtepgM31RlI31MB3bg4ZVfsvdxew3fwUuCp1ud9gKihXpUNGoYeV22YRFki8+YRWH/bo8OXRGXOzbJrwUCn1hVdxzvOK492Hd7Dj4scpwCUcur8WFY/88TmyCHdugJKyc53bfzCs1nrMJ8U4HpjSawl0APd8Z+IiaFFwt/nZeL0IuqUct6Ag3miKYoAWqzc53S3cOBrbASEGg2MdyLTZaNyvGTb1VrdPiZsFyaCspEXO7ah3sCFOkOuwD1obfbbbzPom5ONY/gcQ/97qltt3XXpKr3RlB4JuWfPfGvZFRzyWhV0FZN/b7rXo+CjoQeUgyeohrPdDKFyBkUfcVxdHDxhSScoiloGBcFFuc+dHxKBzZjuWEG6K3qQ8xkEfLXOKUztx2z4Cqq36Q1MGUxrdkzYlpWPLN91hg1e4WSIPHePyDtouoM5VZ0m93/rmoRBjXPBGpijYcOE6Oo/BhzyDCjqE0AE57u7VNIV1k7LXlGjggdMuAaF09DsMIBgj7yH2uGYnUDHHGHaY02pxD3GJst3jBwZRILvBqJwPjvEEdKlFEvR8y0emKqAatsEpsZaktPffbfvK6XmzirjoF694uymQg9K/g/3y5fjm/4SYYD0UkDmKSA4o4FR6mH1YaYVM64r2Ic73aiCuueme2LF5sLii32oGhX0yZDR53VptC4tN+0e+gN3iMC0W15On3H9eNqygybHJd+ERqgLOhcFUXdg8TycahUgBcU3/RjvozVrunabKtEn7lTiNEqpE24DzGiUGvw59pTzPAz7QftzNq6gAlxuNmu2hYf9tvukMC94q+XwIfR639prGrdms2pms1t1ssn2HyLRNKqHzoE4ehilk5tpPZAG5zf3tTaB0InZMXPxET5U4jUh5+7YckwFanfyFXTeJWma9PT9mutwHvwBumUa/OkbkSnnbrabNqublNt25wYHKdKICQtnkKoXexfe1dQjXhoeIRTjGEiGMZtAaIwxlmU/sJgR8q1ceZgRcdxPZIcgy87KS4N060jcTqBGwWeA1qM33QhBbjFs4NUzcLBx9bT1Efy6u/YUV3xmu4pcCBm4t+6GjH42E3+P3RQ5IPPx8POxoasNqkStjgDN7+I/BHpoZiswCJhfv8vgXTB7ExsU/i9h+3pNdUX1NLrbSjb62zXQ78oB7mASYAIb/eCkySmOmQu0Mm9UaW3hvblxHRGo1U9Yq2UbDK+YbaQ7BHRiqckyf4xq57xdWnmRoyZay20YGj9siy0INeXWrgtMDDBviedx3ievmUXzvFcyIViIRfIVYTAuLGP4XuxJ8wIpqIwKjr1OMNNNgWrsslI3Nj6tVFcmA06rWypaHBPPCtOGasPZZyRq1MfW3+hK0igV6bkv5xgX1MNgQl7THyKZGsId9ejFk51uOpoR6sIONeLJNR12Ni0Gv0Kl41HtrJNutxan4ccINgP3R5yLjXr7VD1BajsW91eUQx+h56jxuZa1bqyHgxvYGcAdWW05+Y2LueNcRqrYcWqkHHQhoh02cvK23sLYc3Tp4fyxzjsF5yWFsN/XrTeF1WYLa1WaN4xO01caYTwt4fv+/u/n5GA9oBUmKACHTBnB7gQxxAU6xukqFcaVcx4adH+j8XKjPLhY9H/7TfPPatWbVC7Tf999HDLwQPa+pbpx7VLZGDFg1FscUD4rg5leG4p/k1K9IHaAhrSvBIPbwO6oT6+ai8K1llTk4Z1Tan8VZ7zzP+1Y8eafYhheGe7X7P0DSc0ndfosHv+YMWsXW7XdVwWBuHdNhZaTHsESxdgq+0oWLQuGSQhYDvtKCH9GlXyz5S1KAXPz7bfwz5fauyHbT/ahL6j+87aIkl17UEHCbPlkuakVvXovutMNhqqtt6TdaOJWhHxraDphrHlQ98L/rtuTrgbu+7FerQ+PH/AbK2wiDiMjo1AAAAAElFTkSuQmCC">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="icon-180.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<title>球場実況</title>
+<style>
+/* ==== デザイントークン（屋外の直射日光下でも読める高コントラスト・ライト基調） ==== */
+:root {
+  --bg: #f4f5f2;
+  --surface: #ffffff;
+  --ink: #1c2a24;
+  --sub: #4c5c54;
+  --line: #dde3dd;
+  --green: #2e7d4f;       /* 主色: グラウンドの芝 */
+  --green-deep: #1f5c39;
+  --green-pale: #e8f2ec;
+  --amber: #b45309;       /* アクセント: 得点・強調(文字用) */
+  --amber-pale: #fdf3e3;
+  --red: #b3362a;         /* アウト・取り消し */
+  --dirt: #c9a06b;
+  --s1: 4px; --s2: 8px; --s3: 16px; --s4: 24px; --s5: 32px;
+  --r-card: 12px; --r-btn: 8px;
+}
+* { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+html { font-size: 16px; }
+body {
+  font-family: "Noto Sans JP", "Hiragino Kaku Gothic ProN", "Yu Gothic Medium", Meiryo, sans-serif;
+  background: var(--bg); color: var(--ink);
+  line-height: 1.7;
+  padding-bottom: calc(64px + env(safe-area-inset-bottom));
+  max-width: 560px; margin: 0 auto;
+}
+button { font-family: inherit; font-size: 1rem; color: var(--ink); background: var(--surface); border: 1px solid var(--line); border-bottom-width: 2px; border-radius: var(--r-btn); cursor: pointer; box-shadow: 0 1px 2px rgba(28,42,36,.05); transition: transform .12s cubic-bezier(.2,.7,.3,1), box-shadow .12s cubic-bezier(.2,.7,.3,1); }
+button:active { transform: translateY(1px); box-shadow: none; }
+input, select, textarea { font-family: inherit; font-size: 1rem; color: var(--ink); background: var(--surface); border: 1px solid var(--line); border-radius: var(--r-btn); padding: 10px 12px; }
+h2 { font-size: 1.05rem; letter-spacing: .03em; line-height: 1.4; }
+
+/* ==== ヘッダー: 球場の電光掲示板（この画面の見せ場） ==== */
+.board { background: radial-gradient(150% 120% at 50% -40%, #1d4a30 0%, #143823 55%, #0e2b1a 100%); color: #fff; padding: var(--s2) var(--s3) var(--s3); }
+.board table { width: 100%; border-collapse: collapse; font-variant-numeric: tabular-nums; }
+.board th, .board td { text-align: center; padding: 3px 4px; font-size: .8rem; font-weight: 400; color: #9dbfae; }
+.board td.name { text-align: left; font-size: .85rem; font-weight: 700; color: #fff; letter-spacing: .03em; max-width: 6.5em; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.board td.num { color: #ffd75e; font-weight: 700; text-shadow: 0 0 8px rgba(255,215,94,.4); }
+.board td.total { font-size: 1.35rem; font-weight: 800; color: #ffd75e; letter-spacing: .04em; text-shadow: 0 0 10px rgba(255,215,94,.45); }
+.board td.now { background: rgba(255,215,94,.14); border-radius: 4px; }
+.statusbar { display: flex; align-items: center; gap: var(--s3); margin-top: var(--s2); }
+.statusbar .inning { font-size: 1.15rem; font-weight: 800; letter-spacing: .04em; }
+.dots { display: flex; gap: 5px; align-items: center; }
+.dots .lbl { font-size: .75rem; color: #9dbfae; margin-right: 2px; }
+.dot { width: 12px; height: 12px; border-radius: 50%; border: 1.5px solid #7c9887; transition: background .15s cubic-bezier(.2,.7,.3,1); }
+/* 実際の球場ランプと同じ配色: ボール=緑・ストライク=黄・アウト=赤 */
+#bsDots .dot.on.b { background: #7fd48a; border-color: #7fd48a; box-shadow: 0 0 7px rgba(127,212,138,.55); }
+#bsDots .dot.on.s { background: #ffd75e; border-color: #ffd75e; box-shadow: 0 0 7px rgba(255,215,94,.55); }
+#outDots .dot.on { background: #ff8a75; border-color: #ff8a75; box-shadow: 0 0 7px rgba(255,138,117,.55); }
+.minifield { margin-left: auto; }
+.base { fill: none; stroke: #7c9887; stroke-width: 2; }
+.base.on { fill: #ffd75e; stroke: #ffd75e; }
+
+/* ==== タブ ==== */
+.tabs { position: fixed; bottom: 0; left: 0; right: 0; max-width: 560px; margin: 0 auto; display: flex; background: var(--surface); border-top: 1px solid var(--line); padding-bottom: env(safe-area-inset-bottom); z-index: 30; }
+.tabs button { flex: 1; border: none; border-radius: 0; padding: 10px 0 8px; font-size: .8rem; color: var(--sub); background: none; }
+.tabs button .ico { display: block; width: 22px; height: 22px; margin: 0 auto 2px; }
+.tabs button.act { color: var(--green-deep); font-weight: 700; box-shadow: inset 0 3px 0 var(--green); }
+
+/* ==== 入力画面 ==== */
+.view { display: none; padding: var(--s3); }
+.view.act { display: block; }
+.batcard { background: var(--surface); border-radius: var(--r-card); padding: var(--s3); display: flex; align-items: center; gap: var(--s3); box-shadow: 0 1px 2px rgba(28,42,36,.06), 0 4px 12px rgba(28,42,36,.06); }
+.numbadge { flex: none; width: 52px; height: 52px; border-radius: 50%; background: var(--green-deep); color: #fff; font-size: 1.35rem; font-weight: 800; display: flex; align-items: center; justify-content: center; font-variant-numeric: tabular-nums; }
+.batcard .order { font-size: .8rem; color: var(--sub); }
+.batcard .bname { font-size: 1.35rem; font-weight: 700; line-height: 1.3; letter-spacing: .02em; }
+.batcard .bnum { font-size: .85rem; color: var(--sub); }
+.cntbtns { display: flex; gap: var(--s2); margin-top: var(--s2); }
+.cntbtns button { flex: 1; font-size: .95rem; min-height: 44px; font-weight: 700; }
+.grp { margin-top: var(--s4); }
+.grp h2 { color: var(--sub); font-weight: 700; margin-bottom: var(--s2); display: flex; align-items: center; gap: var(--s2); }
+.grp h2::before { content: ''; width: 4px; height: 15px; border-radius: 2px; background: var(--green); }
+.grp.outgrp h2::before { background: var(--red); }
+.btngrid { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--s2); }
+.btngrid button { min-height: 52px; padding: 8px 4px; font-weight: 700; font-size: .95rem; line-height: 1.35; }
+.btngrid button.out-kind { color: var(--red); }
+.btngrid button.wide { grid-column: span 3; }
+.rowbtns { display: flex; gap: var(--s2); flex-wrap: wrap; }
+.rowbtns button { flex: 1; min-height: 48px; font-weight: 700; }
+.undo { border-color: var(--red); color: var(--red); }
+.modehint { font-size: .8rem; color: var(--sub); margin-top: var(--s2); }
+.banner { background: var(--amber-pale); color: var(--amber); border-radius: var(--r-card); padding: var(--s2) var(--s3); margin-top: var(--s3); font-weight: 700; }
+
+/* ==== 観戦画面(LINE風ログ) ==== */
+.gamecard { background: var(--surface); border-radius: var(--r-card); padding: var(--s3); margin-bottom: var(--s3); box-shadow: 0 1px 2px rgba(28,42,36,.05), 0 4px 12px rgba(28,42,36,.05); }
+.gamecard .gname { font-weight: 700; font-size: 1.05rem; letter-spacing: .02em; line-height: 1.5; }
+.gamecard .gsub { font-size: .85rem; color: var(--sub); margin-top: 2px; }
+.watchtop { display: flex; gap: var(--s2); margin-bottom: var(--s3); }
+.watchtop .modepill { flex: 1; margin-bottom: 0; }
+.statsbtn { min-width: 76px; border-radius: 999px; font-weight: 700; color: var(--green-deep); }
+.fieldlink { font-size: .8rem; color: var(--green-deep); font-weight: 700; margin-top: var(--s1); }
+.fieldlink::after { content: ' ▸'; }
+.statstbl { width: 100%; border-collapse: collapse; font-variant-numeric: tabular-nums; }
+.statstbl th { font-size: .8rem; font-weight: 400; color: var(--sub); text-align: right; padding: 6px 6px; }
+.statstbl td { text-align: right; padding: 8px 6px; border-top: 1px solid var(--line); }
+.statstbl .nm { text-align: left; font-weight: 700; }
+.statstbl .hot { color: var(--amber); font-weight: 700; }
+.modepill { display: flex; background: var(--surface); border: 1px solid var(--line); border-radius: 999px; overflow: hidden; margin-bottom: var(--s3); }
+.modepill button { flex: 1; border: none; border-radius: 0; padding: 10px 0; font-size: .9rem; color: var(--sub); background: none; }
+.modepill button.act { background: var(--green); color: #fff; font-weight: 700; }
+.chip { text-align: center; margin: var(--s3) 0 var(--s2); }
+.chip span { background: #e3e8e3; color: var(--sub); font-size: .8rem; border-radius: 999px; padding: 3px 14px; }
+.bubble { background: var(--surface); border-radius: var(--r-card); padding: 10px 14px; margin-bottom: var(--s2); max-width: 88%; box-shadow: 0 1px 2px rgba(28,42,36,.05); }
+.bubble .sit { font-size: .75rem; color: var(--sub); }
+.bubble .main { font-weight: 700; }
+.bubble .who { font-size: .85rem; color: var(--sub); }
+.bubble.opp { margin-left: auto; background: #eef0ee; }
+.bubble.scored { border-left: 4px solid #d97706; background: linear-gradient(180deg, #fff 0%, #fdf6ea 100%); }
+.bubble.scored .main { color: var(--amber); }
+.scorechip { display: inline-block; background: var(--amber-pale); color: var(--amber); font-weight: 700; font-size: .8rem; border-radius: 999px; padding: 2px 12px; margin-top: var(--s1); }
+.bubble.new { animation: pop .28s cubic-bezier(.2,.7,.3,1); }
+@keyframes pop { from { transform: translateY(10px); opacity: 0; } to { transform: none; opacity: 1; } }
+@media (prefers-reduced-motion: reduce) { .bubble.new { animation: none; } }
+.bubble.meta { max-width: 100%; text-align: center; background: none; box-shadow: none; color: var(--sub); font-size: .85rem; }
+.bubble.tappable { cursor: pointer; }
+.sharebar { position: sticky; bottom: calc(64px + env(safe-area-inset-bottom)); background: var(--bg); padding: var(--s2) 0; }
+.sharebar button { width: 100%; min-height: 48px; font-weight: 700; background: var(--green); color: #fff; border: none; }
+.empty { color: var(--sub); text-align: center; padding: var(--s5) 0; }
+
+/* ==== 設定画面 ==== */
+.card { background: var(--surface); border-radius: var(--r-card); padding: var(--s3); margin-bottom: var(--s3); box-shadow: 0 1px 2px rgba(28,42,36,.05); }
+.card h2 { margin-bottom: var(--s2); }
+.frow { display: flex; align-items: center; gap: var(--s2); margin-bottom: var(--s2); }
+.frow label { font-size: .85rem; color: var(--sub); min-width: 5.5em; }
+.frow input, .frow select { flex: 1; min-width: 0; }
+.plist { list-style: none; }
+.plist li { display: flex; align-items: center; gap: var(--s2); padding: 6px 0; border-bottom: 1px solid var(--line); font-variant-numeric: tabular-nums; }
+.plist li:last-child { border-bottom: none; }
+.plist .pn { min-width: 2.2em; text-align: right; color: var(--sub); }
+.plist .nm { flex: 1; font-weight: 700; }
+.plist .ps { color: var(--sub); font-size: .85rem; }
+.plist button { padding: 6px 10px; font-size: .85rem; min-height: 36px; }
+.addrow { display: flex; gap: var(--s2); margin-top: var(--s2); }
+.addrow input.n { width: 4em; }
+.addrow input.p { width: 5.5em; }
+.addrow input.nm { flex: 1; min-width: 0; }
+.dangerbtn { border-color: var(--red); color: var(--red); width: 100%; min-height: 44px; }
+.primarybtn { background: var(--green); color: #fff; border: none; width: 100%; min-height: 48px; font-weight: 700; font-size: 1rem; }
+
+/* ==== シート(モーダル) ==== */
+.sheetwrap { position: fixed; inset: 0; background: rgba(20,30,25,.45); display: none; z-index: 40; }
+.sheetwrap.act { display: flex; align-items: flex-end; justify-content: center; }
+.sheet { background: var(--surface); border-radius: 16px 16px 0 0; width: 100%; max-width: 560px; max-height: 86vh; overflow-y: auto; padding: var(--s2) var(--s3) calc(var(--s3) + env(safe-area-inset-bottom)); }
+.sheet::before { content: ''; display: block; width: 36px; height: 4px; border-radius: 2px; background: var(--line); margin: 0 auto var(--s3); }
+.sheetwrap.act .sheet { animation: rise .24s cubic-bezier(.2,.7,.3,1); }
+@keyframes rise { from { transform: translateY(24px); opacity: .5; } to { transform: none; opacity: 1; } }
+@media (prefers-reduced-motion: reduce) { .sheetwrap.act .sheet { animation: none; } }
+.sheet h2 { margin-bottom: var(--s3); }
+.sheet .sub { color: var(--sub); font-size: .85rem; }
+.dirgrid { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--s2); margin: var(--s2) 0; }
+.dirgrid button { min-height: 52px; font-weight: 700; }
+.advrow { margin-bottom: var(--s3); }
+.advrow .who { font-weight: 700; margin-bottom: var(--s1); }
+.seg { display: flex; gap: 6px; flex-wrap: wrap; }
+.seg button { flex: 1; min-width: 64px; min-height: 44px; font-size: .9rem; }
+.seg button.sel { background: var(--green); color: #fff; border-color: var(--green); font-weight: 700; }
+.seg button.sel.outsel { background: var(--red); border-color: var(--red); }
+.sheetbtns { display: flex; gap: var(--s2); margin-top: var(--s3); }
+.sheetbtns button { flex: 1; min-height: 50px; font-weight: 700; }
+.sheetbtns .go { background: var(--green); color: #fff; border: none; }
+.fieldbox { margin: var(--s2) 0; text-align: center; }
+.fieldbox svg { width: 100%; max-width: 340px; height: auto; }
+.detailtxt { text-align: center; margin-top: var(--s2); }
+.detailtxt .big { font-size: 1.15rem; font-weight: 700; }
+textarea.share { width: 100%; min-height: 5.5em; margin-bottom: var(--s2); line-height: 1.7; }
+.toast { position: fixed; left: 50%; transform: translateX(-50%); bottom: calc(88px + env(safe-area-inset-bottom)); background: var(--ink); color: #fff; padding: 10px 20px; border-radius: 999px; font-size: .9rem; opacity: 0; transition: opacity .2s cubic-bezier(.2,.7,.3,1); pointer-events: none; z-index: 50; }
+.toast.act { opacity: 1; }
+</style>
+</head>
+<body>
+
+<!-- スコアボード(常時表示) -->
+<header class="board">
+  <table id="lineScore"></table>
+  <div class="statusbar">
+    <span class="inning" id="inningLabel">1回表</span>
+    <span class="dots" id="outDots"></span>
+    <span class="dots" id="bsDots"></span>
+    <svg class="minifield" id="miniField" width="56" height="46" viewBox="0 0 56 46" aria-label="塁上の走者">
+      <rect class="base" id="mb2" x="24" y="4" width="9" height="9" transform="rotate(45 28.5 8.5)"/>
+      <rect class="base" id="mb3" x="8" y="20" width="9" height="9" transform="rotate(45 12.5 24.5)"/>
+      <rect class="base" id="mb1" x="40" y="20" width="9" height="9" transform="rotate(45 44.5 24.5)"/>
+      <path class="base" d="M24 38 h9 v4 l-4.5 4 l-4.5 -4 z"/>
+    </svg>
+  </div>
+</header>
+
+<!-- ① 実況入力 -->
+<section class="view act" id="view-input">
+  <div class="batcard">
+    <div class="numbadge" id="batNumBadge">–</div>
+    <div>
+      <div class="order" id="batOrder">1番・投手</div>
+      <div class="bname" id="batName">—</div>
+      <div class="bnum" id="batNum"></div>
+    </div>
+  </div>
+  <div class="cntbtns">
+    <button id="btnBall">ボール</button>
+    <button id="btnStrike">ストライク</button>
+    <button id="btnFoul">ファウル</button>
+  </div>
+
+  <div id="endBanner" class="banner" style="display:none"></div>
+
+  <div class="grp">
+    <h2>打つ・出塁</h2>
+    <div class="btngrid" id="gridOn"></div>
+  </div>
+  <div class="grp outgrp">
+    <h2>アウト</h2>
+    <div class="btngrid" id="gridOut"></div>
+  </div>
+  <div class="grp">
+    <h2>ランナーのプレー（打順は進みません）</h2>
+    <div class="btngrid" id="gridRun"></div>
+  </div>
+  <div class="grp">
+    <h2>進行・交代</h2>
+    <div class="rowbtns">
+      <button id="btnSub">選手交代</button>
+      <button id="btnForceChange">攻守交代</button>
+      <button id="btnGameEnd">試合終了</button>
+    </div>
+    <div class="rowbtns" style="margin-top:8px">
+      <button id="btnAdjust">得点補正</button>
+      <button class="undo" id="btnUndo">↩ 取り消し</button>
+    </div>
+  </div>
+  <p class="modehint">ボタンの言葉：<button id="btnInputMode" style="padding:4px 12px;min-height:36px">野球用語 ⇔ かんたん</button></p>
+</section>
+
+<!-- ② 観戦・共有 -->
+<section class="view" id="view-watch">
+  <div class="gamecard" id="gameCard" style="display:none">
+    <div class="gname" id="gcName"></div>
+    <div class="gsub" id="gcSub"></div>
+  </div>
+  <div class="watchtop">
+    <div class="modepill">
+      <button id="modeEasy">かんたん表示</button>
+      <button id="modeTerm">野球用語表示</button>
+    </div>
+    <button id="btnStats" class="statsbtn">成績</button>
+  </div>
+  <div id="logList"></div>
+  <div class="sharebar"><button id="btnShare">LINEに送る速報文を作る</button></div>
+</section>
+
+<!-- ③ 選手・設定 -->
+<section class="view" id="view-setting">
+  <div class="card">
+    <h2>試合</h2>
+    <div class="frow"><label>大会名</label><input id="setGameName" placeholder="○○杯△△カップ 8月11日"></div>
+    <div class="frow"><label>回戦</label><input id="setRound" placeholder="５日目 四回戦"></div>
+    <div class="frow"><label>開始時刻</label><input id="setStart" placeholder="11:50"></div>
+    <div class="frow"><label>自チーム</label><input id="setMyName" placeholder="自チーム名"></div>
+    <div class="frow"><label>相手</label><input id="setOppName" placeholder="相手チーム名"></div>
+    <div class="frow"><label>攻撃</label>
+      <select id="setFirst"><option value="1">先攻</option><option value="0">後攻</option></select>
+    </div>
+    <div class="frow"><label>イニング</label>
+      <select id="setInnings"><option value="5">5回制</option><option value="6">6回制</option><option value="7">7回制</option><option value="9">9回制</option></select>
+    </div>
+    <div class="frow"><label>大会ルール</label><input id="setRules" placeholder="80分制・コールドあり など"></div>
+    <div class="frow"><label>表示モード</label>
+      <select id="setDispMode"><option value="easy">かんたん表示</option><option value="term">野球用語表示</option></select>
+    </div>
+  </div>
+  <div class="card">
+    <h2>スタメン（打順）</h2>
+    <ul class="plist" id="lineupList"></ul>
+    <p class="sub" style="font-size:.8rem;color:var(--sub)">▲▼で打順を入れ替え。試合開始後の入れ替えは「選手交代」で。</p>
+  </div>
+  <div class="card">
+    <h2>ベンチ</h2>
+    <ul class="plist" id="benchList"></ul>
+    <div class="addrow">
+      <input class="n" id="addNum" placeholder="背番号" inputmode="numeric">
+      <input class="nm" id="addName" placeholder="選手名">
+      <input class="p" id="addPos" placeholder="守備">
+      <button id="btnAddPlayer">追加</button>
+    </div>
+  </div>
+  <div class="card">
+    <button class="primarybtn" id="btnNewGame">新しい試合を始める（記録をリセット）</button>
+    <p style="margin-top:8px"><button class="dangerbtn" id="btnWipe">選手も含めて全データを消す</button></p>
+  </div>
+</section>
+
+<nav class="tabs">
+  <button data-view="input" class="act"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20l1.2-4.2L16.5 4.5l3 3L8.2 18.8 4 20z"/><path d="M14 7l3 3"/></svg>実況入力</button>
+  <button data-view="watch"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3.5-6 10-6 10 6 10 6-3.5 6-10 6-10-6-10-6z"/><circle cx="12" cy="12" r="3"/></svg>観戦</button>
+  <button data-view="setting"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16M4 12h16M4 17h16"/><circle cx="9" cy="7" r="2.2" fill="var(--surface)"/><circle cx="15" cy="12" r="2.2" fill="var(--surface)"/><circle cx="7" cy="17" r="2.2" fill="var(--surface)"/></svg>選手・設定</button>
+</nav>
+
+<!-- 汎用シート -->
+<div class="sheetwrap" id="sheetWrap"><div class="sheet" id="sheetBody"></div></div>
+<div class="toast" id="toast"></div>
+
+<script>
+/*
+ * 少年野球実況アプリ — ルールエンジン（純ロジック・UIなし）
+ * 走者・アウト・得点・打順を唯一ここで計算する。AIや目分量に任せない（要件整理.md「最大の価値」）。
+ * ブラウザ(script tag)とNode(テスト)の両方で動く。
+ */
+(function (root, factory) {
+  if (typeof module === 'object' && module.exports) module.exports = factory();
+  else root.YakyuEngine = factory();
+}(typeof self !== 'undefined' ? self : this, function () {
+  'use strict';
+
+  // ---- 用語辞書 -------------------------------------------------------
+  const DIR = {
+    p:  { kanji: '投', easy: 'ピッチャー' },
+    c:  { kanji: '捕', easy: 'キャッチャー' },
+    b1: { kanji: '一', easy: 'ファースト' },
+    b2: { kanji: '二', easy: 'セカンド' },
+    b3: { kanji: '三', easy: 'サード' },
+    ss: { kanji: '遊', easy: 'ショート' },
+    lf: { kanji: '左', easy: 'レフト' },
+    cf: { kanji: '中', easy: 'センター' },
+    rf: { kanji: '右', easy: 'ライト' },
+  };
+
+  // 打席結果の定義: batter=既定の行き先, outs=結果自体が作るアウト数(走者アウトは advances 側で表現)
+  const PA_RESULTS = {
+    single:   { term: d => dirK(d) + '安',     easy: d => dirE(d) + 'へのヒット',        batter: 1, traj: 'hit' },
+    double:   { term: d => dirK(d) + '二塁打', easy: d => dirE(d) + 'への二塁打',        batter: 2, traj: 'hit' },
+    triple:   { term: d => dirK(d) + '三塁打', easy: d => dirE(d) + 'への三塁打',        batter: 3, traj: 'hit' },
+    hr:       { term: d => dirK(d) + '本塁打', easy: d => 'ホームラン！',                batter: 4, traj: 'fly' },
+    bb:       { term: () => '四球',            easy: () => 'フォアボールで1塁へ',        batter: 1, traj: null },
+    hbp:      { term: () => '死球',            easy: () => 'デッドボールで1塁へ',        batter: 1, traj: null },
+    k_swing:  { term: () => '空振り三振',      easy: () => '空振りで三振・アウト',        batter: -1, traj: null },
+    k_look:   { term: () => '見逃し三振',      easy: () => '見逃しで三振・アウト',        batter: -1, traj: null },
+    go:       { term: d => dirK(d) + 'ゴロ',   easy: d => dirE(d) + 'へのゴロ・アウト',   batter: -1, traj: 'grounder' },
+    fo:       { term: d => dirK(d) + '飛',     easy: d => dirE(d) + 'フライ・アウト',     batter: -1, traj: 'fly' },
+    liner:    { term: d => dirK(d) + '直',     easy: d => dirE(d) + 'へのライナー・アウト', batter: -1, traj: 'liner' },
+    foul_fly: { term: d => dirK(d) + '邪飛',   easy: d => foulSide(d) + 'ファウルフライ・アウト', batter: -1, traj: 'fly', foul: true },
+    error:    { term: d => dirK(d) + '失',     easy: d => 'エラーで出塁（' + dirE(d) + '）', batter: 1, traj: 'grounder' },
+    fc:       { term: () => '野選',            easy: () => '野手選択で出塁',              batter: 1, traj: 'grounder' },
+    sac_bunt: { term: () => '犠打',            easy: () => '送りバント成功',              batter: -1, traj: null },
+    sac_fly:  { term: d => dirK(d) + '犠飛',   easy: d => '犠牲フライ（' + dirE(d) + '）', batter: -1, traj: 'fly' },
+    dp:       { term: () => '併殺打',          easy: () => 'ダブルプレー',                batter: -1, traj: 'grounder' },
+    dropped3rd:{ term: () => '振り逃げ',       easy: () => '振り逃げで1塁へ',             batter: 1, traj: null },
+    interference:{ term: () => '打撃妨害',     easy: () => '打撃妨害で1塁へ',             batter: 1, traj: null },
+  };
+
+  // 走者プレー（打席は続く＝打順は進まない）
+  const RUN_KINDS = {
+    steal:       { term: '盗塁',       easy: '盗塁成功' },
+    steal_err:   { term: '盗塁悪送球', easy: '盗塁成功・送球ミスでさらに進塁' },
+    caught:      { term: '盗塁死',     easy: '盗塁失敗・アウト' },
+    wp:          { term: '暴投',       easy: 'ピッチャーの投球がそれて進塁' },
+    pb:          { term: '捕逸',       easy: 'キャッチャーが後ろにそらして進塁' },
+    pickoff:     { term: '牽制死',     easy: '牽制でアウト' },
+    pickoff_err: { term: '牽制悪送球', easy: '牽制の送球ミスで進塁' },
+    throw_err:   { term: '送球エラー', easy: '送球ミスで進塁' },
+    advance:     { term: '走者進塁',   easy: 'ランナーが進塁' },
+    score:       { term: '走者生還',   easy: 'ランナーがホームイン' },
+  };
+
+  const SUB_KINDS = {
+    pinch_hit:  { term: '代打', easy: '代打' },
+    pinch_run:  { term: '代走', easy: '代走' },
+    defense:    { term: '守備交代', easy: '守備交代' },
+    reentry:    { term: 'リエントリー', easy: 'リエントリー（再出場）' },
+    pos_change: { term: '守備変更', easy: '守備の入れ替え' },
+  };
+
+  const END_REASONS = {
+    normal:   { term: 'ゲームセット', easy: '試合終了' },
+    time:     { term: '時間切れ試合終了', easy: '時間切れで試合終了' },
+    called:   { term: 'コールドゲーム', easy: '点差コールドで試合終了' },
+    sayonara: { term: 'サヨナラゲーム', easy: 'サヨナラで試合終了' },
+  };
+
+  function dirK(d) { return d && DIR[d] ? DIR[d].kanji : ''; }
+  function dirE(d) { return d && DIR[d] ? DIR[d].easy : '打球'; }
+  function foulSide(d) {
+    if (d === 'b1' || d === 'rf') return '一塁側';
+    if (d === 'b3' || d === 'lf') return '三塁側';
+    if (d === 'c') return 'キャッチャー後方の';
+    return '';
+  }
+
+  const OUTS_JP = ['無死', '一死', '二死'];
+  const OUTS_EASY = ['アウトなし', '1アウト', '2アウト'];
+
+  // ---- 状況文（無死一塁 / アウトなし・1塁に走者） ---------------------
+  function situationText(outs, bases, mode) {
+    const on = [1, 2, 3].filter(b => bases[b]);
+    if (mode === 'term') {
+      let s = OUTS_JP[Math.min(outs, 2)];
+      if (on.length === 0) s += '走者なし';
+      else if (on.length === 3) s += '満塁';
+      else s += on.map(b => ['', '一', '二', '三'][b]).join('') + '塁';
+      return s;
+    }
+    let s = OUTS_EASY[Math.min(outs, 2)];
+    if (on.length === 0) s += '・ランナーなし';
+    else if (on.length === 3) s += '・満塁';
+    else s += '・' + on.map(b => b + '塁').join('') + 'に走者';
+    return s;
+  }
+
+  // ---- 既定の走者進塁案 ------------------------------------------------
+  // dest: 0=そのまま(走者)/該当なし, 1..3=塁, 4=ホームイン, -1=アウト
+  function defaultAdvances(result, bases) {
+    const adv = { batter: PA_RESULTS[result] ? PA_RESULTS[result].batter : -1, r1: 0, r2: 0, r3: 0 };
+    const push = n => { // 全走者 n 個進む（塁が詰まっていなくても押し出す単純案。人が確認して直す前提）
+      if (bases[3]) adv.r3 = Math.min(3 + n, 4);
+      if (bases[2]) adv.r2 = Math.min(2 + n, 4);
+      if (bases[1]) adv.r1 = Math.min(1 + n, 4);
+    };
+    switch (result) {
+      case 'single': case 'error': push(1); break;
+      case 'double': push(2); break;
+      case 'triple': case 'hr': push(4); break;
+      case 'bb': case 'hbp': case 'dropped3rd': case 'interference': {
+        // 押し出しのみ（詰まっている走者だけ進む）
+        if (bases[1]) {
+          adv.r1 = 2;
+          if (bases[2]) {
+            adv.r2 = 3;
+            if (bases[3]) adv.r3 = 4;
+          }
+        }
+        break;
+      }
+      case 'sac_bunt': push(1); break;
+      case 'sac_fly': if (bases[3]) adv.r3 = 4; break;
+      case 'fc': adv.batter = 1; {
+        // 先頭走者アウトの案
+        if (bases[3]) adv.r3 = -1;
+        else if (bases[2]) { adv.r2 = -1; if (bases[1]) adv.r1 = 2; }
+        else if (bases[1]) adv.r1 = -1;
+        break;
+      }
+      case 'dp': {
+        if (bases[1]) adv.r1 = -1; // 一塁走者封殺が最頻
+        else if (bases[2]) adv.r2 = -1;
+        else if (bases[3]) adv.r3 = -1;
+        break;
+      }
+      default: break; // 三振・ゴロ・フライ等は走者そのまま
+    }
+    return adv;
+  }
+
+  // ---- 本体: イベント列 → 導出状態 ------------------------------------
+  // config: { myTeamName, oppName, myTeamBatsFirst, innings, lineup:[{num,name,pos}], bench:[...] }
+  function reduce(config, events) {
+    const innings = config.innings || 5;
+    const st = {
+      inning: 1, half: 'top', outs: 0, balls: 0, strikes: 0,
+      bases: { 1: null, 2: null, 3: null },   // {label} 表示名
+      scores: { away: [], top: null, home: [] }, // away=先攻, home=後攻
+      order: { away: 0, home: 0 },
+      lineup: (config.lineup || []).map(p => Object.assign({}, p)), // 自チームの現打順(交代反映)
+      benchOut: [],   // 退いた選手（リエントリー候補）
+      log: [],
+      finished: false, endReason: null,
+      lastPlay: null,
+      warnings: [],
+    };
+    const myIsAway = !!config.myTeamBatsFirst;
+
+    const battingTeam = () => (st.half === 'top') ? 'away' : 'home';
+    const isMyAtBat = () => (battingTeam() === 'away') === myIsAway;
+    const teamName = t => ((t === 'away') === myIsAway) ? (config.myTeamName || '自チーム') : (config.oppName || '相手チーム');
+
+    const ensureInning = (t) => {
+      while (st.scores[t === 'away' ? 'away' : 'home'].length < st.inning) st.scores[t === 'away' ? 'away' : 'home'].push(0);
+    };
+
+    function batterLabel() {
+      const t = battingTeam();
+      const idx = st.order[t];
+      if (isMyAtBat() && st.lineup.length) {
+        const p = st.lineup[idx % st.lineup.length];
+        return { text: (idx % st.lineup.length + 1) + '番 ' + (p ? p.name : '？'), num: p ? p.num : '', name: p ? p.name : '？', slot: idx % st.lineup.length, pos: p ? p.pos : '' };
+      }
+      return { text: (idx % 9 + 1) + '番', num: '', name: (idx % 9 + 1) + '番打者', slot: idx % 9, pos: '' };
+    }
+
+    function addLog(entry) {
+      entry.inning = st.inning; entry.half = st.half; entry.team = battingTeam();
+      // 状況文はプレー前の場面（「無死一塁からの盗塁」の形）。ハンドラ側で事前計算があればそれを使う
+      if (!entry.situationTerm) entry.situationTerm = situationText(st.outs, st.bases, 'term');
+      if (!entry.situationEasy) entry.situationEasy = situationText(st.outs, st.bases, 'easy');
+      entry.score = { away: sum(st.scores.away), home: sum(st.scores.home) };
+      st.log.push(entry);
+      return entry;
+    }
+
+    function applyAdvances(adv, runnerLabelForBatter) {
+      // 3塁→2塁→1塁→打者 の順に処理して衝突を防ぐ
+      let runs = 0, outs = 0;
+      const nb = { 1: st.bases[1], 2: st.bases[2], 3: st.bases[3] };
+      const scorers = [], outRunners = [], moved = [];
+      const move = (from, dest) => {
+        const runner = nb[from];
+        if (!runner || !dest) return; // 0 = そのまま
+        nb[from] = null;
+        if (dest === 4) { runs++; scorers.push(runner.label); moved.push({ from, to: 4, label: runner.label }); }
+        else if (dest === -1) { outs++; outRunners.push({ from, label: runner.label }); }
+        else { nb[dest] = runner; moved.push({ from, to: dest, label: runner.label }); }
+      };
+      move(3, adv.r3); move(2, adv.r2); move(1, adv.r1);
+      if (adv.batter === 4) { runs++; scorers.push(runnerLabelForBatter); }
+      else if (adv.batter === -1) outs++;
+      else if (adv.batter >= 1) nb[adv.batter] = { label: runnerLabelForBatter };
+      st.bases = nb;
+      // 同一塁に2人はいない（moveの順序で上書きされない設計だが念のため検査）
+      return { runs, outs, scorers, outRunners, moved };
+    }
+
+    function scoreRuns(runs) {
+      if (!runs) return;
+      const t = battingTeam();
+      ensureInning(t);
+      st.scores[t][st.inning - 1] += runs;
+    }
+
+    function halfChange() {
+      addLog({ kind: 'change', term: '三死チェンジ', easy: '3アウト・攻守交代' });
+      st.outs = 0; st.balls = 0; st.strikes = 0;
+      st.bases = { 1: null, 2: null, 3: null };
+      if (st.half === 'top') st.half = 'bottom';
+      else { st.half = 'top'; st.inning++; }
+    }
+
+    for (const ev of events) {
+      if (st.finished) { st.warnings.push('試合終了後のイベントが残っています'); }
+      ensureInning('away'); ensureInning('home');
+
+      if (ev.type === 'pitch') {
+        if (ev.kind === 'ball') st.balls = Math.min(st.balls + 1, 4);
+        else if (ev.kind === 'strike') st.strikes = Math.min(st.strikes + 1, 3);
+        else if (ev.kind === 'foul') st.strikes = Math.min(st.strikes + 1, 2);
+        continue;
+      }
+
+      if (ev.type === 'pa') {
+        const def = PA_RESULTS[ev.result];
+        if (!def) { st.warnings.push('不明な打席結果: ' + ev.result); continue; }
+        // イベントに打者スナップショットがあればそれが正（後からスタメン表を編集しても過去ログが変わらないように）
+        const b = ev.batter
+          ? { text: (ev.batter.slot + 1) + '番' + (isMyAtBat() && ev.batter.name ? ' ' + ev.batter.name : ''), num: ev.batter.num || '', name: ev.batter.name || (ev.batter.slot + 1) + '番打者', slot: ev.batter.slot, pos: ev.batter.pos || '' }
+          : batterLabel();
+        const adv = ev.advances || defaultAdvances(ev.result, st.bases);
+        const before = { outs: st.outs, bases: Object.assign({}, st.bases) };
+        const sitTerm = situationText(st.outs, st.bases, 'term');
+        const sitEasy = situationText(st.outs, st.bases, 'easy');
+        const r = applyAdvances(adv, b.name);
+        scoreRuns(r.runs);
+        st.outs += r.outs;
+        const plus = r.runs > 0 ? '＋' + r.runs : '';
+        // 打球中の走者アウト（例: 右安・二走死＝2塁走者が本塁などを狙ってアウト）
+        const BASE_K = ['', '一', '二', '三'];
+        let outT = '', outE = '';
+        for (const o of r.outRunners) { outT += '・' + BASE_K[o.from] + '走死'; outE += '・' + o.from + '塁ランナーはアウト'; }
+        if (def.batter >= 1 && adv.batter === -1) { outT += '・打者アウト'; outE += '・バッターは先の塁を狙ってアウト'; }
+        addLog({
+          kind: 'pa', result: ev.result, dir: ev.dir || null,
+          batter: b, traj: ev.traj || def.traj, foul: !!def.foul,
+          term: def.term(ev.dir) + plus + outT,
+          easy: def.easy(ev.dir) + (r.runs > 0 ? '・' + r.runs + '人ホームイン' : '') + outE,
+          runs: r.runs, scorers: r.scorers, before,
+          situationTerm: sitTerm, situationEasy: sitEasy,
+          afterTerm: st.outs >= 3 ? '三死チェンジ' : situationText(st.outs, st.bases, 'term'),
+          afterEasy: st.outs >= 3 ? '3アウト・チェンジ' : situationText(st.outs, st.bases, 'easy'),
+        });
+        st.balls = 0; st.strikes = 0;
+        st.order[battingTeam()] = (st.order[battingTeam()] + 1) % (isMyAtBat() && st.lineup.length ? st.lineup.length : 9);
+        if (st.outs >= 3) halfChange();
+        continue;
+      }
+
+      if (ev.type === 'run') {
+        const def = RUN_KINDS[ev.kind];
+        if (!def) { st.warnings.push('不明な走者プレー: ' + ev.kind); continue; }
+        const adv = Object.assign({ batter: 0, r1: 0, r2: 0, r3: 0 }, ev.advances || {});
+        adv.batter = 0; // 走者プレーで打者は動かない・打順も進まない
+        const sitTerm = situationText(st.outs, st.bases, 'term');
+        const sitEasy = situationText(st.outs, st.bases, 'easy');
+        const r = applyAdvances(adv, '');
+        scoreRuns(r.runs);
+        st.outs += r.outs;
+        const plus = r.runs > 0 ? '＋' + r.runs : '';
+        // どの走者がアウトになったか（盗塁死・牽制死で1人だけの時は種類名と重複するので省く）
+        const BASE_K2 = ['', '一', '二', '三'];
+        let outT = '', outE = '';
+        if (!((ev.kind === 'caught' || ev.kind === 'pickoff') && r.outRunners.length === 1)) {
+          for (const o of r.outRunners) { outT += '・' + BASE_K2[o.from] + '走死'; outE += '・' + o.from + '塁ランナーはアウト'; }
+        }
+        addLog({
+          kind: 'run', runKind: ev.kind,
+          term: def.term + plus + outT,
+          easy: def.easy + (r.runs > 0 ? '・' + r.runs + '人ホームイン' : '') + outE,
+          runs: r.runs, scorers: r.scorers, movers: r.moved.map(m => m.label),
+          situationTerm: sitTerm, situationEasy: sitEasy,
+          afterTerm: st.outs >= 3 ? '三死チェンジ' : situationText(st.outs, st.bases, 'term'),
+          afterEasy: st.outs >= 3 ? '3アウト・チェンジ' : situationText(st.outs, st.bases, 'easy'),
+        });
+        if (st.outs >= 3) halfChange();
+        continue;
+      }
+
+      if (ev.type === 'sub') {
+        const def = SUB_KINDS[ev.kind] || { term: '交代', easy: '交代' };
+        if (ev.kind === 'pos_change') {
+          // 出場中の選手どうしの守備位置入れ替え（例: 投 山田・三 佐藤・中 鈴木）
+          const parts = [];
+          for (const c of (ev.changes || [])) {
+            const p = st.lineup.find(x => x.name === c.name);
+            if (p) p.pos = c.pos;
+            parts.push(c.pos + ' ' + c.name);
+          }
+          addLog({ kind: 'sub', subKind: 'pos_change', term: '守備変更：' + parts.join('・'), easy: '守備の入れ替え：' + parts.join('・') });
+          continue;
+        }
+        // 「誰から誰へ」を必ず残す
+        if (ev.kind === 'pinch_run' && ev.base && st.bases[ev.base]) {
+          const from = st.bases[ev.base].label;
+          st.bases[ev.base] = { label: ev.inPlayer.name };
+          replaceLineup(st, ev.outPlayer, ev.inPlayer, ev.pos);
+          addLog({ kind: 'sub', subKind: ev.kind, term: def.term + '：' + from + '→' + ev.inPlayer.name, easy: def.easy + '：' + from + 'に代わって' + ev.inPlayer.name + '（' + ev.base + '塁）' });
+        } else {
+          replaceLineup(st, ev.outPlayer, ev.inPlayer, ev.pos);
+          const fromName = ev.outPlayer ? ev.outPlayer.name : '？';
+          addLog({ kind: 'sub', subKind: ev.kind, term: def.term + '：' + fromName + '→' + ev.inPlayer.name, easy: def.easy + '：' + fromName + 'に代わって' + ev.inPlayer.name });
+        }
+        continue;
+      }
+
+      if (ev.type === 'force_change') { // 3アウト以外の攻守交代（規定・記録修正用）
+        addLog({ kind: 'change', term: '攻守交代', easy: '攻守交代' });
+        st.outs = 0; st.balls = 0; st.strikes = 0;
+        st.bases = { 1: null, 2: null, 3: null };
+        if (st.half === 'top') st.half = 'bottom';
+        else { st.half = 'top'; st.inning++; }
+        continue;
+      }
+
+      if (ev.type === 'adjust') { // 得点補正（打順は進まない）
+        const t = ev.team; // 'away'|'home'
+        while (st.scores[t].length < ev.inning) st.scores[t].push(0);
+        st.scores[t][ev.inning - 1] += ev.delta;
+        addLog({ kind: 'adjust', term: '得点補正（' + teamName(t) + ' ' + ev.inning + '回 ' + (ev.delta > 0 ? '+' : '') + ev.delta + '）', easy: '得点を修正しました（' + teamName(t) + ' ' + ev.inning + '回 ' + (ev.delta > 0 ? '+' : '') + ev.delta + '）' });
+        continue;
+      }
+
+      if (ev.type === 'game_end') {
+        const def = END_REASONS[ev.reason] || END_REASONS.normal;
+        st.finished = true; st.endReason = ev.reason;
+        addLog({ kind: 'end', term: def.term, easy: def.easy });
+        continue;
+      }
+
+      st.warnings.push('不明なイベント: ' + JSON.stringify(ev));
+    }
+
+    // 導出値
+    st.totals = { away: sum(st.scores.away), home: sum(st.scores.home) };
+    st.myTeam = myIsAway ? 'away' : 'home';
+    st.battingTeam = battingTeam();
+    st.isMyAtBat = isMyAtBat();
+    st.batter = batterLabel();
+    st.teamNames = { away: teamName('away'), home: teamName('home') };
+    st.inningsSetting = innings;
+    // 整合チェック（イニング別の和と合計の一致は構造上常に成り立つが、検算として出す）
+    st.checkOk = (st.totals.away === sum(st.scores.away)) && (st.totals.home === sum(st.scores.home));
+    return st;
+  }
+
+  function replaceLineup(st, outPlayer, inPlayer, pos) {
+    if (!inPlayer) return;
+    const i = outPlayer ? st.lineup.findIndex(p => p.name === outPlayer.name && String(p.num) === String(outPlayer.num)) : -1;
+    if (i >= 0) {
+      st.benchOut.push(st.lineup[i]);
+      st.lineup[i] = { num: inPlayer.num, name: inPlayer.name, pos: pos || st.lineup[i].pos };
+      // リエントリーで戻った選手は「退いた選手」リストから外す
+      st.benchOut = st.benchOut.filter(p => !(p.name === inPlayer.name && String(p.num) === String(inPlayer.num)));
+    }
+  }
+
+  function sum(a) { return a.reduce((x, y) => x + y, 0); }
+
+  // ---- イニングまるごと速報文（スコアラーの手打ちLINE投稿と同じ形式） ----
+  const KANJI_NUM = ['', '一', '二', '三', '四', '五', '六', '七', '八', '九', '十'];
+  function kanjiNum(n) { return KANJI_NUM[n] || String(n); }
+  function circled(n) { return (n >= 1 && n <= 20) ? String.fromCharCode(0x245F + n) : '(' + n + ')'; }
+
+  // config: 大会名gameName / 回戦round / 開始時刻startTime / ルールrules も参照する
+  function reportText(config, st, mode, inning, half) {
+    mode = mode === 'easy' ? 'easy' : 'term';
+    const lines = [];
+    if (config.gameName) lines.push(config.gameName);
+    const l2 = [];
+    if (config.round) l2.push(config.round);
+    l2.push('🆚' + (config.oppName || '相手チーム'));
+    lines.push(l2.join('　'));
+    const l3 = [];
+    if (config.startTime) l3.push('開始 ' + config.startTime);
+    l3.push(kanjiNum(config.innings || 5) + '回');
+    if (config.rules) l3.push(config.rules);
+    lines.push(l3.join('　'));
+    const row = t => (st.teamNames[t] || '') + '　' + st.scores[t].map(String).join(' ') + '　計' + st.totals[t];
+    lines.push(row('away'));
+    lines.push(row('home'));
+    if (inning) {
+      lines.push(kanjiNum(inning) + '回' + (half === 'top' ? '表' : '裏'));
+      const myIsAway = !!config.myTeamBatsFirst;
+      for (const en of st.log) {
+        if (en.inning !== inning || en.half !== half) continue;
+        const txt = mode === 'term' ? en.term : en.easy;
+        const after = mode === 'term' ? (en.afterTerm || '') : (en.afterEasy || '');
+        if (en.kind === 'pa') {
+          const mine = (en.team === 'away') === myIsAway;
+          lines.push(circled(en.batter.slot + 1) + (mine ? en.batter.name : '') + '　' + txt + '　' + after);
+        } else if (en.kind === 'run') {
+          lines.push('　　' + txt + '　' + after);
+        } else if (en.kind === 'sub') {
+          lines.push('選手交代　' + txt);
+        } else if (en.kind === 'end') {
+          lines.push(txt);
+        }
+      }
+    }
+    return lines.join('\n');
+  }
+
+  // ---- 個人打撃成績（手書き実況では追えなかった、アプリならではの集計） ----
+  function stats(st) {
+    const rows = new Map(); // 選手名 → 集計行
+    const get = (name, slot) => {
+      if (!rows.has(name)) rows.set(name, { name, slot: slot === undefined ? 99 : slot, ab: 0, h: 0, rbi: 0, runs: 0, steals: 0 });
+      const r = rows.get(name);
+      if (slot !== undefined && slot < r.slot) r.slot = slot;
+      return r;
+    };
+    const NO_AB = { bb: 1, hbp: 1, sac_bunt: 1, sac_fly: 1, interference: 1 };
+    const HIT = { single: 1, double: 1, triple: 1, hr: 1 };
+    for (const en of st.log) {
+      if (en.team !== st.myTeam) continue;
+      if (en.kind === 'pa') {
+        const r = get(en.batter.name, en.batter.slot);
+        if (!NO_AB[en.result]) r.ab++;
+        if (HIT[en.result]) r.h++;
+        r.rbi += en.runs || 0;
+        for (const s of en.scorers || []) get(s).runs++;
+      } else if (en.kind === 'run') {
+        for (const s of en.scorers || []) get(s).runs++;
+        if (en.runKind === 'steal' || en.runKind === 'steal_err') {
+          for (const m of en.movers || []) get(m).steals++;
+        }
+      }
+    }
+    return Array.from(rows.values()).sort((a, b) => a.slot - b.slot);
+  }
+
+  // ---- LINE速報文 ------------------------------------------------------
+  function lineText(config, st, entry) {
+    const halfJp = h => h === 'top' ? '表' : '裏';
+    const head = '【' + entry.inning + '回' + halfJp(entry.half) + '】';
+    const names = st.teamNames;
+    const scoreLine = names.away + ' ' + entry.score.away + ' - ' + entry.score.home + ' ' + names.home;
+    let body = entry.easy;
+    if (entry.kind === 'pa' && entry.batter && entry.batter.name) body = entry.batter.name + '、' + body;
+    return head + body + '\n' + scoreLine;
+  }
+
+  return {
+    DIR, PA_RESULTS, RUN_KINDS, SUB_KINDS, END_REASONS,
+    reduce, defaultAdvances, situationText, lineText, reportText, stats,
+  };
+}));
+
+</script>
+<script>
+'use strict';
+const E = window.YakyuEngine;
+const $ = id => document.getElementById(id);
+const KEY = 'yakyu_jikkyo_v1';
+
+// ==== 永続データ ====
+const DEFAULT_CONFIG = { gameName: '', round: '', startTime: '', myTeamName: '', oppName: '', myTeamBatsFirst: true, innings: 5, rules: '', displayMode: 'easy', inputMode: 'term' };
+let data = load();
+function load() {
+  try {
+    const raw = localStorage.getItem(KEY);
+    if (raw) {
+      const d = JSON.parse(raw);
+      d.config = Object.assign({}, DEFAULT_CONFIG, d.config); // 旧データに新項目を補う
+      return d;
+    }
+  } catch (e) { /* 壊れていたら初期化 */ }
+  return { config: Object.assign({}, DEFAULT_CONFIG), lineup: [], bench: [], events: [] };
+}
+let saveWarned = false;
+function save() {
+  try { localStorage.setItem(KEY, JSON.stringify(data)); }
+  catch (e) { // 保存が使えない環境（プライベートモード等）でも動作は続ける
+    if (!saveWarned) { saveWarned = true; setTimeout(() => toast('この環境では記録を保存できません（閉じると消えます）'), 0); }
+  }
+}
+
+// ==== 状態導出 ====
+let st = null;
+function engineCfg() { return Object.assign({}, data.config, { lineup: data.lineup }); }
+function recompute() {
+  st = E.reduce(engineCfg(), data.events);
+  render();
+}
+function commit(ev) { data.events.push(ev); save(); recompute(); }
+
+// ==== 用語ボタン定義 ====
+const NEED_DIR = { single: 1, double: 1, triple: 1, hr: 1, go: 1, fo: 1, liner: 1, foul_fly: 1, error: 1, sac_fly: 1, dp: 0, fc: 0 };
+const BTN_ON = [
+  ['single', 'ヒット', 'ヒット'], ['double', '二塁打', '2ベース'], ['triple', '三塁打', '3ベース'],
+  ['hr', '本塁打', 'ホームラン'], ['bb', '四球', 'フォアボール'], ['hbp', '死球', 'デッドボール'],
+  ['error', 'エラー出塁', 'エラーで出塁'], ['fc', '野選', '野手選択'], ['dropped3rd', '振り逃げ', '振り逃げ'],
+  ['interference', '打撃妨害', '打撃妨害'],
+];
+const BTN_OUT = [
+  ['k_swing', '空振り三振', '空振り三振'], ['k_look', '見逃し三振', '見逃し三振'], ['go', 'ゴロ', 'ゴロでアウト'],
+  ['fo', '飛（フライ）', 'フライでアウト'], ['liner', '直（ライナー）', 'ライナーでアウト'], ['foul_fly', '邪飛', 'ファウルフライ'],
+  ['dp', '併殺', 'ダブルプレー'], ['sac_bunt', '犠打', '送りバント'], ['sac_fly', '犠飛', '犠牲フライ'],
+];
+const BTN_RUN = [
+  ['steal', '盗塁', '盗塁'], ['steal_err', '盗塁悪送球', '盗塁＋送球ミス'], ['caught', '盗塁死', '盗塁失敗'],
+  ['wp', '暴投', '暴投（ワイルドピッチ）'], ['pb', '捕逸', 'キャッチャーのそらし'], ['throw_err', '送球エラー', '送球エラー'],
+  ['pickoff', '牽制死', '牽制アウト'], ['pickoff_err', '牽制悪送球', '牽制の送球ミス'], ['advance', '走者進塁', 'ランナー進塁'],
+  ['score', '走者生還', 'ホームイン'],
+];
+const DIR_BTNS = [
+  ['p', '投', 'ピッチャー'], ['c', '捕', 'キャッチャー'], ['b1', '一', 'ファースト'],
+  ['b2', '二', 'セカンド'], ['b3', '三', 'サード'], ['ss', '遊', 'ショート'],
+  ['lf', '左', 'レフト'], ['cf', '中', 'センター'], ['rf', '右', 'ライト'],
+];
+
+// ==== レンダリング ====
+function render() {
+  renderBoard(); renderInput(); renderLog(); renderSetting();
+}
+
+function renderBoard() {
+  const n = Math.max(data.config.innings, st.scores.away.length, st.scores.home.length);
+  let head = '<tr><th></th>';
+  for (let i = 1; i <= n; i++) head += '<th>' + i + '</th>';
+  head += '<th>計</th></tr>';
+  const row = (t) => {
+    let cells = '<td class="name">' + esc(st.teamNames[t] || (t === 'away' ? '先攻' : '後攻')) + '</td>';
+    for (let i = 0; i < n; i++) {
+      const v = st.scores[t][i];
+      const now = !st.finished && (st.inning === i + 1) && ((t === 'away') === (st.half === 'top'));
+      cells += '<td class="num' + (now ? ' now' : '') + '">' + (v === undefined ? '' : v) + '</td>';
+    }
+    cells += '<td class="total">' + st.totals[t] + '</td>';
+    return '<tr>' + cells + '</tr>';
+  };
+  $('lineScore').innerHTML = head + row('away') + row('home');
+  $('inningLabel').textContent = st.finished ? '試合終了' : st.inning + '回' + (st.half === 'top' ? '表' : '裏');
+  $('outDots').innerHTML = '<span class="lbl">アウト</span>' + [0, 1].map(i => '<span class="dot' + (st.outs > i ? ' on' : '') + '"></span>').join('');
+  $('bsDots').innerHTML = '<span class="lbl">B</span>' + [0, 1, 2].map(i => '<span class="dot' + (st.balls > i ? ' on b' : '') + '"></span>').join('')
+    + '<span class="lbl" style="margin-left:6px">S</span>' + [0, 1].map(i => '<span class="dot' + (st.strikes > i ? ' on s' : '') + '"></span>').join('');
+  $('mb1').classList.toggle('on', !!st.bases[1]);
+  $('mb2').classList.toggle('on', !!st.bases[2]);
+  $('mb3').classList.toggle('on', !!st.bases[3]);
+}
+
+function renderInput() {
+  const b = st.batter;
+  $('batOrder').textContent = (st.isMyAtBat ? '攻撃中：' + (st.teamNames[st.battingTeam] || '自チーム') : '守備中：相手の攻撃') + '　' + b.text.split(' ')[0];
+  $('batName').textContent = b.name;
+  $('batNumBadge').textContent = b.num !== '' ? b.num : (b.slot + 1);
+  $('batNum').textContent = (b.num !== '' ? '背番号 ' + b.num : '') + (b.pos ? '・' + b.pos : '');
+  const mode = data.config.inputMode;
+  const mk = (list, grid, outKind) => {
+    grid.innerHTML = '';
+    for (const [key, term, easy] of list) {
+      const btn = document.createElement('button');
+      btn.textContent = mode === 'term' ? term : easy;
+      if (outKind) btn.classList.add('out-kind');
+      btn.onclick = () => (grid === $('gridRun') ? startRunPlay(key) : startPA(key));
+      grid.appendChild(btn);
+    }
+  };
+  mk(BTN_ON, $('gridOn'), false);
+  mk(BTN_OUT, $('gridOut'), true);
+  mk(BTN_RUN, $('gridRun'), false);
+  const disable = st.finished;
+  document.querySelectorAll('#view-input .btngrid button, .cntbtns button').forEach(b2 => b2.disabled = disable);
+  $('endBanner').style.display = st.finished ? '' : 'none';
+  if (st.finished) $('endBanner').textContent = '試合終了（' + (E.END_REASONS[st.endReason] || E.END_REASONS.normal).term + '）。間違いなら「取り消し」。';
+}
+
+function renderLog() {
+  const list = $('logList');
+  const mode = data.config.displayMode;
+  $('modeEasy').classList.toggle('act', mode === 'easy');
+  $('modeTerm').classList.toggle('act', mode === 'term');
+  // 試合情報カード（手打ちLINEでは毎回書いていたヘッダーを、ここでは1回だけ見せる）
+  const c = data.config;
+  const hasInfo = c.gameName || c.round || c.startTime;
+  $('gameCard').style.display = hasInfo ? '' : 'none';
+  $('gcName').textContent = c.gameName || (st.teamNames.away + ' vs ' + st.teamNames.home);
+  $('gcSub').textContent = [c.round, c.startTime ? '開始 ' + c.startTime : '', c.innings + '回制', c.rules].filter(Boolean).join('・');
+  if (!st.log.length) { list.innerHTML = '<p class="empty">まだ記録がありません。<br>「実況入力」からプレーを記録すると、ここに流れます。</p>'; return; }
+  let html = '';
+  let curKey = '';
+  st.log.forEach((en, i) => {
+    const key = en.inning + '-' + en.half;
+    if ((en.kind === 'pa' || en.kind === 'run') && key !== curKey) {
+      curKey = key;
+      html += '<div class="chip"><span>' + en.inning + '回' + (en.half === 'top' ? '表' : '裏') + '　' + esc(st.teamNames[en.team]) + 'の攻撃</span></div>';
+    }
+    if (en.kind === 'change' || en.kind === 'end' || en.kind === 'adjust' || en.kind === 'sub') {
+      html += '<div class="bubble meta">' + esc(mode === 'term' ? en.term : en.easy) + '</div>';
+      return;
+    }
+    const opp = ((en.team === 'away') !== data.config.myTeamBatsFirst);
+    const tappable = en.kind === 'pa' && en.traj && en.dir;
+    const cls = 'bubble' + (opp ? ' opp' : '') + (en.runs > 0 ? ' scored' : '') + (tappable ? ' tappable' : '');
+    const who = en.kind === 'pa' ? '<div class="who">' + esc(en.batter.text) + '</div>' : '';
+    const sit = '<div class="sit">' + esc(mode === 'term' ? en.situationTerm : en.situationEasy) + '</div>';
+    const score = en.runs > 0 ? '<div><span class="scorechip">' + esc(st.teamNames.away) + ' ' + en.score.away + ' - ' + en.score.home + ' ' + esc(st.teamNames.home) + '</span></div>' : '';
+    const link = tappable ? '<div class="fieldlink">打球図をみる</div>' : '';
+    const isLast = (i === st.log.length - 1);
+    html += '<div class="' + cls + (isLast ? ' new' : '') + '" data-log="' + i + '">' + sit + who + '<div class="main">' + esc(mode === 'term' ? en.term : en.easy) + '</div>' + score + link + '</div>';
+  });
+  list.innerHTML = html;
+  list.querySelectorAll('.bubble.tappable').forEach(el => el.onclick = () => showPlayDetail(+el.dataset.log));
+}
+
+function renderSetting() {
+  $('setGameName').value = data.config.gameName;
+  $('setRound').value = data.config.round;
+  $('setStart').value = data.config.startTime;
+  $('setMyName').value = data.config.myTeamName;
+  $('setOppName').value = data.config.oppName;
+  $('setFirst').value = data.config.myTeamBatsFirst ? '1' : '0';
+  $('setInnings').value = String(data.config.innings);
+  $('setRules').value = data.config.rules;
+  $('setDispMode').value = data.config.displayMode;
+  const lu = $('lineupList');
+  lu.innerHTML = data.lineup.map((p, i) =>
+    '<li><span class="pn">' + (i + 1) + '番</span><span class="nm">' + esc(p.name) + '</span><span class="ps">#' + esc(String(p.num)) + ' ' + esc(p.pos || '') + '</span>'
+    + '<button data-a="up" data-i="' + i + '">▲</button><button data-a="down" data-i="' + i + '">▼</button><button data-a="tobench" data-i="' + i + '">外す</button></li>').join('')
+    || '<li style="color:var(--sub)">ベンチから「打順へ」で追加</li>';
+  const be = $('benchList');
+  be.innerHTML = data.bench.map((p, i) =>
+    '<li><span class="nm">' + esc(p.name) + '</span><span class="ps">#' + esc(String(p.num)) + ' ' + esc(p.pos || '') + '</span>'
+    + '<button data-a="tolineup" data-i="' + i + '">打順へ</button><button data-a="del" data-i="' + i + '">削除</button></li>').join('')
+    || '<li style="color:var(--sub)">選手がいません</li>';
+  lu.querySelectorAll('button').forEach(b => b.onclick = () => lineupOp(b.dataset.a, +b.dataset.i));
+  be.querySelectorAll('button').forEach(b => b.onclick = () => lineupOp(b.dataset.a, +b.dataset.i));
+}
+
+function lineupOp(a, i) {
+  if (data.events.length) { toast('試合中は打順を編集できません。「選手交代」を使ってください'); return; }
+  if (a === 'up' && i > 0) [data.lineup[i - 1], data.lineup[i]] = [data.lineup[i], data.lineup[i - 1]];
+  if (a === 'down' && i < data.lineup.length - 1) [data.lineup[i + 1], data.lineup[i]] = [data.lineup[i], data.lineup[i + 1]];
+  if (a === 'tobench') data.bench.push(data.lineup.splice(i, 1)[0]);
+  if (a === 'tolineup') data.lineup.push(data.bench.splice(i, 1)[0]);
+  if (a === 'del' && confirm('この選手を削除しますか？')) data.bench.splice(i, 1);
+  save(); recompute();
+}
+
+// ==== 打席結果フロー: 結果 → (方向) → (走者確認) → 記録 ====
+let pending = null;
+function startPA(result) {
+  pending = { type: 'pa', result };
+  if (NEED_DIR[result]) showDirSheet();
+  else afterDir(null);
+}
+function showDirSheet() {
+  const mode = data.config.inputMode;
+  let html = '<h2>どこへの打球？</h2><div class="dirgrid">';
+  for (const [k, t, e] of DIR_BTNS) html += '<button data-d="' + k + '">' + (mode === 'term' ? t : e) + '</button>';
+  html += '</div><div class="sheetbtns"><button data-d="">方向なしで進む</button><button class="cancel">やめる</button></div>';
+  openSheet(html);
+  $('sheetBody').querySelectorAll('button[data-d]').forEach(b => b.onclick = () => afterDir(b.dataset.d || null));
+  $('sheetBody').querySelector('.cancel').onclick = closeSheet;
+}
+// 三振・四球・死球は走者の動きが規則で決まるので確認なしで即記録（走者が動いた時は「ランナーのプレー」で別途記録）
+const NO_CONFIRM = { k_swing: 1, k_look: 1, bb: 1, hbp: 1, interference: 1 };
+function afterDir(dir) {
+  pending.dir = dir;
+  const def = E.PA_RESULTS[pending.result];
+  pending.adv = E.defaultAdvances(pending.result, st.bases);
+  const hasRunner = st.bases[1] || st.bases[2] || st.bases[3];
+  if (NO_CONFIRM[pending.result] || (!hasRunner && def.batter <= 1)) {
+    commitPA();
+  } else {
+    showAdvSheet();
+  }
+}
+function destOptions(from, isBatter) {
+  const opts = [];
+  if (!isBatter) opts.push([0, 'そのまま']);
+  for (let b = from + 1; b <= 3; b++) opts.push([b, ['', '1塁', '2塁', '3塁'][b]]);
+  opts.push([4, 'ホームイン'], [-1, 'アウト']);
+  return opts;
+}
+function showAdvSheet() {
+  const rows = [];
+  if (st.bases[3]) rows.push(['r3', '3塁走者 ' + st.bases[3].label, 3, false]);
+  if (st.bases[2]) rows.push(['r2', '2塁走者 ' + st.bases[2].label, 2, false]);
+  if (st.bases[1]) rows.push(['r1', '1塁走者 ' + st.bases[1].label, 1, false]);
+  const def = E.PA_RESULTS[pending.result];
+  if (def.batter !== -1 || pending.adv.batter !== def.batter) rows.push(['batter', '打者 ' + st.batter.name, 0, true]);
+  let html = '<h2>ランナーはどうなった？</h2><p class="sub">よくある形を入れてあります。違うところだけ直してください。</p>';
+  for (const [key, label, from, isBatter] of rows) {
+    html += '<div class="advrow"><div class="who">' + esc(label) + '</div><div class="seg" data-key="' + key + '">';
+    for (const [v, t] of destOptions(from, isBatter)) {
+      const sel = pending.adv[key] === v ? ' sel' + (v === -1 ? ' outsel' : '') : '';
+      html += '<button class="' + sel.trim() + '" data-v="' + v + '">' + t + '</button>';
+    }
+    html += '</div></div>';
+  }
+  html += '<div class="sheetbtns"><button class="go">これで記録</button><button class="cancel">やめる</button></div>';
+  openSheet(html);
+  $('sheetBody').querySelectorAll('.seg').forEach(seg => {
+    seg.querySelectorAll('button').forEach(b => b.onclick = () => {
+      pending.adv[seg.dataset.key] = +b.dataset.v;
+      seg.querySelectorAll('button').forEach(x => x.className = '');
+      b.className = 'sel' + (+b.dataset.v === -1 ? ' outsel' : '');
+    });
+  });
+  $('sheetBody').querySelector('.go').onclick = commitPA;
+  $('sheetBody').querySelector('.cancel').onclick = closeSheet;
+}
+function commitPA() {
+  closeSheet();
+  // 打者スナップショットをイベントに焼き込む（後からスタメン表を編集しても記録が変わらないように）
+  const b = st.batter;
+  commit({ type: 'pa', result: pending.result, dir: pending.dir, advances: pending.adv, batter: { name: st.isMyAtBat ? b.name : '', num: b.num, slot: b.slot, pos: b.pos } });
+  pending = null;
+}
+
+// ==== 走者プレー ====
+const RUN_DEFAULT = {
+  steal: b => lead(b, 1), steal_err: b => lead(b, 2), caught: b => leadOut(b),
+  wp: b => all(b, 1), pb: b => all(b, 1), pickoff: b => leadOut(b), pickoff_err: b => all(b, 1),
+  throw_err: b => all(b, 1), advance: b => lead(b, 1), score: b => leadHome(b),
+};
+function lead(bases, n) { const a = { r1: 0, r2: 0, r3: 0 }; if (bases[3]) a.r3 = Math.min(4, 3 + n); else if (bases[2]) a.r2 = Math.min(4, 2 + n); else if (bases[1]) a.r1 = Math.min(4, 1 + n); return a; }
+function leadOut(bases) { const a = { r1: 0, r2: 0, r3: 0 }; if (bases[3]) a.r3 = -1; else if (bases[2]) a.r2 = -1; else if (bases[1]) a.r1 = -1; return a; }
+function leadHome(bases) { const a = { r1: 0, r2: 0, r3: 0 }; if (bases[3]) a.r3 = 4; else if (bases[2]) a.r2 = 4; else if (bases[1]) a.r1 = 4; return a; }
+function all(bases, n) { const a = { r1: 0, r2: 0, r3: 0 }; if (bases[3]) a.r3 = Math.min(4, 3 + n); if (bases[2]) a.r2 = Math.min(4, 2 + n); if (bases[1]) a.r1 = Math.min(4, 1 + n); return a; }
+
+function startRunPlay(kind) {
+  if (!st.bases[1] && !st.bases[2] && !st.bases[3]) { toast('ランナーがいません'); return; }
+  pending = { type: 'run', kind, adv: RUN_DEFAULT[kind](st.bases) };
+  const rows = [];
+  if (st.bases[3]) rows.push(['r3', '3塁走者 ' + st.bases[3].label, 3]);
+  if (st.bases[2]) rows.push(['r2', '2塁走者 ' + st.bases[2].label, 2]);
+  if (st.bases[1]) rows.push(['r1', '1塁走者 ' + st.bases[1].label, 1]);
+  const def = E.RUN_KINDS[kind];
+  let html = '<h2>' + esc(def.term) + '：ランナーの動き</h2>';
+  for (const [key, label, from] of rows) {
+    html += '<div class="advrow"><div class="who">' + esc(label) + '</div><div class="seg" data-key="' + key + '">';
+    for (const [v, t] of destOptions(from, false)) {
+      const sel = pending.adv[key] === v ? ' sel' + (v === -1 ? ' outsel' : '') : '';
+      html += '<button class="' + sel.trim() + '" data-v="' + v + '">' + t + '</button>';
+    }
+    html += '</div></div>';
+  }
+  html += '<div class="sheetbtns"><button class="go">これで記録</button><button class="cancel">やめる</button></div>';
+  openSheet(html);
+  $('sheetBody').querySelectorAll('.seg').forEach(seg => {
+    seg.querySelectorAll('button').forEach(b => b.onclick = () => {
+      pending.adv[seg.dataset.key] = +b.dataset.v;
+      seg.querySelectorAll('button').forEach(x => x.className = '');
+      b.className = 'sel' + (+b.dataset.v === -1 ? ' outsel' : '');
+    });
+  });
+  $('sheetBody').querySelector('.go').onclick = () => {
+    closeSheet();
+    commit({ type: 'run', kind: pending.kind, advances: pending.adv });
+    pending = null;
+  };
+  $('sheetBody').querySelector('.cancel').onclick = closeSheet;
+}
+
+// ==== 選手交代（自チームのみ・複数まとめて記録できる） ====
+let subQueue = [];
+let subKindNow = 'pinch_hit';
+const SUB_KIND_LIST = [['pinch_hit', '代打'], ['pinch_run', '代走'], ['defense', '守備交代（ベンチから）'], ['reentry', 'リエントリー'], ['pos_change', 'ポジション入れ替え']];
+
+function subInCandidates(kind) {
+  if (kind === 'reentry') return st.benchOut.map(p => ({ p, label: p.name + '（リエントリー）' }));
+  const onField = new Set(st.lineup.map(p => p.name + '#' + p.num));
+  return data.bench.filter(p => !onField.has(p.name + '#' + p.num)).map(p => ({ p, label: p.name + '（#' + p.num + '）' }));
+}
+
+function startSub() { subQueue = []; subKindNow = 'pinch_hit'; renderSubSheet(); }
+
+function renderSubSheet() {
+  let html = '<h2>選手交代（自チーム）</h2>';
+  html += '<div class="frow"><label>種類</label><select id="subKind">' + SUB_KIND_LIST.map(k => '<option value="' + k[0] + '"' + (k[0] === subKindNow ? ' selected' : '') + '>' + k[1] + '</option>').join('') + '</select></div>';
+  if (subKindNow === 'pos_change') {
+    html += '<div class="frow"><label>選手</label><select id="subOut">' + st.lineup.map((p, i) => '<option value="' + i + '">' + (i + 1) + '番 ' + esc(p.name) + '（今：' + esc(p.pos || 'なし') + '）</option>').join('') + '</select></div>';
+    html += '<div class="frow"><label>新しい守備</label><input id="subPos" placeholder="投・遊・右 など"></div>';
+  } else {
+    const cands = subInCandidates(subKindNow);
+    if (subKindNow === 'pinch_run') {
+      html += '<div class="frow"><label>どの塁</label><select id="subBase">'
+        + [1, 2, 3].filter(b => st.bases[b]).map(b => '<option value="' + b + '">' + b + '塁（' + esc(st.bases[b].label) + '）</option>').join('') + '</select></div>';
+    }
+    html += '<div class="frow"><label>退く選手</label><select id="subOut">' + st.lineup.map((p, i) => '<option value="' + i + '">' + (i + 1) + '番 ' + esc(p.name) + '</option>').join('') + '</select></div>';
+    html += '<div class="frow"><label>出る選手</label><select id="subIn">' + cands.map((c, i) => '<option value="' + i + '">' + esc(c.label) + '</option>').join('') + '</select></div>';
+    if (!cands.length) html += '<p class="sub">出られる選手がいません（' + (subKindNow === 'reentry' ? '退いた選手がまだいません' : 'ベンチに選手を追加してください') + '）</p>';
+    html += '<div class="frow"><label>守備位置</label><input id="subPos" placeholder="そのまま なら空欄"></div>';
+  }
+  if (subQueue.length) {
+    html += '<div class="advrow"><div class="who">まとめて記録する交代（' + subQueue.length + '件）</div><ul class="plist">'
+      + subQueue.map((q, i) => '<li><span class="nm" style="font-weight:400">' + esc(q.label) + '</span><button data-qdel="' + i + '">削除</button></li>').join('') + '</ul></div>';
+  }
+  html += '<div class="sheetbtns"><button id="subAdd">＋続けて追加</button><button class="go">記録する</button><button class="cancel">やめる</button></div>';
+  html += '<p class="sub">複数人の交代は「＋続けて追加」で足してから「記録する」。</p>';
+  openSheet(html);
+  $('subKind').onchange = () => { subKindNow = $('subKind').value; renderSubSheet(); };
+  $('sheetBody').querySelectorAll('button[data-qdel]').forEach(b => b.onclick = () => { subQueue.splice(+b.dataset.qdel, 1); renderSubSheet(); });
+  $('subAdd').onclick = () => { if (addSubFromForm()) renderSubSheet(); };
+  $('sheetBody').querySelector('.go').onclick = () => {
+    // 追加を押さずに1件だけ記録する使い方も許す（キューが空の時だけフォームを拾う）
+    if (!subQueue.length && !addSubFromForm()) return;
+    commitSubQueue();
+  };
+  $('sheetBody').querySelector('.cancel').onclick = closeSheet;
+}
+
+function addSubFromForm() {
+  if (subKindNow === 'pos_change') {
+    const p = st.lineup[+$('subOut').value];
+    const pos = $('subPos').value.trim();
+    if (!p) { toast('選手を選んでください'); return false; }
+    if (!pos) { toast('新しい守備位置を入れてください'); return false; }
+    subQueue.push({ kind: 'pos_change', name: p.name, pos, label: '守備変更 ' + pos + ' ' + p.name });
+    return true;
+  }
+  const cands = subInCandidates(subKindNow);
+  if (!cands.length) { toast(subKindNow === 'reentry' ? '退いた選手がいません' : 'ベンチに選手がいません（設定で追加）'); return false; }
+  const outP = st.lineup[+$('subOut').value];
+  const inP = cands[+$('subIn').value].p;
+  if (!outP || !inP) { toast('選手を選んでください'); return false; }
+  const item = { kind: subKindNow, outPlayer: { num: outP.num, name: outP.name }, inPlayer: { num: inP.num, name: inP.name }, pos: $('subPos').value.trim() || undefined, label: (SUB_KIND_LIST.find(k => k[0] === subKindNow) || ['', '交代'])[1].replace(/（.*）/, '') + ' ' + outP.name + '→' + inP.name };
+  if (subKindNow === 'pinch_run') {
+    if (!$('subBase') || !$('subBase').value) { toast('塁にランナーがいません'); return false; }
+    item.base = +$('subBase').value;
+  }
+  subQueue.push(item);
+  return true;
+}
+
+function commitSubQueue() {
+  const evs = [];
+  for (const q of subQueue) {
+    if (q.kind === 'pos_change') {
+      const prev = evs[evs.length - 1];
+      if (prev && prev.kind === 'pos_change') prev.changes.push({ name: q.name, pos: q.pos }); // 連続する守備変更は1行にまとめる
+      else evs.push({ type: 'sub', kind: 'pos_change', changes: [{ name: q.name, pos: q.pos }] });
+    } else {
+      const ev = { type: 'sub', kind: q.kind, outPlayer: q.outPlayer, inPlayer: q.inPlayer, pos: q.pos };
+      if (q.base) ev.base = q.base;
+      evs.push(ev);
+    }
+  }
+  closeSheet();
+  for (const ev of evs) data.events.push(ev);
+  save(); recompute();
+  toast('交代を記録しました（' + subQueue.length + '件）');
+  subQueue = [];
+}
+
+// ==== 試合終了・得点補正 ====
+function startGameEnd() {
+  const reasons = [['normal', 'ゲームセット（規定回数）'], ['time', '時間切れ'], ['called', 'コールド'], ['sayonara', 'サヨナラ']];
+  let html = '<h2>試合終了の記録</h2><div class="btngrid">';
+  for (const [k, t] of reasons) html += '<button data-r="' + k + '" class="wide">' + t + '</button>';
+  html += '</div><div class="sheetbtns"><button class="cancel">やめる</button></div>';
+  openSheet(html);
+  $('sheetBody').querySelectorAll('button[data-r]').forEach(b => b.onclick = () => { closeSheet(); commit({ type: 'game_end', reason: b.dataset.r }); });
+  $('sheetBody').querySelector('.cancel').onclick = closeSheet;
+}
+function startAdjust() {
+  let html = '<h2>得点補正</h2><p class="sub">イニング別と合計は必ず一緒に動くので、食い違いは起きません。</p>';
+  html += '<div class="frow"><label>チーム</label><select id="adjTeam"><option value="away">' + esc(st.teamNames.away) + '（先攻）</option><option value="home">' + esc(st.teamNames.home) + '（後攻）</option></select></div>';
+  html += '<div class="frow"><label>イニング</label><select id="adjInning">' + Array.from({ length: Math.max(st.inning, data.config.innings) }, (_, i) => '<option value="' + (i + 1) + '">' + (i + 1) + '回</option>').join('') + '</select></div>';
+  html += '<div class="frow"><label>増減</label><select id="adjDelta"><option value="1">+1</option><option value="-1">-1</option></select></div>';
+  html += '<div class="sheetbtns"><button class="go">補正する</button><button class="cancel">やめる</button></div>';
+  openSheet(html);
+  $('sheetBody').querySelector('.go').onclick = () => {
+    closeSheet();
+    commit({ type: 'adjust', team: $('adjTeam').value, inning: +$('adjInning').value, delta: +$('adjDelta').value });
+  };
+  $('sheetBody').querySelector('.cancel').onclick = closeSheet;
+}
+
+// ==== 打球図 ====
+const FIELD_POS = { p: [200, 292], c: [200, 332], b1: [268, 258], b2: [240, 208], b3: [132, 258], ss: [160, 208], lf: [112, 122], cf: [200, 86], rf: [288, 122] };
+const FOUL_POS = { b1: [318, 300], rf: [340, 240], b3: [82, 300], lf: [60, 240], c: [200, 372] };
+function fieldSVG(dir, traj, foul) {
+  // 正しい配置: ホーム下・一塁右・二塁上・三塁左。一二三塁=菱形 / ホーム=五角形 / ファウルラインは薄く
+  let s = '<svg viewBox="0 0 400 400" xmlns="http://www.w3.org/2000/svg">';
+  s += '<defs><clipPath id="fairzone"><path d="M200 340 L40 180 A 226 226 0 0 1 360 180 Z"/></clipPath></defs>';
+  s += '<rect x="0" y="0" width="400" height="400" rx="12" fill="#2c5f3f"/>'; // 場外(暗めの芝)
+  s += '<g clip-path="url(#fairzone)">';
+  s += '<rect x="0" y="0" width="400" height="400" fill="#469660"/>'; // フェアゾーン
+  for (let r = 40; r <= 200; r += 40) s += '<circle cx="200" cy="340" r="' + r + '" fill="none" stroke="#3f8c58" stroke-width="20"/>'; // 芝の刈り込み
+  s += '<circle cx="200" cy="340" r="218" fill="none" stroke="#b08b5c" stroke-width="16"/>'; // ウォーニングトラック
+  s += '</g>';
+  s += '<path d="M200 340 L110 250 A 127 127 0 0 1 290 250 Z" fill="#c9a06b"/>'; // 内野ダート
+  s += '<path d="M200 318 L132 250 L200 182 L268 250 Z" fill="#469660"/>'; // 内野の芝ダイヤ
+  s += '<circle cx="200" cy="292" r="13" fill="#b8905c"/>'; // マウンド
+  s += '<path d="M200 340 L110 250 L200 160 L290 250 Z" fill="none" stroke="#f0ede6" stroke-width="2.5"/>'; // ベースパス
+  s += '<line x1="200" y1="340" x2="52" y2="192" stroke="#f0ede6" stroke-width="1.5" opacity="0.35"/>'; // ファウルライン(薄く)
+  s += '<line x1="200" y1="340" x2="348" y2="192" stroke="#f0ede6" stroke-width="1.5" opacity="0.35"/>';
+  const base = (x, y) => '<rect x="' + (x - 7) + '" y="' + (y - 7) + '" width="14" height="14" fill="#fff" transform="rotate(45 ' + x + ' ' + y + ')"/>';
+  s += base(290, 250) + base(200, 160) + base(110, 250); // 一・二・三塁=菱形
+  s += '<path d="M192 332 h16 v8 l-8 7 l-8 -7 z" fill="#fff"/>'; // ホーム=五角形
+  if (dir && (FIELD_POS[dir] || FOUL_POS[dir])) {
+    const [ex, ey] = (foul ? (FOUL_POS[dir] || FIELD_POS[dir]) : FIELD_POS[dir]);
+    const hx = 200, hy = 336;
+    const mx = (hx + ex) / 2, my = (hy + ey) / 2;
+    const dx = ex - hx, dy = ey - hy, len = Math.hypot(dx, dy) || 1;
+    const bulge = traj === 'fly' ? 60 : traj === 'liner' ? 22 : traj === 'hit' ? 30 : 0;
+    const px = -dy / len, py = dx / len; // 垂直方向
+    const side = ex >= 200 ? 1 : -1;
+    const cx = mx + px * bulge * side, cy = my + py * bulge * side;
+    const dash = traj === 'grounder' ? '' : ' stroke-dasharray="7 6"';
+    const d = 'M' + hx + ' ' + hy + ' Q ' + cx.toFixed(0) + ' ' + cy.toFixed(0) + ' ' + ex + ' ' + ey;
+    s += '<path d="' + d + '" fill="none" stroke="#f5c451" stroke-width="8" stroke-linecap="round" opacity="0.4"/>'; // 発光(下層)
+    s += '<path d="' + d + '" fill="none" stroke="#ffffff" stroke-width="3" stroke-linecap="round"' + dash + '/>';    // 軌道(本体)
+    s += '<circle cx="' + ex + '" cy="' + ey + '" r="7" fill="#ffffff" stroke="#7a5c12" stroke-width="2.5"/>';       // 着点
+  }
+  s += '</svg>';
+  return s;
+}
+function showPlayDetail(i) {
+  const en = st.log[i];
+  const mode = data.config.displayMode;
+  let html = '<h2>' + en.inning + '回' + (en.half === 'top' ? '表' : '裏') + '　' + esc(en.batter ? en.batter.text : '') + '</h2>';
+  html += '<div class="fieldbox">' + fieldSVG(en.dir, en.traj, en.foul) + '</div>';
+  html += '<div class="detailtxt"><div class="sit" style="color:var(--sub);font-size:.85rem">' + esc(mode === 'term' ? en.situationTerm : en.situationEasy) + 'から</div>';
+  html += '<div class="big">' + esc(mode === 'term' ? en.term : en.easy) + '</div>';
+  if (en.runs > 0) html += '<div style="color:var(--amber);font-weight:700">' + esc(en.scorers.join('・')) + ' がホームイン</div>';
+  html += '</div>';
+  html += '<div class="sheetbtns"><button class="go" id="btnCopyPlay">この速報をコピー</button><button class="cancel">閉じる</button></div>';
+  openSheet(html);
+  $('btnCopyPlay').onclick = () => copyText(E.lineText(data.config, st, en));
+  $('sheetBody').querySelector('.cancel').onclick = closeSheet;
+}
+
+// ==== 個人成績（手書き実況では追えなかった、アプリならではの表） ====
+function showStats() {
+  const rows = E.stats(st);
+  if (!rows.length) { toast('まだ打席の記録がありません'); return; }
+  let html = '<h2>' + esc(st.teamNames[st.myTeam]) + '　打撃成績</h2>';
+  html += '<table class="statstbl"><thead><tr><th class="nm">選手</th><th>打数</th><th>安打</th><th>打点</th><th>得点</th><th>盗塁</th></tr></thead><tbody>';
+  for (const r of rows) {
+    html += '<tr><td class="nm">' + esc(r.name) + '</td><td>' + r.ab + '</td><td class="' + (r.h > 0 ? 'hot' : '') + '">' + r.h + '</td><td>' + r.rbi + '</td><td>' + r.runs + '</td><td>' + r.steals + '</td></tr>';
+  }
+  html += '</tbody></table>';
+  html += '<p class="sub" style="margin-top:8px">四球・死球・犠打・犠飛は打数に数えません（野球の公式ルールと同じ）</p>';
+  html += '<div class="sheetbtns"><button class="go" id="btnCopyStats">成績をコピー</button><button class="cancel">閉じる</button></div>';
+  openSheet(html);
+  $('btnCopyStats').onclick = () => {
+    const lines = [st.teamNames[st.myTeam] + ' 打撃成績', '選手　打数 安打 打点 得点 盗塁'];
+    for (const r of rows) lines.push(r.name + '　' + r.ab + ' ' + r.h + ' ' + r.rbi + ' ' + r.runs + ' ' + r.steals);
+    copyText(lines.join('\n'));
+  };
+  $('sheetBody').querySelector('.cancel').onclick = closeSheet;
+}
+
+// ==== LINE共有 ====
+function inningShareText() {
+  // 手打ちLINE実況と同じ形式：大会ヘッダー＋スコア表＋今のイニングの全プレー
+  const plays = st.log.filter(e => e.kind === 'pa' || e.kind === 'run');
+  const last = plays[plays.length - 1];
+  const inn = last ? last.inning : st.inning;
+  const hf = last ? last.half : st.half;
+  return E.reportText(engineCfg(), st, data.config.displayMode, inn, hf);
+}
+function lastPlayShareText() {
+  const last = st.log.filter(e => e.kind === 'pa' || e.kind === 'run' || e.kind === 'end').slice(-1)[0];
+  if (!last) return '【試合開始】' + (data.config.gameName ? data.config.gameName + '\n' : '') + st.teamNames.away + ' vs ' + st.teamNames.home;
+  if (last.kind === 'end') return '【試合終了】' + mode2(last) + '\n' + st.teamNames.away + ' ' + st.totals.away + ' - ' + st.totals.home + ' ' + st.teamNames.home;
+  return E.lineText(data.config, st, last);
+}
+function showShare() {
+  let html = '<h2>LINEに送る速報文</h2>';
+  html += '<div class="rowbtns" style="margin-bottom:8px"><button id="genInning">このイニングまるごと</button><button id="genLast">直前のプレーだけ</button></div>';
+  html += '<textarea class="share" id="shareText" style="min-height:11em">' + esc(inningShareText()) + '</textarea>';
+  html += '<div class="sheetbtns"><button class="go" id="btnCopyShare">コピー</button><button class="go" id="btnLineShare" style="background:var(--green-deep)">LINEを開く</button><button class="cancel">閉じる</button></div>';
+  html += '<p class="sub" style="margin-top:8px">文面は手で直せます。「LINEを開く」→送り先のグループを選んで送信（自動では送りません）</p>';
+  openSheet(html);
+  $('genInning').onclick = () => { $('shareText').value = inningShareText(); };
+  $('genLast').onclick = () => { $('shareText').value = lastPlayShareText(); };
+  $('btnCopyShare').onclick = () => copyText($('shareText').value);
+  $('btnLineShare').onclick = () => { window.location.href = 'https://line.me/R/share?text=' + encodeURIComponent($('shareText').value); };
+  $('sheetBody').querySelector('.cancel').onclick = closeSheet;
+}
+function mode2(en) { return data.config.displayMode === 'term' ? en.term : en.easy; }
+
+function copyText(t) {
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(t).then(() => toast('コピーしました'), () => fallbackCopy(t));
+  } else fallbackCopy(t);
+}
+function fallbackCopy(t) {
+  const ta = document.createElement('textarea');
+  ta.value = t; document.body.appendChild(ta); ta.select();
+  try { document.execCommand('copy'); toast('コピーしました'); } catch (e) { toast('コピーできませんでした'); }
+  document.body.removeChild(ta);
+}
+
+// ==== シート・トースト ====
+function openSheet(html) { $('sheetBody').innerHTML = html; $('sheetWrap').classList.add('act'); }
+function closeSheet() { $('sheetWrap').classList.remove('act'); }
+$('sheetWrap').addEventListener('click', e => { if (e.target === $('sheetWrap')) closeSheet(); });
+let toastTimer = null;
+function toast(msg) {
+  const t = $('toast'); t.textContent = msg; t.classList.add('act');
+  clearTimeout(toastTimer); toastTimer = setTimeout(() => t.classList.remove('act'), 1800);
+}
+function esc(s) { return String(s == null ? '' : s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;'); }
+
+// ==== イベント配線 ====
+document.querySelectorAll('.tabs button').forEach(b => b.onclick = () => {
+  document.querySelectorAll('.tabs button').forEach(x => x.classList.remove('act'));
+  document.querySelectorAll('.view').forEach(x => x.classList.remove('act'));
+  b.classList.add('act');
+  $('view-' + b.dataset.view).classList.add('act');
+  window.scrollTo(0, 0);
+  if (b.dataset.view === 'watch') { const l = $('logList'); l.lastElementChild && l.lastElementChild.scrollIntoView({ block: 'end' }); }
+});
+$('btnBall').onclick = () => commit({ type: 'pitch', kind: 'ball' });
+$('btnStrike').onclick = () => commit({ type: 'pitch', kind: 'strike' });
+$('btnFoul').onclick = () => commit({ type: 'pitch', kind: 'foul' });
+$('btnUndo').onclick = () => {
+  if (!data.events.length) { toast('取り消す記録がありません'); return; }
+  data.events.pop(); save(); recompute(); toast('直前の記録を取り消しました');
+};
+$('btnSub').onclick = startSub;
+$('btnForceChange').onclick = () => { if (confirm('3アウト前ですが攻守交代を記録しますか？')) commit({ type: 'force_change' }); };
+$('btnGameEnd').onclick = startGameEnd;
+$('btnAdjust').onclick = startAdjust;
+$('btnInputMode').onclick = () => { data.config.inputMode = data.config.inputMode === 'term' ? 'easy' : 'term'; save(); recompute(); };
+$('modeEasy').onclick = () => { data.config.displayMode = 'easy'; save(); recompute(); };
+$('modeTerm').onclick = () => { data.config.displayMode = 'term'; save(); recompute(); };
+$('btnShare').onclick = showShare;
+$('btnStats').onclick = showStats;
+for (const [id, key] of [['setGameName', 'gameName'], ['setRound', 'round'], ['setStart', 'startTime'], ['setMyName', 'myTeamName'], ['setOppName', 'oppName'], ['setRules', 'rules']]) {
+  $(id).addEventListener('change', () => { data.config[key] = $(id).value; save(); recompute(); });
+}
+$('setFirst').addEventListener('change', () => { data.config.myTeamBatsFirst = $('setFirst').value === '1'; save(); recompute(); });
+$('setInnings').addEventListener('change', () => { data.config.innings = +$('setInnings').value; save(); recompute(); });
+$('setDispMode').addEventListener('change', () => { data.config.displayMode = $('setDispMode').value; save(); recompute(); });
+$('btnAddPlayer').onclick = () => {
+  const num = $('addNum').value.trim(), name = $('addName').value.trim(), pos = $('addPos').value.trim();
+  if (!name) { toast('選手名を入れてください'); return; }
+  data.bench.push({ num, name, pos });
+  $('addNum').value = $('addName').value = $('addPos').value = '';
+  save(); recompute();
+};
+$('btnNewGame').onclick = () => {
+  if (!confirm('今の試合の記録を消して、新しい試合を始めますか？（選手は残ります）')) return;
+  data.events = []; save(); recompute(); toast('新しい試合を始めました');
+};
+$('btnWipe').onclick = () => {
+  if (!confirm('選手・設定・記録をすべて消します。よろしいですか？')) return;
+  localStorage.removeItem(KEY); data = load(); recompute();
+};
+
+recompute();
+
+// オフライン対応（ホスティング版のみ・ファイル版では何もしない）
+if ('serviceWorker' in navigator && location.protocol === 'https:') {
+  navigator.serviceWorker.register('./sw.js').catch(() => {});
+}
+</script>
+</body>
+</html>
