@@ -325,6 +325,14 @@ body.viewer #view-input, body.viewer #view-setting { display: none !important; }
     <ul class="plist" id="gamesList"></ul>
   </div>
   <div class="card">
+    <h2>引き継ぎ・バックアップ</h2>
+    <div class="rowbtns">
+      <button id="btnExport">書き出す</button>
+      <button id="btnImport">読み込む</button>
+    </div>
+    <p style="font-size:.8rem;color:var(--sub);margin-top:8px">記録係の交代・機種変更用。選手名簿と今の試合（配信の鍵ごと）をテキストで受け渡せます。次の記録係へは<strong>個別LINE</strong>で送ってください（配信の鍵入りのため）。</p>
+  </div>
+  <div class="card">
     <button class="primarybtn" id="btnNewGame">新しい試合を始める（今の試合は自動保存）</button>
     <p style="margin-top:8px"><button class="dangerbtn" id="btnWipe">選手も含めて全データを消す</button></p>
   </div>
@@ -803,6 +811,20 @@ body.viewer #view-input, body.viewer #view-setting { display: none !important; }
     return Array.from(rows.values()).sort((a, b) => a.slot - b.slot);
   }
 
+  // ---- 通算成績（複数試合の成績表をマージ） -----------------------------
+  function statsMerge(rowsLists) {
+    const m = new Map();
+    for (const rows of rowsLists) {
+      for (const r of rows) {
+        if (!m.has(r.name)) m.set(r.name, { name: r.name, slot: r.slot, games: 0, ab: 0, h: 0, rbi: 0, runs: 0, steals: 0 });
+        const t = m.get(r.name);
+        t.games++; t.ab += r.ab; t.h += r.h; t.rbi += r.rbi; t.runs += r.runs; t.steals += r.steals;
+        if (r.slot < t.slot) t.slot = r.slot;
+      }
+    }
+    return Array.from(m.values()).sort((a, b) => a.slot - b.slot);
+  }
+
   // ---- LINE速報文 ------------------------------------------------------
   function lineText(config, st, entry) {
     const halfJp = h => h === 'top' ? '表' : '裏';
@@ -816,7 +838,7 @@ body.viewer #view-input, body.viewer #view-setting { display: none !important; }
 
   return {
     DIR, PA_RESULTS, RUN_KINDS, SUB_KINDS, END_REASONS,
-    reduce, defaultAdvances, situationText, lineText, reportText, stats,
+    reduce, defaultAdvances, situationText, lineText, reportText, stats, statsMerge,
   };
 }));
 
@@ -1466,22 +1488,85 @@ function showPlayDetail(i) {
 }
 
 // ==== 個人成績（手書き実況では追えなかった、アプリならではの表） ====
-function showStats() {
-  const rows = E.stats(st);
+function totalStatsRows() {
+  // 通算 = 過去の試合すべて + 今の試合
+  const lists = data.games.map(g => E.stats(E.reduce(Object.assign({}, g.config, { lineup: g.lineup || [] }), g.events || [])));
+  lists.push(E.stats(st));
+  return E.statsMerge(lists);
+}
+function avg(h, ab) {
+  if (!ab) return '－';
+  const n = Math.round(h / ab * 1000);
+  return n >= 1000 ? '1.000' : '.' + String(n).padStart(3, '0');
+}
+function showStats(scope) {
+  scope = scope || 'game';
+  const total = scope === 'total';
+  const rows = total ? totalStatsRows() : E.stats(st);
+  if (!rows.length && !total && !LIVE_ROOM && totalStatsRows().length) { showStats('total'); return; } // 今の試合が0打席でも通算があれば見せる
   if (!rows.length) { toast('まだ打席の記録がありません'); return; }
   let html = '<h2>' + esc(st.teamNames[st.myTeam]) + '　打撃成績</h2>';
-  html += '<table class="statstbl"><thead><tr><th class="nm">選手</th><th>打数</th><th>安打</th><th>打点</th><th>得点</th><th>盗塁</th></tr></thead><tbody>';
+  if (!LIVE_ROOM) { // 観戦モードでは通算(自端末の記録)は出さない
+    html += '<div class="modepill" style="margin-bottom:16px"><button id="stG" class="' + (total ? '' : 'act') + '">この試合</button><button id="stT" class="' + (total ? 'act' : '') + '">通算</button></div>';
+  }
+  html += '<table class="statstbl"><thead><tr><th class="nm">選手</th>' + (total ? '<th>試合</th>' : '') + '<th>打数</th><th>安打</th><th>打率</th><th>打点</th><th>得点</th><th>盗塁</th></tr></thead><tbody>';
   for (const r of rows) {
-    html += '<tr><td class="nm">' + esc(r.name) + '</td><td>' + r.ab + '</td><td class="' + (r.h > 0 ? 'hot' : '') + '">' + r.h + '</td><td>' + r.rbi + '</td><td>' + r.runs + '</td><td>' + r.steals + '</td></tr>';
+    html += '<tr><td class="nm">' + esc(r.name) + '</td>' + (total ? '<td>' + r.games + '</td>' : '')
+      + '<td>' + r.ab + '</td><td class="' + (r.h > 0 ? 'hot' : '') + '">' + r.h + '</td><td>' + avg(r.h, r.ab) + '</td><td>' + r.rbi + '</td><td>' + r.runs + '</td><td>' + r.steals + '</td></tr>';
   }
   html += '</tbody></table>';
-  html += '<p class="sub" style="margin-top:8px">四球・死球・犠打・犠飛は打数に数えません（野球の公式ルールと同じ）</p>';
+  html += '<p class="sub" style="margin-top:8px">四球・死球・犠打・犠飛は打数に数えません（野球の公式ルールと同じ）' + (total ? '。通算は過去の試合＋今の試合の合計' : '') + '</p>';
   html += '<div class="sheetbtns"><button class="go" id="btnCopyStats">成績をコピー</button><button class="cancel">閉じる</button></div>';
   openSheet(html);
+  if ($('stG')) { $('stG').onclick = () => showStats('game'); $('stT').onclick = () => showStats('total'); }
   $('btnCopyStats').onclick = () => {
-    const lines = [st.teamNames[st.myTeam] + ' 打撃成績', '選手　打数 安打 打点 得点 盗塁'];
-    for (const r of rows) lines.push(r.name + '　' + r.ab + ' ' + r.h + ' ' + r.rbi + ' ' + r.runs + ' ' + r.steals);
+    const lines = [st.teamNames[st.myTeam] + ' 打撃成績' + (total ? '（通算）' : ''), '選手　' + (total ? '試合 ' : '') + '打数 安打 打率 打点 得点 盗塁'];
+    for (const r of rows) lines.push(r.name + '　' + (total ? r.games + ' ' : '') + r.ab + ' ' + r.h + ' ' + avg(r.h, r.ab) + ' ' + r.rbi + ' ' + r.runs + ' ' + r.steals);
     copyText(lines.join('\n'));
+  };
+  $('sheetBody').querySelector('.cancel').onclick = closeSheet;
+}
+
+// ==== 引き継ぎ・バックアップ（記録係の交代・機種変更） ====
+function b64enc(s) { const b = new TextEncoder().encode(s); let out = ''; for (let i = 0; i < b.length; i += 8000) out += String.fromCharCode.apply(null, b.subarray(i, i + 8000)); return btoa(out); }
+function b64dec(s) { const bin = atob(s); const b = new Uint8Array(bin.length); for (let i = 0; i < bin.length; i++) b[i] = bin.charCodeAt(i); return new TextDecoder().decode(b); }
+const HANDOFF_PREFIX = 'YAKYU2:';
+function exportText() {
+  const payload = { v: 2, config: data.config, roster: data.roster, lineupIds: data.lineupIds, benchIds: data.benchIds, events: data.events, live: data.live || null };
+  return HANDOFF_PREFIX + b64enc(JSON.stringify(payload));
+}
+function showExport() {
+  const txt = exportText();
+  let html = '<h2>引き継ぎデータの書き出し</h2>';
+  html += '<p class="sub">選手名簿・スタメン・今の試合・配信の鍵が入っています。次の記録係へ<strong>個別LINE</strong>で送ってください。</p>';
+  html += '<textarea class="share" id="handoffText" readonly style="min-height:7em;font-size:.75rem;word-break:break-all">' + esc(txt) + '</textarea>';
+  html += '<div class="sheetbtns"><button class="go" id="btnHandoffCopy">コピー</button><button class="cancel">閉じる</button></div>';
+  openSheet(html);
+  $('btnHandoffCopy').onclick = () => copyText(txt);
+  $('sheetBody').querySelector('.cancel').onclick = closeSheet;
+}
+function showImport() {
+  let html = '<h2>引き継ぎデータの読み込み</h2>';
+  html += '<p class="sub">受け取ったテキストを貼り付けてください。選手名簿と今の試合が置き換わります（過去の試合は残ります）。</p>';
+  html += '<textarea class="share" id="importText" style="min-height:7em;font-size:.75rem" placeholder="YAKYU2: で始まるテキストを貼り付け"></textarea>';
+  html += '<div class="sheetbtns"><button class="go" id="btnImportGo">読み込む</button><button class="cancel">やめる</button></div>';
+  openSheet(html);
+  $('btnImportGo').onclick = () => {
+    const raw = $('importText').value.trim();
+    if (!raw.startsWith(HANDOFF_PREFIX)) { toast('形式が違います（YAKYU2: で始まるテキストを貼ってください）'); return; }
+    let p;
+    try { p = JSON.parse(b64dec(raw.slice(HANDOFF_PREFIX.length))); } catch (e) { toast('読み込めませんでした（途中で切れていないか確認）'); return; }
+    if (!p || p.v !== 2 || !Array.isArray(p.roster) || !Array.isArray(p.events)) { toast('データの中身が想定と違います'); return; }
+    if (!confirm('今の選手名簿と試合を、受け取った内容で置き換えます。よろしいですか？')) return;
+    data.config = Object.assign({}, DEFAULT_CONFIG, p.config || {});
+    data.roster = p.roster;
+    data.lineupIds = p.lineupIds || [];
+    data.benchIds = p.benchIds || [];
+    data.events = p.events;
+    data.live = p.live || null;
+    save(); recompute(); closeSheet();
+    if (data.live) { pushLive(); toast('読み込みました。配信も引き継いでいます'); }
+    else toast('読み込みました');
   };
   $('sheetBody').querySelector('.cancel').onclick = closeSheet;
 }
@@ -1597,6 +1682,8 @@ $('btnNewGame').onclick = () => {
   save(); recompute();
   toast(data.games.length ? '前の試合を保存して、新しい試合を始めました' : '新しい試合を始めました');
 };
+$('btnExport').onclick = showExport;
+$('btnImport').onclick = showImport;
 $('btnLiveStart').onclick = async () => {
   data.live = { roomId: 'r' + rnd(), secret: rnd() + rnd() };
   save(); recompute();
