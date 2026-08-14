@@ -282,20 +282,30 @@ textarea.share { width: 100%; min-height: 5.5em; margin-bottom: var(--s2); line-
   <div class="card">
     <h2>スタメン（打順）</h2>
     <ul class="plist" id="lineupList"></ul>
-    <p class="sub" style="font-size:.8rem;color:var(--sub)">▲▼で打順を入れ替え。試合開始後の入れ替えは「選手交代」で。</p>
+    <p style="font-size:.8rem;color:var(--sub)">▲▼で打順を入れ替え。試合が始まったら変更は「選手交代」で。</p>
   </div>
   <div class="card">
-    <h2>ベンチ</h2>
+    <h2>この試合のベンチ入り</h2>
     <ul class="plist" id="benchList"></ul>
+    <p style="font-size:.8rem;color:var(--sub)">「選手交代」で出られるのはベンチ入りの選手です。</p>
+  </div>
+  <div class="card">
+    <h2>選手名簿（全選手・ずっと保存）</h2>
+    <ul class="plist" id="rosterList"></ul>
     <div class="addrow">
       <input class="n" id="addNum" placeholder="背番号" inputmode="numeric">
       <input class="nm" id="addName" placeholder="選手名">
       <input class="p" id="addPos" placeholder="守備">
       <button id="btnAddPlayer">追加</button>
     </div>
+    <p style="font-size:.8rem;color:var(--sub)">追加した選手は自動でベンチ入りに入ります。名簿は試合を新しくしても消えません。</p>
   </div>
   <div class="card">
-    <button class="primarybtn" id="btnNewGame">新しい試合を始める（記録をリセット）</button>
+    <h2>過去の試合</h2>
+    <ul class="plist" id="gamesList"></ul>
+  </div>
+  <div class="card">
+    <button class="primarybtn" id="btnNewGame">新しい試合を始める（今の試合は自動保存）</button>
     <p style="margin-top:8px"><button class="dangerbtn" id="btnWipe">選手も含めて全データを消す</button></p>
   </div>
 </section>
@@ -795,22 +805,43 @@ textarea.share { width: 100%; min-height: 5.5em; margin-bottom: var(--s2); line-
 'use strict';
 const E = window.YakyuEngine;
 const $ = id => document.getElementById(id);
-const KEY = 'yakyu_jikkyo_v1';
+const KEY = 'yakyu_jikkyo_v2';
+const KEY_V1 = 'yakyu_jikkyo_v1';
 
 // ==== 永続データ ====
+// v2: 選手は「名簿(roster)」に固定登録し、試合ごとにスタメン(lineupIds)・ベンチ入り(benchIds)を選ぶ。
+//     試合を新しく始めると、前の試合は games に自動保存される（選手・記録が消えない構造）。
 const DEFAULT_CONFIG = { gameName: '', round: '', startTime: '', myTeamName: '', oppName: '', myTeamBatsFirst: true, innings: 5, rules: '', displayMode: 'easy', inputMode: 'term' };
 let data = load();
+try { localStorage.setItem(KEY, JSON.stringify(data)); } catch (e) {} // v1からの移行を確定保存
+function fresh() { return { config: Object.assign({}, DEFAULT_CONFIG), roster: [], lineupIds: [], benchIds: [], events: [], games: [] }; }
+function pid() { return 'p' + Math.random().toString(36).slice(2, 10); }
 function load() {
   try {
     const raw = localStorage.getItem(KEY);
     if (raw) {
       const d = JSON.parse(raw);
       d.config = Object.assign({}, DEFAULT_CONFIG, d.config); // 旧データに新項目を補う
+      d.roster = d.roster || []; d.lineupIds = d.lineupIds || []; d.benchIds = d.benchIds || [];
+      d.events = d.events || []; d.games = d.games || [];
       return d;
     }
+    const old = localStorage.getItem(KEY_V1);
+    if (old) return migrateV1(JSON.parse(old)); // 旧v1キーは保険として消さず残す
   } catch (e) { /* 壊れていたら初期化 */ }
-  return { config: Object.assign({}, DEFAULT_CONFIG), lineup: [], bench: [], events: [] };
+  return fresh();
 }
+function migrateV1(v1) {
+  const d = fresh();
+  d.config = Object.assign({}, DEFAULT_CONFIG, v1.config || {});
+  for (const p of (v1.lineup || [])) { const id = pid(); d.roster.push({ id, num: p.num, name: p.name, pos: p.pos || '' }); d.lineupIds.push(id); }
+  for (const p of (v1.bench || [])) { const id = pid(); d.roster.push({ id, num: p.num, name: p.name, pos: p.pos || '' }); d.benchIds.push(id); }
+  d.events = v1.events || [];
+  return d;
+}
+function byId(id) { return data.roster.find(p => p.id === id); }
+function lineupPlayers() { return data.lineupIds.map(byId).filter(Boolean); }
+function benchPlayers() { return data.benchIds.map(byId).filter(Boolean); }
 let saveWarned = false;
 function save() {
   try { localStorage.setItem(KEY, JSON.stringify(data)); }
@@ -821,7 +852,7 @@ function save() {
 
 // ==== 状態導出 ====
 let st = null;
-function engineCfg() { return Object.assign({}, data.config, { lineup: data.lineup }); }
+function engineCfg() { return Object.assign({}, data.config, { lineup: lineupPlayers().map(p => ({ num: p.num, name: p.name, pos: p.pos })) }); }
 function recompute() {
   st = E.reduce(engineCfg(), data.events);
   render();
@@ -958,27 +989,76 @@ function renderSetting() {
   $('setRules').value = data.config.rules;
   $('setDispMode').value = data.config.displayMode;
   const lu = $('lineupList');
-  lu.innerHTML = data.lineup.map((p, i) =>
+  lu.innerHTML = lineupPlayers().map((p, i) =>
     '<li><span class="pn">' + (i + 1) + '番</span><span class="nm">' + esc(p.name) + '</span><span class="ps">#' + esc(String(p.num)) + ' ' + esc(p.pos || '') + '</span>'
     + '<button data-a="up" data-i="' + i + '">▲</button><button data-a="down" data-i="' + i + '">▼</button><button data-a="tobench" data-i="' + i + '">外す</button></li>').join('')
-    || '<li style="color:var(--sub)">ベンチから「打順へ」で追加</li>';
+    || '<li style="color:var(--sub)">ベンチ入りから「打順へ」で選びます</li>';
   const be = $('benchList');
-  be.innerHTML = data.bench.map((p, i) =>
+  be.innerHTML = benchPlayers().map((p, i) =>
     '<li><span class="nm">' + esc(p.name) + '</span><span class="ps">#' + esc(String(p.num)) + ' ' + esc(p.pos || '') + '</span>'
-    + '<button data-a="tolineup" data-i="' + i + '">打順へ</button><button data-a="del" data-i="' + i + '">削除</button></li>').join('')
-    || '<li style="color:var(--sub)">選手がいません</li>';
-  lu.querySelectorAll('button').forEach(b => b.onclick = () => lineupOp(b.dataset.a, +b.dataset.i));
-  be.querySelectorAll('button').forEach(b => b.onclick = () => lineupOp(b.dataset.a, +b.dataset.i));
+    + '<button data-a="tolineup" data-i="' + i + '">打順へ</button><button data-a="benchout" data-i="' + i + '">外す</button></li>').join('')
+    || '<li style="color:var(--sub)">名簿から「ベンチ入り」で選びます</li>';
+  const inLineup = new Set(data.lineupIds), inBench = new Set(data.benchIds);
+  const ro = $('rosterList');
+  ro.innerHTML = data.roster.map(p => {
+    const state = inLineup.has(p.id) ? 'スタメン' : inBench.has(p.id) ? 'ベンチ' : '－';
+    const btns = (!inLineup.has(p.id) && !inBench.has(p.id))
+      ? '<button data-a="tobenchro" data-id="' + p.id + '">ベンチ入り</button><button data-a="delro" data-id="' + p.id + '">削除</button>' : '';
+    return '<li><span class="nm">' + esc(p.name) + '</span><span class="ps">#' + esc(String(p.num)) + ' ' + esc(p.pos || '') + '・' + state + '</span>' + btns + '</li>';
+  }).join('') || '<li style="color:var(--sub)">下の欄から選手を登録してください</li>';
+  const ga = $('gamesList');
+  ga.innerHTML = data.games.map((g, i) => {
+    const d = (g.savedAt || '').slice(0, 10);
+    return '<li><span class="nm">' + esc(d) + '　' + esc(g.teamNames ? g.teamNames.away + ' ' + g.totals.away + '-' + g.totals.home + ' ' + g.teamNames.home : '試合') + '</span>'
+      + '<button data-a="viewgame" data-i="' + i + '">見る</button><button data-a="delgame" data-i="' + i + '">削除</button></li>';
+  }).join('') || '<li style="color:var(--sub)">まだありません（新しい試合を始めると前の試合がここに残ります）</li>';
+  document.querySelectorAll('#view-setting .plist button').forEach(b =>
+    b.onclick = () => lineupOp(b.dataset.a, b.dataset.i !== undefined ? +b.dataset.i : b.dataset.id));
 }
 
 function lineupOp(a, i) {
-  if (data.events.length) { toast('試合中は打順を編集できません。「選手交代」を使ってください'); return; }
-  if (a === 'up' && i > 0) [data.lineup[i - 1], data.lineup[i]] = [data.lineup[i], data.lineup[i - 1]];
-  if (a === 'down' && i < data.lineup.length - 1) [data.lineup[i + 1], data.lineup[i]] = [data.lineup[i], data.lineup[i + 1]];
-  if (a === 'tobench') data.bench.push(data.lineup.splice(i, 1)[0]);
-  if (a === 'tolineup') data.lineup.push(data.bench.splice(i, 1)[0]);
-  if (a === 'del' && confirm('この選手を削除しますか？')) data.bench.splice(i, 1);
+  const LOCKED = { up: 1, down: 1, tobench: 1, tolineup: 1 };
+  if (LOCKED[a] && data.events.length) { toast('試合中はスタメンを変えられません。「選手交代」を使ってください'); return; }
+  if (a === 'up' && i > 0) [data.lineupIds[i - 1], data.lineupIds[i]] = [data.lineupIds[i], data.lineupIds[i - 1]];
+  if (a === 'down' && i < data.lineupIds.length - 1) [data.lineupIds[i + 1], data.lineupIds[i]] = [data.lineupIds[i], data.lineupIds[i + 1]];
+  if (a === 'tobench') data.benchIds.push(data.lineupIds.splice(i, 1)[0]);
+  if (a === 'tolineup') data.lineupIds.push(data.benchIds.splice(i, 1)[0]);
+  if (a === 'benchout') data.benchIds.splice(i, 1); // 名簿には残る
+  if (a === 'tobenchro') data.benchIds.push(i); // i=id
+  if (a === 'delro' && confirm('この選手を名簿から削除しますか？')) data.roster = data.roster.filter(p => p.id !== i);
+  if (a === 'viewgame') { showPastGame(+i); return; }
+  if (a === 'delgame') { if (confirm('この試合の記録を削除しますか？')) data.games.splice(+i, 1); else return; }
   save(); recompute();
+}
+
+// ==== 過去の試合の閲覧（読み取り専用） ====
+function showPastGame(i) {
+  const g = data.games[i];
+  if (!g) return;
+  const cfg = Object.assign({}, g.config, { lineup: g.lineup || [] });
+  const gst = E.reduce(cfg, g.events || []);
+  const mode = data.config.displayMode;
+  let html = '<h2>' + esc((g.savedAt || '').slice(0, 10)) + '　' + esc(gst.teamNames.away) + ' ' + gst.totals.away + ' - ' + gst.totals.home + ' ' + esc(gst.teamNames.home) + '</h2>';
+  const rows = E.stats(gst);
+  if (rows.length) {
+    html += '<table class="statstbl"><thead><tr><th class="nm">選手</th><th>打数</th><th>安打</th><th>打点</th><th>得点</th><th>盗塁</th></tr></thead><tbody>';
+    for (const r of rows) html += '<tr><td class="nm">' + esc(r.name) + '</td><td>' + r.ab + '</td><td class="' + (r.h > 0 ? 'hot' : '') + '">' + r.h + '</td><td>' + r.rbi + '</td><td>' + r.runs + '</td><td>' + r.steals + '</td></tr>';
+    html += '</tbody></table>';
+  }
+  html += '<div style="margin-top:16px">';
+  let cur = '';
+  for (const en of gst.log) {
+    const key = en.inning + '-' + en.half;
+    if ((en.kind === 'pa' || en.kind === 'run') && key !== cur) {
+      cur = key;
+      html += '<div class="chip"><span>' + en.inning + '回' + (en.half === 'top' ? '表' : '裏') + '</span></div>';
+    }
+    const who = en.kind === 'pa' ? esc(en.batter.text) + '　' : '';
+    html += '<div style="padding:4px 0;border-bottom:1px solid var(--line)"><span style="color:var(--sub);font-size:.8rem">' + who + '</span>' + esc(mode === 'term' ? en.term : en.easy) + '</div>';
+  }
+  html += '</div><div class="sheetbtns"><button class="cancel">閉じる</button></div>';
+  openSheet(html);
+  $('sheetBody').querySelector('.cancel').onclick = closeSheet;
 }
 
 // ==== 打席結果フロー: 結果 → (方向) → (走者確認) → 記録 ====
@@ -1106,7 +1186,7 @@ const SUB_KIND_LIST = [['pinch_hit', '代打'], ['pinch_run', '代走'], ['defen
 function subInCandidates(kind) {
   if (kind === 'reentry') return st.benchOut.map(p => ({ p, label: p.name + '（リエントリー）' }));
   const onField = new Set(st.lineup.map(p => p.name + '#' + p.num));
-  return data.bench.filter(p => !onField.has(p.name + '#' + p.num)).map(p => ({ p, label: p.name + '（#' + p.num + '）' }));
+  return benchPlayers().filter(p => !onField.has(p.name + '#' + p.num)).map(p => ({ p, label: p.name + '（#' + p.num + '）' }));
 }
 
 function startSub() { subQueue = []; subKindNow = 'pinch_hit'; renderSubSheet(); }
@@ -1376,17 +1456,33 @@ $('setDispMode').addEventListener('change', () => { data.config.displayMode = $(
 $('btnAddPlayer').onclick = () => {
   const num = $('addNum').value.trim(), name = $('addName').value.trim(), pos = $('addPos').value.trim();
   if (!name) { toast('選手名を入れてください'); return; }
-  data.bench.push({ num, name, pos });
+  const id = pid();
+  data.roster.push({ id, num, name, pos });
+  data.benchIds.push(id); // 追加した選手は自動でベンチ入り
   $('addNum').value = $('addName').value = $('addPos').value = '';
   save(); recompute();
 };
 $('btnNewGame').onclick = () => {
-  if (!confirm('今の試合の記録を消して、新しい試合を始めますか？（選手は残ります）')) return;
-  data.events = []; save(); recompute(); toast('新しい試合を始めました');
+  if (!confirm('今の試合を「過去の試合」へ保存して、新しい試合を始めますか？（選手名簿・スタメンは残ります）')) return;
+  if (data.events.length) {
+    const gst = E.reduce(engineCfg(), data.events);
+    data.games.unshift({
+      savedAt: new Date().toISOString(),
+      config: Object.assign({}, data.config),
+      lineup: lineupPlayers().map(p => ({ num: p.num, name: p.name, pos: p.pos })),
+      events: data.events,
+      totals: gst.totals, teamNames: gst.teamNames,
+    });
+    if (data.games.length > 50) data.games.pop(); // 念のための上限
+  }
+  data.events = [];
+  save(); recompute();
+  toast(data.games.length ? '前の試合を保存して、新しい試合を始めました' : '新しい試合を始めました');
 };
 $('btnWipe').onclick = () => {
-  if (!confirm('選手・設定・記録をすべて消します。よろしいですか？')) return;
-  localStorage.removeItem(KEY); data = load(); recompute();
+  if (!confirm('選手名簿・設定・全試合の記録をすべて消します。よろしいですか？')) return;
+  localStorage.removeItem(KEY); localStorage.removeItem(KEY_V1);
+  data = load(); recompute();
 };
 
 recompute();
