@@ -175,6 +175,9 @@ h2 { font-size: 1.05rem; letter-spacing: .03em; line-height: 1.4; }
 .detailtxt { text-align: center; margin-top: var(--s2); }
 .detailtxt .big { font-size: 1.15rem; font-weight: 700; }
 textarea.share { width: 100%; min-height: 5.5em; margin-bottom: var(--s2); line-height: 1.7; }
+/* ライブ観戦モード（?live=部屋コード で開いた人）: 見るだけ */
+body.viewer .tabs button[data-view="input"], body.viewer .tabs button[data-view="setting"] { display: none; }
+body.viewer #view-input, body.viewer #view-setting { display: none !important; }
 .toast { position: fixed; left: 50%; transform: translateX(-50%); bottom: calc(88px + env(safe-area-inset-bottom)); background: var(--ink); color: #fff; padding: 10px 20px; border-radius: 999px; font-size: .9rem; opacity: 0; transition: opacity .2s cubic-bezier(.2,.7,.3,1); pointer-events: none; z-index: 50; }
 .toast.act { opacity: 1; }
 </style>
@@ -248,6 +251,7 @@ textarea.share { width: 100%; min-height: 5.5em; margin-bottom: var(--s2); line-
     <div class="gname" id="gcName"></div>
     <div class="gsub" id="gcSub"></div>
   </div>
+  <div class="banner" id="viewerBanner" style="display:none;margin:0 0 16px"></div>
   <div class="watchtop">
     <div class="modepill">
       <button id="modeEasy">かんたん表示</button>
@@ -299,6 +303,22 @@ textarea.share { width: 100%; min-height: 5.5em; margin-bottom: var(--s2); line-
       <button id="btnAddPlayer">追加</button>
     </div>
     <p style="font-size:.8rem;color:var(--sub)">追加した選手は自動でベンチ入りに入ります。名簿は試合を新しくしても消えません。</p>
+  </div>
+  <div class="card">
+    <h2>ライブ配信（リアルタイム観戦）</h2>
+    <div id="liveOff">
+      <button class="primarybtn" id="btnLiveStart">配信を開始する</button>
+      <p style="font-size:.8rem;color:var(--sub);margin-top:8px">観戦用のリンクができます。リンクを開いた人の画面は、記録するたびに自動で更新されます。サーバーに送るのは登録名・背番号・プレー内容だけです。</p>
+    </div>
+    <div id="liveOn" style="display:none">
+      <p style="font-weight:700;color:var(--green-deep)" id="liveStatus">配信中</p>
+      <textarea class="share" id="liveUrlBox" readonly style="min-height:3.2em"></textarea>
+      <div class="rowbtns">
+        <button id="btnLiveCopy">観戦リンクをコピー</button>
+        <button class="undo" id="btnLiveStop">配信を終了する</button>
+      </div>
+      <p style="font-size:.8rem;color:var(--sub);margin-top:8px">終了するとサーバー上のデータは消えます（スマホの中の記録は残ります）。</p>
+    </div>
   </div>
   <div class="card">
     <h2>過去の試合</h2>
@@ -848,12 +868,106 @@ function save() {
   catch (e) { // 保存が使えない環境（プライベートモード等）でも動作は続ける
     if (!saveWarned) { saveWarned = true; setTimeout(() => toast('この環境では記録を保存できません（閉じると消えます）'), 0); }
   }
+  schedulePush(); // ライブ配信中なら自動送信
+}
+
+// ==== ライブ配信（Firebase Realtime Database・RESTのみでSDK不要） ====
+// 設計: 部屋コード=推測不可能な乱数 / 書き込みはsecret一致が必要(ルールで強制) / 観戦者はstateだけ読める
+const FB_DB = 'https://yakyu-jikkyo-default-rtdb.firebaseio.com';
+const LIVE_ROOM = new URLSearchParams(location.search).get('live');
+function rnd() { let s = ''; while (s.length < 18) s += Math.random().toString(36).slice(2); return s.slice(0, 18); }
+function liveState() {
+  return {
+    config: {
+      gameName: data.config.gameName, round: data.config.round, startTime: data.config.startTime,
+      myTeamName: data.config.myTeamName, oppName: data.config.oppName,
+      myTeamBatsFirst: data.config.myTeamBatsFirst, innings: data.config.innings, rules: data.config.rules,
+    },
+    lineup: lineupPlayers().map(p => ({ num: p.num, name: p.name })), // 登録名+背番号のみ(守備・連絡先等は送らない)
+    events: data.events,
+    updatedAt: Date.now(),
+  };
+}
+let pushTimer = null, pushRetryTimer = null;
+function schedulePush() {
+  if (!data.live || LIVE_ROOM) return;
+  clearTimeout(pushTimer);
+  pushTimer = setTimeout(pushLive, 700);
+}
+async function pushLive(extraState) {
+  if (!data.live) return;
+  const body = { secret: data.live.secret, state: Object.assign(liveState(), extraState || {}) };
+  try {
+    const res = await fetch(FB_DB + '/rooms/' + data.live.roomId + '.json', { method: 'PUT', body: JSON.stringify(body) });
+    if (!res.ok) throw new Error('http ' + res.status);
+    setLiveStatus('配信中（同期OK）', true);
+    return true;
+  } catch (e) {
+    setLiveStatus('同期待ち（電波が戻り次第送ります）', false);
+    clearTimeout(pushRetryTimer);
+    pushRetryTimer = setTimeout(pushLive, 20000);
+    return false;
+  }
+}
+function setLiveStatus(msg, ok) {
+  const el = $('liveStatus');
+  if (el) { el.textContent = msg; el.style.color = ok ? 'var(--green-deep)' : 'var(--amber)'; }
+}
+function liveUrl() { return location.origin + location.pathname + '?live=' + data.live.roomId; }
+
+// ==== ライブ観戦モード（?live= で開いた人・見るだけ） ====
+let REMOTE = null;
+function applyRemote(state) {
+  REMOTE = state;
+  const b = $('viewerBanner');
+  b.style.display = '';
+  if (!state) b.textContent = 'この配信は見つかりません（終了したか、リンクが違います）';
+  else if (state.ended) b.textContent = 'この試合の配信は終了しました';
+  else b.textContent = 'ライブ観戦中：記録が入ると自動で更新されます';
+  recompute();
+}
+function startViewer() {
+  document.body.classList.add('viewer');
+  document.querySelectorAll('.tabs button').forEach(x => x.classList.remove('act'));
+  document.querySelectorAll('.view').forEach(x => x.classList.remove('act'));
+  document.querySelector('.tabs button[data-view="watch"]').classList.add('act');
+  $('view-watch').classList.add('act');
+  $('viewerBanner').style.display = '';
+  $('viewerBanner').textContent = 'ライブ配信につないでいます…';
+  const url = FB_DB + '/rooms/' + LIVE_ROOM + '/state.json';
+  let pollTimer = null;
+  const poll = async () => {
+    try {
+      const r = await fetch(url);
+      if (!r.ok) return; // 権限エラー等は状態を変えず次の周期へ
+      applyRemote(await r.json());
+    } catch (e) { /* 次の周期で再試行 */ }
+  };
+  try {
+    const es = new EventSource(url);
+    es.addEventListener('put', e => {
+      const m = JSON.parse(e.data);
+      if (m.path === '/') applyRemote(m.data);
+      else poll(); // 部分更新は取り直す(通常は全置換なので来ない)
+    });
+    es.addEventListener('patch', poll);
+    es.onerror = () => { if (!pollTimer) pollTimer = setInterval(poll, 15000); };
+  } catch (e) {
+    pollTimer = setInterval(poll, 15000);
+  }
+  poll();
 }
 
 // ==== 状態導出 ====
 let st = null;
 function engineCfg() { return Object.assign({}, data.config, { lineup: lineupPlayers().map(p => ({ num: p.num, name: p.name, pos: p.pos })) }); }
 function recompute() {
+  if (LIVE_ROOM) { // ライブ観戦: 受信した試合データで描画（自分の記録には触らない）
+    if (REMOTE && REMOTE.config) st = E.reduce(Object.assign({}, DEFAULT_CONFIG, REMOTE.config, { lineup: REMOTE.lineup || [] }), REMOTE.events || []);
+    else st = E.reduce(Object.assign({}, DEFAULT_CONFIG, { lineup: [] }), []);
+    render();
+    return;
+  }
   st = E.reduce(engineCfg(), data.events);
   render();
 }
@@ -1006,6 +1120,9 @@ function renderSetting() {
       ? '<button data-a="tobenchro" data-id="' + p.id + '">ベンチ入り</button><button data-a="delro" data-id="' + p.id + '">削除</button>' : '';
     return '<li><span class="nm">' + esc(p.name) + '</span><span class="ps">#' + esc(String(p.num)) + ' ' + esc(p.pos || '') + '・' + state + '</span>' + btns + '</li>';
   }).join('') || '<li style="color:var(--sub)">下の欄から選手を登録してください</li>';
+  $('liveOff').style.display = data.live ? 'none' : '';
+  $('liveOn').style.display = data.live ? '' : 'none';
+  if (data.live) $('liveUrlBox').value = liveUrl();
   const ga = $('gamesList');
   ga.innerHTML = data.games.map((g, i) => {
     const d = (g.savedAt || '').slice(0, 10);
@@ -1370,19 +1487,20 @@ function showStats() {
 }
 
 // ==== LINE共有 ====
+function withLiveLink(text) { return data.live ? text + '\n▼ライブ観戦はこちら\n' + liveUrl() : text; }
 function inningShareText() {
   // 手打ちLINE実況と同じ形式：大会ヘッダー＋スコア表＋今のイニングの全プレー
   const plays = st.log.filter(e => e.kind === 'pa' || e.kind === 'run');
   const last = plays[plays.length - 1];
   const inn = last ? last.inning : st.inning;
   const hf = last ? last.half : st.half;
-  return E.reportText(engineCfg(), st, data.config.displayMode, inn, hf);
+  return withLiveLink(E.reportText(engineCfg(), st, data.config.displayMode, inn, hf));
 }
 function lastPlayShareText() {
   const last = st.log.filter(e => e.kind === 'pa' || e.kind === 'run' || e.kind === 'end').slice(-1)[0];
-  if (!last) return '【試合開始】' + (data.config.gameName ? data.config.gameName + '\n' : '') + st.teamNames.away + ' vs ' + st.teamNames.home;
-  if (last.kind === 'end') return '【試合終了】' + mode2(last) + '\n' + st.teamNames.away + ' ' + st.totals.away + ' - ' + st.totals.home + ' ' + st.teamNames.home;
-  return E.lineText(data.config, st, last);
+  if (!last) return withLiveLink('【試合開始】' + (data.config.gameName ? data.config.gameName + '\n' : '') + st.teamNames.away + ' vs ' + st.teamNames.home);
+  if (last.kind === 'end') return withLiveLink('【試合終了】' + mode2(last) + '\n' + st.teamNames.away + ' ' + st.totals.away + ' - ' + st.totals.home + ' ' + st.teamNames.home);
+  return withLiveLink(E.lineText(data.config, st, last));
 }
 function showShare() {
   let html = '<h2>LINEに送る速報文</h2>';
@@ -1479,6 +1597,19 @@ $('btnNewGame').onclick = () => {
   save(); recompute();
   toast(data.games.length ? '前の試合を保存して、新しい試合を始めました' : '新しい試合を始めました');
 };
+$('btnLiveStart').onclick = async () => {
+  data.live = { roomId: 'r' + rnd(), secret: rnd() + rnd() };
+  save(); recompute();
+  const ok = await pushLive();
+  toast(ok ? '配信を開始しました。観戦リンクをLINEで共有してください' : '開始できませんでした（電波かサーバー設定を確認）');
+};
+$('btnLiveCopy').onclick = () => copyText(liveUrl());
+$('btnLiveStop').onclick = async () => {
+  if (!confirm('配信を終了しますか？（サーバー上の試合データは消えます。スマホの記録は残ります）')) return;
+  await pushLive({ ended: true, events: [], lineup: [] }); // 中身を空にして終了印を残す
+  data.live = null; save(); recompute();
+  toast('配信を終了しました');
+};
 $('btnWipe').onclick = () => {
   if (!confirm('選手名簿・設定・全試合の記録をすべて消します。よろしいですか？')) return;
   localStorage.removeItem(KEY); localStorage.removeItem(KEY_V1);
@@ -1486,6 +1617,7 @@ $('btnWipe').onclick = () => {
 };
 
 recompute();
+if (LIVE_ROOM) startViewer();
 
 // オフライン対応（ホスティング版のみ・ファイル版では何もしない）
 if ('serviceWorker' in navigator && location.protocol === 'https:') {
