@@ -183,7 +183,8 @@ h2 { font-size: 1.05rem; letter-spacing: .03em; line-height: 1.4; }
 .batrow .batcard { flex: 1; min-width: 0; }
 .batcard .binfo { flex: 1; min-width: 0; }
 .undofab { display: none; position: fixed; z-index: 35; right: max(12px, calc((100vw - 560px) / 2 + 12px)); bottom: calc(72px + env(safe-area-inset-bottom)); }
-body[data-tab="setting"] .undofab { display: flex; }
+body[data-tab="input"] .undofab, body[data-tab="setting"] .undofab { display: flex; }
+.undofab .undobtn, .undofab .redobtn { box-shadow: 0 1px 2px rgba(28,42,36,.10), 0 4px 12px rgba(28,42,36,.14); }
 body.viewer .undoset { display: none; }
 .sheetwrap { position: fixed; inset: 0; background: rgba(20,30,25,.45); display: none; z-index: 40; }
 .sheetwrap.act { display: flex; align-items: flex-end; justify-content: center; }
@@ -213,7 +214,7 @@ textarea.share { width: 100%; min-height: 5.5em; margin-bottom: var(--s2); line-
 /* ライブ観戦モード（?live=部屋コード で開いた人）: 見るだけ */
 body.viewer .tabs button[data-view="input"], body.viewer .tabs button[data-view="setting"] { display: none; }
 body.viewer #view-input, body.viewer #view-setting { display: none !important; }
-.toast { position: fixed; left: 50%; transform: translateX(-50%); bottom: calc(136px + env(safe-area-inset-bottom)); background: var(--ink); color: #fff; padding: 10px 20px; border-radius: 999px; font-size: .9rem;
+.toast { position: fixed; left: 50%; transform: translateX(-50%); bottom: calc(170px + env(safe-area-inset-bottom)); background: var(--ink); color: #fff; padding: 10px 20px; border-radius: 999px; font-size: .9rem;
   width: max-content; max-width: calc(100vw - 32px); text-align: center;   /* 左50%配置で幅が半分に縮み、短い文でも折れとった */ opacity: 0; transition: opacity .2s cubic-bezier(.2,.7,.3,1); pointer-events: none; z-index: 50; }
 .toast.act { opacity: 1; }
 </style>
@@ -238,7 +239,6 @@ body.viewer #view-input, body.viewer #view-setting { display: none !important; }
 
 <!-- ① 実況入力 -->
 <section class="view act" id="view-input">
-  <!-- 打者カードと「戻る／進む」は別々に並べる（とと 2026-10-12「枠の中にあると選手に影響しそうに見える」） -->
   <div class="batrow">
     <div class="batcard">
       <div class="numbadge" id="batNumBadge">–</div>
@@ -247,10 +247,6 @@ body.viewer #view-input, body.viewer #view-setting { display: none !important; }
         <div class="bname" id="batName">—</div>
         <div class="bnum" id="batNum"></div>
       </div>
-    </div>
-    <div class="undoset">
-      <button class="undobtn" id="btnBack1" aria-label="1つ前の操作に戻る" disabled>↶ 戻る</button>
-      <button class="redobtn" id="btnFwd1" aria-label="戻した操作をもう一度進める" style="display:none">↷ 進む</button>
     </div>
   </div>
   <div class="cntbtns">
@@ -405,9 +401,11 @@ body.viewer #view-input, body.viewer #view-setting { display: none !important; }
 
 <!-- 汎用シート -->
 <div class="sheetwrap" id="sheetWrap"><div class="sheet" id="sheetBody"></div></div>
+<!-- 戻る／進む：実況入力と設定タブで右下に固定（とと 2026-10-12「常に右下・スクロールしても固定がやりやすい」）。
+     進むは戻った後だけ、戻るの上に出る（戻るの位置は動かさん） -->
 <div class="undoset undofab">
-  <button class="undobtn" id="btnBack2" aria-label="1つ前の操作に戻る" disabled>↶ 戻る</button>
   <button class="redobtn" id="btnFwd2" aria-label="戻した操作をもう一度進める" style="display:none">↷ 進む</button>
+  <button class="undobtn" id="btnBack2" aria-label="1つ前の操作に戻る" disabled>↶ 戻る</button>
 </div>
 <div class="toast" id="toast"></div>
 
@@ -1047,8 +1045,8 @@ function snapOf(d) {
 }
 function updateUndoBtn() {
   // 回数は出さん（とと 2026-10-12「数字はなくてもいい」）。戻れるかどうかは色で分かる
-  ['btnBack1', 'btnBack2'].forEach(bid => { const b = $(bid); if (b) b.disabled = undoStack.length === 0; });
-  ['btnFwd1', 'btnFwd2'].forEach(bid => { const b = $(bid); if (b) b.style.display = redoStack.length ? '' : 'none'; });
+  $('btnBack2').disabled = undoStack.length === 0;
+  $('btnFwd2').style.display = redoStack.length ? '' : 'none';
 }
 // 2つの状態の差を「何の操作か」の名前にする（newer＝新しい方・older＝古い方）。戻る／進むの案内で共用
 function describeChange(newer, older) {
@@ -1901,9 +1899,7 @@ document.querySelectorAll('.tabs button').forEach(b => b.onclick = () => {
 $('btnBall').onclick = () => commit({ type: 'pitch', kind: 'ball' });
 $('btnStrike').onclick = () => commit({ type: 'pitch', kind: 'strike' });
 $('btnFoul').onclick = () => commit({ type: 'pitch', kind: 'foul' });
-$('btnBack1').onclick = undo;
 $('btnBack2').onclick = undo;
-$('btnFwd1').onclick = redo;
 $('btnFwd2').onclick = redo;
 document.body.dataset.tab = 'input';
 $('btnSub').onclick = startSub;
