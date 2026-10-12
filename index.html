@@ -34,7 +34,7 @@ body {
   font-family: "Noto Sans JP", "Hiragino Kaku Gothic ProN", "Yu Gothic Medium", Meiryo, sans-serif;
   background: var(--bg); color: var(--ink);
   line-height: 1.7;
-  padding-bottom: calc(64px + env(safe-area-inset-bottom));
+  padding-bottom: calc(128px + env(safe-area-inset-bottom));   /* タブ＋（設定タブの）右下の「戻る」ぶん */
   max-width: 560px; margin: 0 auto;
 }
 button { font-family: inherit; font-size: 1rem; color: var(--ink); background: var(--surface); border: 1px solid var(--line); border-bottom-width: 2px; border-radius: var(--r-btn); cursor: pointer; box-shadow: 0 1px 2px rgba(28,42,36,.05); transition: transform .12s cubic-bezier(.2,.7,.3,1), box-shadow .12s cubic-bezier(.2,.7,.3,1); }
@@ -50,10 +50,16 @@ h2 { font-size: 1.05rem; letter-spacing: .03em; line-height: 1.4; }
 .board td.num { color: #ffd75e; font-weight: 700; text-shadow: 0 0 8px rgba(255,215,94,.4); }
 .board td.total { font-size: 1.35rem; font-weight: 800; color: #ffd75e; letter-spacing: .04em; text-shadow: 0 0 10px rgba(255,215,94,.45); }
 .board td.now { background: rgba(255,215,94,.14); border-radius: 4px; }
+/* 球数：計の右に控えめに（とと 2026-10-12「幅を取りすぎ」）。得点より小さく・光らせず・名前なし */
+.board th.pc, .board td.pc { width: 1%; white-space: nowrap; border-left: 1px solid rgba(157,191,174,.25); padding: 3px 0 3px 5px; }
+.board th.pc { font-size: .65rem; }
+.board td.pc { font-size: .8rem; font-weight: 700; color: #cfe3d8; font-variant-numeric: tabular-nums; }
 .statusbar { display: flex; align-items: center; gap: var(--s3); margin-top: var(--s2); }
-.statusbar .inning { font-size: 1.15rem; font-weight: 800; letter-spacing: .04em; }
+.statusbar .inning { font-size: 1.15rem; font-weight: 800; letter-spacing: .04em; white-space: nowrap; }
 .dots { display: flex; gap: 5px; align-items: center; }
-.dots .lbl { font-size: .75rem; color: #9dbfae; margin-right: 2px; }
+.dots .lbl { font-size: .75rem; color: #9dbfae; margin-right: 2px; white-space: nowrap; }
+/* スマホ幅では間を詰める（延長の「10回表」でも1行に収める） */
+@media (max-width: 400px) { .statusbar { gap: var(--s2); } .dots { gap: 4px; } }
 .dot { width: 12px; height: 12px; border-radius: 50%; border: 1.5px solid #7c9887; transition: background .15s cubic-bezier(.2,.7,.3,1); }
 /* 実際の球場ランプと同じ配色: ボール=緑・ストライク=黄・アウト=赤 */
 #bsDots .dot.on.b { background: #7fd48a; border-color: #7fd48a; box-shadow: 0 0 7px rgba(127,212,138,.55); }
@@ -142,14 +148,43 @@ h2 { font-size: 1.05rem; letter-spacing: .03em; line-height: 1.4; }
 .plist .nm { flex: 1; font-weight: 700; }
 .plist .ps { color: var(--sub); font-size: .85rem; }
 .plist button { padding: 6px 10px; font-size: .85rem; min-height: 36px; }
+#lineupList li { flex-wrap: wrap; row-gap: 4px; }
+#lineupList .ctl { flex-basis: 100%; min-width: 0; display: flex; align-items: center; gap: var(--s2); padding-left: calc(2.2em + var(--s2)); }
+.plist button { white-space: nowrap; }
+.plist .possel { min-height: 36px; padding: 4px 8px; font-size: .95rem; flex: 1 1 0; min-width: 0; max-width: 10em; }
+.poswarn { color: var(--red); font-size: .85rem; font-weight: 700; min-height: 0; }
+.poswarn:empty { display: none; }
 .addrow { display: flex; gap: var(--s2); margin-top: var(--s2); }
 .addrow input.n { width: 4em; }
 .addrow input.p { width: 5.5em; }
+.addrow select { flex: 1; min-width: 0; }
 .addrow input.nm { flex: 1; min-width: 0; }
 .dangerbtn { border-color: var(--red); color: var(--red); width: 100%; min-height: 44px; }
 .primarybtn { background: var(--green); color: #fff; border: none; width: 100%; min-height: 48px; font-weight: 700; font-size: 1rem; }
 
 /* ==== シート(モーダル) ==== */
+/* 右下の「戻る」：どの画面にも出す。シートより下・タブより上 */
+.undobtn {
+  /* 他のボタン（白）と見分けがつくよう琥珀色で塗る（とと 2026-10-12）。白文字/琥珀=5.02・ボタン/背景=4.59 */
+  /* 大きさは控えめに（とと 2026-10-12「主張がありすぎて選手の枠が弱く感じる」）。押しやすさの目安40pxは守る */
+  flex: none; min-height: 40px; padding: 4px 12px; font-size: .88rem; white-space: nowrap; border-radius: 999px; font-weight: 700; color: #fff; background: var(--amber);
+  border: 1px solid #8a3f07; border-bottom-width: 2px;
+  box-shadow: 0 1px 2px rgba(28,42,36,.10); }
+/* 戻れん時も場所が分かるよう色は残す（とと 2026-10-12「探さんでいいように少し色はつけといて」）。
+   淡い琥珀の地＋琥珀の枠＋濃い琥珀の文字（文字/地=6.17・枠/背景=4.59）。塗りと影が無いので押せる時と見分けがつく */
+.undobtn:disabled { color: #8a3f07; background: #fbe6c8; border-color: var(--amber); border-bottom-width: 2px;
+  box-shadow: none; cursor: default; }
+/* 実況入力では打者の枠の右（スコアボードのすぐ下）。打者の枠が無い設定タブだけ右下に浮かべる。観戦タブには出さん */
+/* 「進む」＝戻るを押した後だけ出す。塗らずに琥珀の枠と文字（戻ると見分ける）。琥珀/白=5.02 */
+.redobtn { flex: none; min-height: 36px; padding: 2px 12px; font-size: .85rem; white-space: nowrap; border-radius: 999px; font-weight: 700;
+  color: var(--amber); background: var(--surface); border: 1px solid var(--amber); border-bottom-width: 2px; }
+.undoset { display: flex; flex-direction: column; gap: 6px; flex: none; }
+.batrow { display: flex; align-items: center; gap: var(--s2); }
+.batrow .batcard { flex: 1; min-width: 0; }
+.batcard .binfo { flex: 1; min-width: 0; }
+.undofab { display: none; position: fixed; z-index: 35; right: max(12px, calc((100vw - 560px) / 2 + 12px)); bottom: calc(72px + env(safe-area-inset-bottom)); }
+body[data-tab="setting"] .undofab { display: flex; }
+body.viewer .undoset { display: none; }
 .sheetwrap { position: fixed; inset: 0; background: rgba(20,30,25,.45); display: none; z-index: 40; }
 .sheetwrap.act { display: flex; align-items: flex-end; justify-content: center; }
 .sheet { background: var(--surface); border-radius: 16px 16px 0 0; width: 100%; max-width: 560px; max-height: 86vh; overflow-y: auto; padding: var(--s2) var(--s3) calc(var(--s3) + env(safe-area-inset-bottom)); }
@@ -178,7 +213,8 @@ textarea.share { width: 100%; min-height: 5.5em; margin-bottom: var(--s2); line-
 /* ライブ観戦モード（?live=部屋コード で開いた人）: 見るだけ */
 body.viewer .tabs button[data-view="input"], body.viewer .tabs button[data-view="setting"] { display: none; }
 body.viewer #view-input, body.viewer #view-setting { display: none !important; }
-.toast { position: fixed; left: 50%; transform: translateX(-50%); bottom: calc(88px + env(safe-area-inset-bottom)); background: var(--ink); color: #fff; padding: 10px 20px; border-radius: 999px; font-size: .9rem; opacity: 0; transition: opacity .2s cubic-bezier(.2,.7,.3,1); pointer-events: none; z-index: 50; }
+.toast { position: fixed; left: 50%; transform: translateX(-50%); bottom: calc(136px + env(safe-area-inset-bottom)); background: var(--ink); color: #fff; padding: 10px 20px; border-radius: 999px; font-size: .9rem;
+  width: max-content; max-width: calc(100vw - 32px); text-align: center;   /* 左50%配置で幅が半分に縮み、短い文でも折れとった */ opacity: 0; transition: opacity .2s cubic-bezier(.2,.7,.3,1); pointer-events: none; z-index: 50; }
 .toast.act { opacity: 1; }
 </style>
 </head>
@@ -202,12 +238,19 @@ body.viewer #view-input, body.viewer #view-setting { display: none !important; }
 
 <!-- ① 実況入力 -->
 <section class="view act" id="view-input">
-  <div class="batcard">
-    <div class="numbadge" id="batNumBadge">–</div>
-    <div>
-      <div class="order" id="batOrder">1番・投手</div>
-      <div class="bname" id="batName">—</div>
-      <div class="bnum" id="batNum"></div>
+  <!-- 打者カードと「戻る／進む」は別々に並べる（とと 2026-10-12「枠の中にあると選手に影響しそうに見える」） -->
+  <div class="batrow">
+    <div class="batcard">
+      <div class="numbadge" id="batNumBadge">–</div>
+      <div class="binfo">
+        <div class="order" id="batOrder">1番・投手</div>
+        <div class="bname" id="batName">—</div>
+        <div class="bnum" id="batNum"></div>
+      </div>
+    </div>
+    <div class="undoset">
+      <button class="undobtn" id="btnBack1" aria-label="1つ前の操作に戻る" disabled>↶ 戻る</button>
+      <button class="redobtn" id="btnFwd1" aria-label="戻した操作をもう一度進める" style="display:none">↷ 進む</button>
     </div>
   </div>
   <div class="cntbtns">
@@ -239,7 +282,6 @@ body.viewer #view-input, body.viewer #view-setting { display: none !important; }
     </div>
     <div class="rowbtns" style="margin-top:8px">
       <button id="btnAdjust">得点補正</button>
-      <button class="undo" id="btnUndo">↩ 取り消し</button>
     </div>
   </div>
   <p class="modehint">ボタンの言葉：<button id="btnInputMode" style="padding:4px 12px;min-height:36px">野球用語 ⇔ かんたん</button></p>
@@ -286,12 +328,25 @@ body.viewer #view-input, body.viewer #view-setting { display: none !important; }
   <div class="card">
     <h2>スタメン（打順）</h2>
     <ul class="plist" id="lineupList"></ul>
-    <p style="font-size:.8rem;color:var(--sub)">▲▼で打順を入れ替え。試合が始まったら変更は「選手交代」で。</p>
+    <p class="poswarn" id="posWarn" role="status"></p>
+    <p style="font-size:.8rem;color:var(--sub)">▲▼で打順を入れ替え。守備はこの試合だけのもの（最初は名簿の守備が入ります）。試合が始まったら変更は「選手交代」で。</p>
   </div>
   <div class="card">
     <h2>この試合のベンチ入り</h2>
     <ul class="plist" id="benchList"></ul>
     <p style="font-size:.8rem;color:var(--sub)">「選手交代」で出られるのはベンチ入りの選手です。</p>
+  </div>
+  <div class="card">
+    <h2>投球数のスタート（同じ日の2試合目など）</h2>
+    <p style="font-size:.8rem;color:var(--sub);margin-bottom:8px">前の試合で投げた球数を入れておくと、その数から数えます。得点盤の「球数」はその日の合計です。</p>
+    <div class="frow"><label>相手投手</label><input id="psOpp" type="number" min="0" inputmode="numeric" placeholder="0"></div>
+    <ul class="plist" id="psList"></ul>
+    <div class="addrow">
+      <select id="psWho" aria-label="球数を入れる選手"></select>
+      <input class="n" id="psNum" type="number" min="0" inputmode="numeric" placeholder="球数">
+      <button id="btnPsAdd">入れる</button>
+    </div>
+    <button id="btnPsToday" style="margin-top:8px;width:100%;min-height:44px">同じ日の前の試合から自チームの球数を入れる</button>
   </div>
   <div class="card">
     <h2>選手名簿（全選手・ずっと保存）</h2>
@@ -350,6 +405,10 @@ body.viewer #view-input, body.viewer #view-setting { display: none !important; }
 
 <!-- 汎用シート -->
 <div class="sheetwrap" id="sheetWrap"><div class="sheet" id="sheetBody"></div></div>
+<div class="undoset undofab">
+  <button class="undobtn" id="btnBack2" aria-label="1つ前の操作に戻る" disabled>↶ 戻る</button>
+  <button class="redobtn" id="btnFwd2" aria-label="戻した操作をもう一度進める" style="display:none">↷ 進む</button>
+</div>
 <div class="toast" id="toast"></div>
 
 <script>
@@ -376,6 +435,13 @@ body.viewer #view-input, body.viewer #view-setting { display: none !important; }
     cf: { kanji: '中', easy: 'センター' },
     rf: { kanji: '右', easy: 'ライト' },
   };
+  // 投手の判定（名簿の守備は自由入力なので「投」「投手」「ピッチャー」「P」を投手とみなす）
+  const NO_PITCHER = '投手（未設定）';
+  const isPitcherPos = (pos) => /^(投|投手|ピッチャー|p|P)$/.test(String(pos || '').trim());
+  // 守備の漢字1文字 → かんたん表示の言葉（投→ピッチャー）。9つ以外の書き方はそのまま返す
+  const POS_EASY = {};
+  Object.keys(DIR).forEach(k => { POS_EASY[DIR[k].kanji] = DIR[k].easy; });
+  const posEasy = (pos) => POS_EASY[pos] || pos || '';
 
   // 打席結果の定義: batter=既定の行き先, outs=結果自体が作るアウト数(走者アウトは advances 側で表現)
   const PA_RESULTS = {
@@ -517,8 +583,36 @@ body.viewer #view-input, body.viewer #view-setting { display: none !important; }
       finished: false, endReason: null,
       lastPlay: null,
       warnings: [],
+      pitchers: [],       // 自チームの投手ごとの投球数 [{name,num,pitches,start}]（登板順・pitches＝この試合の分）
+      curPitcher: null,   // いまマウンドにおる自チームの投手 {name,num}
+      oppPitches: 0,      // 相手投手の投球数（この試合の分。相手の選手名は持たんので1つにまとめる）
     };
     const myIsAway = !!config.myTeamBatsFirst;
+
+    // ---- 投球数（とと 2026-10-12）：相手の攻撃中に、自チームの投手が投げた球を数える。
+    // カウント（ボール/ストライク/ファウル）＝1球、打席の結果（ヒット・アウト・三振・四球…）＝その最後の1球。
+    // 牽制・盗塁・暴投などランナーのプレーは数えん（暴投の球そのものはボール/ストライクで入れる）。
+    // 投手が替わったら、前の投手の数はそのまま残り、新しい投手は0から。
+    // スタートの数（同じ日の前の試合で投げた分。とと 2026-10-12「2試合目のスタートの数字を設定できるように。相手もこっちも」）
+    const PS = config.pitchStart || {};
+    const myStart = (name) => Math.max(0, +((PS.my || {})[name]) || 0);
+    const oppStart = Math.max(0, +PS.opp || 0);
+    const setPitcher = (pl) => { st.curPitcher = pl ? { name: pl.name, num: pl.num } : null; };
+    const countPitch = () => {
+      if (isMyAtBat()) { st.oppPitches++; return; }   // 自チームの攻撃中＝相手の投手の球
+      const cp = st.curPitcher || { name: NO_PITCHER, num: '' };
+      let e = st.pitchers.find(x => x.name === cp.name);
+      if (!e) { e = { name: cp.name, num: cp.num, pitches: 0, start: myStart(cp.name) }; st.pitchers.push(e); }
+      e.pitches++;
+    };
+    const syncPitcherAfterSub = (ev) => {
+      if (!ev.inPlayer) return;
+      const np = st.lineup.find(x => x.name === ev.inPlayer.name && String(x.num) === String(ev.inPlayer.num));
+      if (np && isPitcherPos(np.pos)) setPitcher(np);
+      else if (st.curPitcher && ev.outPlayer && st.curPitcher.name === ev.outPlayer.name)
+        setPitcher(st.lineup.find(x => isPitcherPos(x.pos)));
+    };
+    setPitcher(st.lineup.find(pl => isPitcherPos(pl.pos)));
 
     const battingTeam = () => (st.half === 'top') ? 'away' : 'home';
     const isMyAtBat = () => (battingTeam() === 'away') === myIsAway;
@@ -590,6 +684,7 @@ body.viewer #view-input, body.viewer #view-setting { display: none !important; }
       ensureInning('away'); ensureInning('home');
 
       if (ev.type === 'pitch') {
+        countPitch();
         if (ev.kind === 'ball') st.balls = Math.min(st.balls + 1, 4);
         else if (ev.kind === 'strike') st.strikes = Math.min(st.strikes + 1, 3);
         else if (ev.kind === 'foul') st.strikes = Math.min(st.strikes + 1, 2);
@@ -599,6 +694,7 @@ body.viewer #view-input, body.viewer #view-setting { display: none !important; }
       if (ev.type === 'pa') {
         const def = PA_RESULTS[ev.result];
         if (!def) { st.warnings.push('不明な打席結果: ' + ev.result); continue; }
+        countPitch();   // 打席を終わらせた最後の1球
         // イベントに打者スナップショットがあればそれが正（後からスタメン表を編集しても過去ログが変わらないように）
         const b = ev.batter
           ? { text: (ev.batter.slot + 1) + '番' + (isMyAtBat() && ev.batter.name ? ' ' + ev.batter.name : ''), num: ev.batter.num || '', name: ev.batter.name || (ev.batter.slot + 1) + '番打者', slot: ev.batter.slot, pos: ev.batter.pos || '' }
@@ -666,13 +762,19 @@ body.viewer #view-input, body.viewer #view-setting { display: none !important; }
         const def = SUB_KINDS[ev.kind] || { term: '交代', easy: '交代' };
         if (ev.kind === 'pos_change') {
           // 出場中の選手どうしの守備位置入れ替え（例: 投 山田・三 佐藤・中 鈴木）
-          const parts = [];
+          const parts = [], partsEasy = [];
+          let newP = null;
           for (const c of (ev.changes || [])) {
             const p = st.lineup.find(x => x.name === c.name);
             if (p) p.pos = c.pos;
+            if (p && isPitcherPos(c.pos)) newP = p;
             parts.push(c.pos + ' ' + c.name);
+            partsEasy.push(c.name + '（' + posEasy(c.pos) + '）');
           }
-          addLog({ kind: 'sub', subKind: 'pos_change', term: '守備変更：' + parts.join('・'), easy: '守備の入れ替え：' + parts.join('・') });
+          if (newP) setPitcher(newP);
+          else if (st.curPitcher && !st.lineup.some(x => x.name === st.curPitcher.name && isPitcherPos(x.pos)))
+            setPitcher(st.lineup.find(x => isPitcherPos(x.pos)));   // 投手が別の守備へ回った
+          addLog({ kind: 'sub', subKind: 'pos_change', term: '守備変更：' + parts.join('・'), easy: '守備の入れ替え：' + partsEasy.join('・') });
           continue;
         }
         // 「誰から誰へ」を必ず残す
@@ -680,9 +782,11 @@ body.viewer #view-input, body.viewer #view-setting { display: none !important; }
           const from = st.bases[ev.base].label;
           st.bases[ev.base] = { label: ev.inPlayer.name };
           replaceLineup(st, ev.outPlayer, ev.inPlayer, ev.pos);
+          syncPitcherAfterSub(ev);
           addLog({ kind: 'sub', subKind: ev.kind, term: def.term + '：' + from + '→' + ev.inPlayer.name, easy: def.easy + '：' + from + 'に代わって' + ev.inPlayer.name + '（' + ev.base + '塁）' });
         } else {
           replaceLineup(st, ev.outPlayer, ev.inPlayer, ev.pos);
+          syncPitcherAfterSub(ev);
           const fromName = ev.outPlayer ? ev.outPlayer.name : '？';
           addLog({ kind: 'sub', subKind: ev.kind, term: def.term + '：' + fromName + '→' + ev.inPlayer.name, easy: def.easy + '：' + fromName + 'に代わって' + ev.inPlayer.name });
         }
@@ -721,6 +825,16 @@ body.viewer #view-input, body.viewer #view-setting { display: none !important; }
     st.myTeam = myIsAway ? 'away' : 'home';
     st.battingTeam = battingTeam();
     st.isMyAtBat = isMyAtBat();
+    // いまの投手の投球数（まだ投げとらんかったら0）
+    {
+      const cp = st.curPitcher || { name: NO_PITCHER, num: '' };
+      const e = st.pitchers.find(x => x.name === cp.name);
+      const start = myStart(cp.name), n = e ? e.pitches : 0;
+      // pitches＝この試合の分／total＝スタートの数＋この試合（その日の合計。得点盤に出すのはこっち）
+      st.pitcher = (st.curPitcher || e) ? { name: cp.name, num: cp.num, pitches: n, start: start, total: start + n } : null;
+      st.oppStart = oppStart;
+      st.oppTotal = oppStart + st.oppPitches;
+    }
     st.batter = batterLabel();
     st.teamNames = { away: teamName('away'), home: teamName('home') };
     st.inningsSetting = innings;
@@ -790,7 +904,7 @@ body.viewer #view-input, body.viewer #view-setting { display: none !important; }
   function stats(st) {
     const rows = new Map(); // 選手名 → 集計行
     const get = (name, slot) => {
-      if (!rows.has(name)) rows.set(name, { name, slot: slot === undefined ? 99 : slot, ab: 0, h: 0, rbi: 0, runs: 0, steals: 0 });
+      if (!rows.has(name)) rows.set(name, { name, slot: slot === undefined ? 99 : slot, ab: 0, h: 0, rbi: 0, runs: 0, steals: 0, pitches: 0 });
       const r = rows.get(name);
       if (slot !== undefined && slot < r.slot) r.slot = slot;
       return r;
@@ -812,6 +926,7 @@ body.viewer #view-input, body.viewer #view-setting { display: none !important; }
         }
       }
     }
+    for (const pc of (st.pitchers || [])) if (pc.name !== NO_PITCHER) get(pc.name).pitches = pc.pitches;   // 投手の欄に投球数
     return Array.from(rows.values()).sort((a, b) => a.slot - b.slot);
   }
 
@@ -820,9 +935,9 @@ body.viewer #view-input, body.viewer #view-setting { display: none !important; }
     const m = new Map();
     for (const rows of rowsLists) {
       for (const r of rows) {
-        if (!m.has(r.name)) m.set(r.name, { name: r.name, slot: r.slot, games: 0, ab: 0, h: 0, rbi: 0, runs: 0, steals: 0 });
+        if (!m.has(r.name)) m.set(r.name, { name: r.name, slot: r.slot, games: 0, ab: 0, h: 0, rbi: 0, runs: 0, steals: 0, pitches: 0 });
         const t = m.get(r.name);
-        t.games++; t.ab += r.ab; t.h += r.h; t.rbi += r.rbi; t.runs += r.runs; t.steals += r.steals;
+        t.games++; t.ab += r.ab; t.h += r.h; t.rbi += r.rbi; t.runs += r.runs; t.steals += r.steals; t.pitches += r.pitches || 0;
         if (r.slot < t.slot) t.slot = r.slot;
       }
     }
@@ -842,7 +957,7 @@ body.viewer #view-input, body.viewer #view-setting { display: none !important; }
 
   return {
     DIR, PA_RESULTS, RUN_KINDS, SUB_KINDS, END_REASONS,
-    reduce, defaultAdvances, situationText, lineText, reportText, stats, statsMerge,
+    reduce, defaultAdvances, situationText, lineText, reportText, stats, statsMerge, posEasy, isPitcherPos,
   };
 }));
 
@@ -858,9 +973,16 @@ const KEY_V1 = 'yakyu_jikkyo_v1';
 // v2: 選手は「名簿(roster)」に固定登録し、試合ごとにスタメン(lineupIds)・ベンチ入り(benchIds)を選ぶ。
 //     試合を新しく始めると、前の試合は games に自動保存される（選手・記録が消えない構造）。
 const DEFAULT_CONFIG = { gameName: '', round: '', startTime: '', myTeamName: '', oppName: '', myTeamBatsFirst: true, innings: 5, rules: '', displayMode: 'easy', inputMode: 'term' };
+// 「戻る」の履歴（とと 2026-10-12「入力ミスをしたときに一つ前に戻れる・何個か戻れる」）
+// 保存のたびに直前の状態を積む。記録・選手・スタメン・守備・設定・過去の試合が対象。
+// 見た目の切り替え（かんたん/用語）と配信の鍵は戻さん（鍵を戻すと配信が途切れる）。
+// 履歴はこの画面を開いとる間だけ（再読み込みで消える）。
+const UNDO_MAX = 30;
+let undoStack = [], redoStack = [], lastSnap = null;   // redo＝「進む」（とと 2026-10-12・戻りすぎた時用）
 let data = load();
 try { localStorage.setItem(KEY, JSON.stringify(data)); } catch (e) {} // v1からの移行を確定保存
-function fresh() { return { config: Object.assign({}, DEFAULT_CONFIG), roster: [], lineupIds: [], benchIds: [], events: [], games: [] }; }
+lastSnap = snapOf(data);   // ここが「戻る」の起点（開いた時の状態より前には戻らん）
+function fresh() { return { config: Object.assign({}, DEFAULT_CONFIG), roster: [], lineupIds: [], benchIds: [], gamePos: {}, events: [], games: [] }; }
 function pid() { return 'p' + Math.random().toString(36).slice(2, 10); }
 function load() {
   try {
@@ -869,7 +991,7 @@ function load() {
       const d = JSON.parse(raw);
       d.config = Object.assign({}, DEFAULT_CONFIG, d.config); // 旧データに新項目を補う
       d.roster = d.roster || []; d.lineupIds = d.lineupIds || []; d.benchIds = d.benchIds || [];
-      d.events = d.events || []; d.games = d.games || [];
+      d.events = d.events || []; d.games = d.games || []; d.gamePos = d.gamePos || {};
       return d;
     }
     const old = localStorage.getItem(KEY_V1);
@@ -888,8 +1010,102 @@ function migrateV1(v1) {
 function byId(id) { return data.roster.find(p => p.id === id); }
 function lineupPlayers() { return data.lineupIds.map(byId).filter(Boolean); }
 function benchPlayers() { return data.benchIds.map(byId).filter(Boolean); }
+// その試合の守備。名簿の守備は「専門（いつもの）」で、試合ごとに別の守備を選べる（とと 2026-10-12）
+function posOf(p) { return (data.gamePos && data.gamePos[p.id]) || p.pos || ''; }
+// 守備の見せ方：かんたん表示なら「ピッチャー」、野球用語なら「投」（とと 2026-10-12）
+function posLabel(pos, mode) { return mode === 'easy' ? E.posEasy(pos) : (pos || ''); }
+const POS_OPTS = ['投', '捕', '一', '二', '三', '遊', '左', '中', '右'];
+// 投球数のスタート（同じ日の2試合目など）。config.pitchStart = { my: {選手名: 球数}, opp: 球数 }
+// 入れ子のオブジェクトを使い回すと「戻る」の写しまで書き換わるので、読む時も書く時も新しく作る
+function getPS() { const ps = data.config.pitchStart || {}; return { my: Object.assign({}, ps.my || {}), opp: Math.max(0, +ps.opp || 0) }; }
+function setPS(ps) { data.config.pitchStart = { my: Object.assign({}, ps.my), opp: ps.opp }; save(); recompute(); }
+// 今日保存した過去の試合から、自チームの投手ごとの「今日ここまでの球数」を出す（2試合目・3試合目のスタートに使う）
+// 古い試合から順に「その試合のスタートの数（無ければそれまでの合計）＋その試合で投げた数」を積む。
+// こうすると、1試合目にスタートを入れとった場合も、2試合目のスタートを前の合計から入れた場合も二重に数えん。
+function sameDayPitches() {
+  const ymdOf = (d) => d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
+  const today = ymdOf(new Date());
+  const games = (data.games || []).filter(g => ymdOf(new Date(g.savedAt || 0)) === today)
+    .sort((a, b) => String(a.savedAt).localeCompare(String(b.savedAt)));
+  const carry = {};
+  for (const g of games) {
+    const gst = E.reduce(Object.assign({}, g.config, { lineup: g.lineup || [] }), g.events || []);
+    const starts = ((g.config || {}).pitchStart || {}).my || {};
+    const thrown = {};
+    for (const pc of gst.pitchers) if (pc.name.indexOf('（') < 0) thrown[pc.name] = pc.pitches;
+    for (const nm of new Set(Object.keys(starts).concat(Object.keys(thrown))))
+      carry[nm] = Math.max(carry[nm] || 0, +starts[nm] || 0) + (thrown[nm] || 0);
+  }
+  for (const k of Object.keys(carry)) if (!carry[k]) delete carry[k];
+  return Object.keys(carry).length ? carry : null;
+}
 let saveWarned = false;
+function snapOf(d) {
+  const c = Object.assign({}, d.config); delete c.displayMode; delete c.inputMode;
+  const o = Object.assign({}, d, { config: c }); delete o.live;
+  return JSON.stringify(o);
+}
+function updateUndoBtn() {
+  // 回数は出さん（とと 2026-10-12「数字はなくてもいい」）。戻れるかどうかは色で分かる
+  ['btnBack1', 'btnBack2'].forEach(bid => { const b = $(bid); if (b) b.disabled = undoStack.length === 0; });
+  ['btnFwd1', 'btnFwd2'].forEach(bid => { const b = $(bid); if (b) b.style.display = redoStack.length ? '' : 'none'; });
+}
+// 2つの状態の差を「何の操作か」の名前にする（newer＝新しい方・older＝古い方）。戻る／進むの案内で共用
+function describeChange(newer, older) {
+  const ng = (newer.games || []).length, og = (older.games || []).length;
+  if (ng !== og) return ng > og ? '「新しい試合」' : '過去の試合の削除';
+  const ne = newer.events || [], oe = older.events || [];
+  if (JSON.stringify(ne) !== JSON.stringify(oe)) {
+    if (ne.length === oe.length + 1) {
+      const last = ne[ne.length - 1];
+      if (last.type === 'pitch') return '「' + ({ ball: 'ボール', strike: 'ストライク', foul: 'ファウル' }[last.kind] || 'カウント') + '」';
+      // 増えたログを見る。3アウト目はプレーの行と「攻守交代」の行が両方出るので、プレーの方を名前にする
+      const added = E.reduce(engineCfg(), ne).log.slice(E.reduce(engineCfg(), oe).log.length);
+      const main = added.find(x => x.kind !== 'change') || added[0];
+      let m = main ? '「' + mode2(main) + '」' : '記録';
+      if (main && main.kind !== 'change' && added.some(x => x.kind === 'change')) m += '（攻守交代も）';
+      return m;
+    }
+    return ne.length > oe.length ? '記録' + (ne.length - oe.length) + 'つ' : '記録';
+  }
+  const keys = ['roster', 'lineupIds', 'benchIds', 'gamePos'];
+  if (keys.some(k => JSON.stringify(newer[k] || null) !== JSON.stringify(older[k] || null))) return '選手・スタメンの変更';
+  return '試合の設定の変更';
+}
+// 保存した写しを今の画面に入れる（見た目の切り替えと配信の鍵は今のまま）
+function restoreSnap(snapStr) {
+  const d = JSON.parse(snapStr);
+  d.config = Object.assign({}, DEFAULT_CONFIG, d.config, { displayMode: data.config.displayMode, inputMode: data.config.inputMode });
+  d.live = data.live || null;
+  data = d;
+  lastSnap = snapOf(data);
+  try { localStorage.setItem(KEY, JSON.stringify(data)); } catch (e) {}
+  schedulePush(); recompute(); updateUndoBtn();
+}
+function undo() {
+  if (!undoStack.length) { toast('戻れる操作がありません'); return; }
+  const prevS = undoStack.pop();
+  const msg = describeChange(data, JSON.parse(prevS)) + 'を戻しました';
+  redoStack.push(lastSnap);
+  restoreSnap(prevS);
+  toast(msg);
+}
+function redo() {
+  if (!redoStack.length) return;
+  const nextS = redoStack.pop();
+  const msg = describeChange(JSON.parse(nextS), data) + 'まで進めました';
+  undoStack.push(lastSnap);
+  restoreSnap(nextS);
+  toast(msg);
+}
 function save() {
+  const sn = snapOf(data);
+  if (lastSnap !== null && sn !== lastSnap) {
+    undoStack.push(lastSnap); if (undoStack.length > UNDO_MAX) undoStack.shift();
+    redoStack = [];   // 戻った後に新しく入力したら、その先の「進む」は消える
+  }
+  lastSnap = sn;
+  updateUndoBtn();
   try { localStorage.setItem(KEY, JSON.stringify(data)); }
   catch (e) { // 保存が使えない環境（プライベートモード等）でも動作は続ける
     if (!saveWarned) { saveWarned = true; setTimeout(() => toast('この環境では記録を保存できません（閉じると消えます）'), 0); }
@@ -958,6 +1174,7 @@ function startViewer() {
   document.querySelectorAll('.view').forEach(x => x.classList.remove('act'));
   document.querySelector('.tabs button[data-view="watch"]').classList.add('act');
   $('view-watch').classList.add('act');
+  document.body.dataset.tab = 'watch';
   $('viewerBanner').style.display = '';
   $('viewerBanner').textContent = 'ライブ配信につないでいます…';
   const url = FB_DB + '/rooms/' + LIVE_ROOM + '/state.json';
@@ -986,7 +1203,7 @@ function startViewer() {
 
 // ==== 状態導出 ====
 let st = null;
-function engineCfg() { return Object.assign({}, data.config, { lineup: lineupPlayers().map(p => ({ num: p.num, name: p.name, pos: p.pos })) }); }
+function engineCfg() { return Object.assign({}, data.config, { lineup: lineupPlayers().map(p => ({ num: p.num, name: p.name, pos: posOf(p) })) }); }
 function recompute() {
   if (LIVE_ROOM) { // ライブ観戦: 受信した試合データで描画（自分の記録には触らない）
     if (REMOTE && REMOTE.config) st = E.reduce(Object.assign({}, DEFAULT_CONFIG, REMOTE.config, { lineup: REMOTE.lineup || [] }), REMOTE.events || []);
@@ -1033,7 +1250,7 @@ function renderBoard() {
   const n = Math.max(data.config.innings, st.scores.away.length, st.scores.home.length);
   let head = '<tr><th></th>';
   for (let i = 1; i <= n; i++) head += '<th>' + i + '</th>';
-  head += '<th>計</th></tr>';
+  head += '<th>計</th><th class="pc">球数</th></tr>';
   const row = (t) => {
     let cells = '<td class="name">' + esc(st.teamNames[t] || (t === 'away' ? '先攻' : '後攻')) + '</td>';
     for (let i = 0; i < n; i++) {
@@ -1042,6 +1259,13 @@ function renderBoard() {
       cells += '<td class="num' + (now ? ' now' : '') + '">' + (v === undefined ? '' : v) + '</td>';
     }
     cells += '<td class="total">' + st.totals[t] + '</td>';
+    // 投球数（とと 2026-10-12「得点盤の一番右に」）：自チームの行に、いまの自チームの投手の数
+    // 数＝その日の合計（スタートの数＋この試合）。自チームの行＝自チームの投手、相手の行＝相手投手
+    if (t === st.myTeam) {
+      const pc = st.pitcher ? st.pitcher.total : 0;
+      const who = st.pitcher ? st.pitcher.name : '';
+      cells += '<td class="pc" title="' + esc(who ? who + 'の投球数' : '投球数') + '">' + pc + '</td>';   // 名前は出さん（自チームの投手は見れば分かる・とと 2026-10-12）
+    } else cells += '<td class="pc" title="相手投手の投球数">' + st.oppTotal + '</td>';
     return '<tr>' + cells + '</tr>';
   };
   $('lineScore').innerHTML = head + row('away') + row('home');
@@ -1059,8 +1283,8 @@ function renderInput() {
   $('batOrder').textContent = (st.isMyAtBat ? '攻撃中：' + (st.teamNames[st.battingTeam] || '自チーム') : '守備中：相手の攻撃') + '　' + b.text.split(' ')[0];
   $('batName').textContent = b.name;
   $('batNumBadge').textContent = b.num !== '' ? b.num : (b.slot + 1);
-  $('batNum').textContent = (b.num !== '' ? '背番号 ' + b.num : '') + (b.pos ? '・' + b.pos : '');
   const mode = data.config.inputMode;
+  $('batNum').textContent = (b.num !== '' ? '背番号 ' + b.num : '') + (b.pos ? '・' + posLabel(b.pos, mode) : '');
   const mk = (list, grid, outKind) => {
     grid.innerHTML = '';
     for (const [key, term, easy] of list) {
@@ -1077,7 +1301,7 @@ function renderInput() {
   const disable = st.finished;
   document.querySelectorAll('#view-input .btngrid button, .cntbtns button').forEach(b2 => b2.disabled = disable);
   $('endBanner').style.display = st.finished ? '' : 'none';
-  if (st.finished) $('endBanner').textContent = '試合終了（' + (E.END_REASONS[st.endReason] || E.END_REASONS.normal).term + '）。間違いなら「取り消し」。';
+  if (st.finished) $('endBanner').textContent = '試合終了（' + (E.END_REASONS[st.endReason] || E.END_REASONS.normal).term + '）。間違いなら右下の「戻る」。';
 }
 
 function renderLog() {
@@ -1129,13 +1353,47 @@ function renderSetting() {
   $('setRules').value = data.config.rules;
   $('setDispMode').value = data.config.displayMode;
   const lu = $('lineupList');
-  lu.innerHTML = lineupPlayers().map((p, i) =>
-    '<li><span class="pn">' + (i + 1) + '番</span><span class="nm">' + esc(p.name) + '</span><span class="ps">#' + esc(String(p.num)) + ' ' + esc(p.pos || '') + '</span>'
-    + '<button data-a="up" data-i="' + i + '">▲</button><button data-a="down" data-i="' + i + '">▼</button><button data-a="tobench" data-i="' + i + '">外す</button></li>').join('')
+  // 投球数のスタート
+  const PSc = getPS();
+  $('psOpp').value = PSc.opp ? String(PSc.opp) : '';
+  const psNames = Object.keys(PSc.my);
+  $('psList').innerHTML = psNames.map(nm => '<li><span class="nm">' + esc(nm) + '</span><span class="ps">' + PSc.my[nm] + '球から</span><button data-psdel="' + esc(nm) + '">消す</button></li>').join('')
+    || '<li style="color:var(--sub)">自チーム：まだ入っていません（0球から数えます）</li>';
+  const cand = lineupPlayers().concat(benchPlayers());
+  $('psWho').innerHTML = cand.map(pl => '<option value="' + esc(pl.name) + '">' + esc(pl.name) + '</option>').join('') || '<option value="">（先に選手を登録）</option>';
+  $('btnPsToday').style.display = sameDayPitches() ? '' : 'none';
+  document.querySelectorAll('#psList button[data-psdel]').forEach(b => b.onclick = () => {
+    const ps = getPS(); delete ps.my[b.dataset.psdel]; setPS(ps);
+  });
+  const playing = data.events.length > 0;   // 試合が始まったら守備の変更は「選手交代」→守備変更で
+  lu.innerHTML = lineupPlayers().map((p, i) => {
+    const cur = posOf(p), home = p.pos || '';
+    const opts = POS_OPTS.slice();
+    if (home && opts.indexOf(home) < 0) opts.unshift(home);           // 名簿に9つ以外の書き方で入っとっても残す
+    if (cur && opts.indexOf(cur) < 0) opts.unshift(cur);
+    const sel = '<select class="possel" data-id="' + p.id + '"' + (playing ? ' disabled' : '') + ' aria-label="' + esc(p.name) + 'のこの試合の守備">'
+      + (cur ? '' : '<option value="" selected>守備</option>')
+      + opts.map(o => '<option value="' + esc(o) + '"' + (o === cur ? ' selected' : '') + '>' + esc(posLabel(o, data.config.displayMode)) + '</option>').join('')
+      + '</select>';
+    // 1人2段：上＝打順と名前、下＝この試合の守備と操作（スマホ幅で名前が潰れんように）
+    return '<li><span class="pn">' + (i + 1) + '番</span><span class="nm">' + esc(p.name) + ' <span class="ps">#' + esc(String(p.num)) + '</span></span>'
+      + '<div class="ctl">' + sel
+      + '<button data-a="up" data-i="' + i + '">▲</button><button data-a="down" data-i="' + i + '">▼</button><button data-a="tobench" data-i="' + i + '">外す</button></div></li>';
+  }).join('')
     || '<li style="color:var(--sub)">ベンチ入りから「打順へ」で選びます</li>';
+  // 同じ守備が2人いたら知らせる（選び間違いの気づき口）
+  const cnt = {};
+  lineupPlayers().forEach(p => { const v = posOf(p); if (v) cnt[v] = (cnt[v] || 0) + 1; });
+  const dup = Object.keys(cnt).filter(k => cnt[k] > 1);
+  $('posWarn').textContent = dup.length ? '同じ守備が2人以上います：' + dup.join('・') : '';
+  document.querySelectorAll('#lineupList .possel').forEach(sl => sl.onchange = () => {
+    const pl = byId(sl.dataset.id); if (!pl) return;
+    if (!sl.value || sl.value === (pl.pos || '')) delete data.gamePos[pl.id]; else data.gamePos[pl.id] = sl.value;
+    save(); recompute();
+  });
   const be = $('benchList');
   be.innerHTML = benchPlayers().map((p, i) =>
-    '<li><span class="nm">' + esc(p.name) + '</span><span class="ps">#' + esc(String(p.num)) + ' ' + esc(p.pos || '') + '</span>'
+    '<li><span class="nm">' + esc(p.name) + '</span><span class="ps">#' + esc(String(p.num)) + ' ' + esc(posLabel(p.pos, data.config.displayMode)) + '</span>'
     + '<button data-a="tolineup" data-i="' + i + '">打順へ</button><button data-a="benchout" data-i="' + i + '">外す</button></li>').join('')
     || '<li style="color:var(--sub)">名簿から「ベンチ入り」で選びます</li>';
   const inLineup = new Set(data.lineupIds), inBench = new Set(data.benchIds);
@@ -1144,7 +1402,7 @@ function renderSetting() {
     const state = inLineup.has(p.id) ? 'スタメン' : inBench.has(p.id) ? 'ベンチ' : '－';
     const btns = (!inLineup.has(p.id) && !inBench.has(p.id))
       ? '<button data-a="tobenchro" data-id="' + p.id + '">ベンチ入り</button><button data-a="delro" data-id="' + p.id + '">削除</button>' : '';
-    return '<li><span class="nm">' + esc(p.name) + '</span><span class="ps">#' + esc(String(p.num)) + ' ' + esc(p.pos || '') + '・' + state + '</span>' + btns + '</li>';
+    return '<li><span class="nm">' + esc(p.name) + '</span><span class="ps">#' + esc(String(p.num)) + ' ' + esc(posLabel(p.pos, data.config.displayMode)) + '・' + state + '</span>' + btns + '</li>';
   }).join('') || '<li style="color:var(--sub)">下の欄から選手を登録してください</li>';
   $('liveOff').style.display = data.live ? 'none' : '';
   $('liveOn').style.display = data.live ? '' : 'none';
@@ -1184,8 +1442,8 @@ function showPastGame(i) {
   let html = '<h2>' + esc((g.savedAt || '').slice(0, 10)) + '　' + esc(gst.teamNames.away) + ' ' + gst.totals.away + ' - ' + gst.totals.home + ' ' + esc(gst.teamNames.home) + '</h2>';
   const rows = E.stats(gst);
   if (rows.length) {
-    html += '<table class="statstbl"><thead><tr><th class="nm">選手</th><th>打数</th><th>安打</th><th>打点</th><th>得点</th><th>盗塁</th></tr></thead><tbody>';
-    for (const r of rows) html += '<tr><td class="nm">' + esc(r.name) + '</td><td>' + r.ab + '</td><td class="' + (r.h > 0 ? 'hot' : '') + '">' + r.h + '</td><td>' + r.rbi + '</td><td>' + r.runs + '</td><td>' + r.steals + '</td></tr>';
+    html += '<table class="statstbl"><thead><tr><th class="nm">選手</th><th>打数</th><th>安打</th><th>打点</th><th>得点</th><th>盗塁</th><th>球数</th></tr></thead><tbody>';
+    for (const r of rows) html += '<tr><td class="nm">' + esc(r.name) + '</td><td>' + r.ab + '</td><td class="' + (r.h > 0 ? 'hot' : '') + '">' + r.h + '</td><td>' + r.rbi + '</td><td>' + r.runs + '</td><td>' + r.steals + '</td>' + '<td>' + (r.pitches ? r.pitches : '') + '</td>' + '</tr>';
     html += '</tbody></table>';
   }
   html += '<div style="margin-top:16px">';
@@ -1338,7 +1596,7 @@ function renderSubSheet() {
   let html = '<h2>選手交代（自チーム）</h2>';
   html += '<div class="frow"><label>種類</label><select id="subKind">' + SUB_KIND_LIST.map(k => '<option value="' + k[0] + '"' + (k[0] === subKindNow ? ' selected' : '') + '>' + k[1] + '</option>').join('') + '</select></div>';
   if (subKindNow === 'pos_change') {
-    html += '<div class="frow"><label>選手</label><select id="subOut">' + st.lineup.map((p, i) => '<option value="' + i + '">' + (i + 1) + '番 ' + esc(p.name) + '（今：' + esc(p.pos || 'なし') + '）</option>').join('') + '</select></div>';
+    html += '<div class="frow"><label>選手</label><select id="subOut">' + st.lineup.map((p, i) => '<option value="' + i + '">' + (i + 1) + '番 ' + esc(p.name) + '（今：' + esc(posLabel(p.pos, data.config.inputMode) || 'なし') + '）</option>').join('') + '</select></div>';
     html += '<div class="frow"><label>新しい守備</label><input id="subPos" placeholder="投・遊・右 など"></div>';
   } else {
     const cands = subInCandidates(subKindNow);
@@ -1513,19 +1771,19 @@ function showStats(scope) {
   if (!LIVE_ROOM) { // 観戦モードでは通算(自端末の記録)は出さない
     html += '<div class="modepill" style="margin-bottom:16px"><button id="stG" class="' + (total ? '' : 'act') + '">この試合</button><button id="stT" class="' + (total ? 'act' : '') + '">通算</button></div>';
   }
-  html += '<table class="statstbl"><thead><tr><th class="nm">選手</th>' + (total ? '<th>試合</th>' : '') + '<th>打数</th><th>安打</th><th>打率</th><th>打点</th><th>得点</th><th>盗塁</th></tr></thead><tbody>';
+  html += '<table class="statstbl"><thead><tr><th class="nm">選手</th>' + (total ? '<th>試合</th>' : '') + '<th>打数</th><th>安打</th><th>打率</th><th>打点</th><th>得点</th><th>盗塁</th><th>球数</th></tr></thead><tbody>';
   for (const r of rows) {
     html += '<tr><td class="nm">' + esc(r.name) + '</td>' + (total ? '<td>' + r.games + '</td>' : '')
-      + '<td>' + r.ab + '</td><td class="' + (r.h > 0 ? 'hot' : '') + '">' + r.h + '</td><td>' + avg(r.h, r.ab) + '</td><td>' + r.rbi + '</td><td>' + r.runs + '</td><td>' + r.steals + '</td></tr>';
+      + '<td>' + r.ab + '</td><td class="' + (r.h > 0 ? 'hot' : '') + '">' + r.h + '</td><td>' + avg(r.h, r.ab) + '</td><td>' + r.rbi + '</td><td>' + r.runs + '</td><td>' + r.steals + '</td>' + '<td>' + (r.pitches ? r.pitches : '') + '</td>' + '</tr>';
   }
   html += '</tbody></table>';
-  html += '<p class="sub" style="margin-top:8px">四球・死球・犠打・犠飛は打数に数えません（野球の公式ルールと同じ）' + (total ? '。通算は過去の試合＋今の試合の合計' : '') + '</p>';
+  html += '<p class="sub" style="margin-top:8px">四球・死球・犠打・犠飛は打数に数えません（野球の公式ルールと同じ）。球数＝投げた球の数（相手の攻撃中）' + (total ? '。通算は過去の試合＋今の試合の合計' : '') + '</p>';
   html += '<div class="sheetbtns"><button class="go" id="btnCopyStats">成績をコピー</button><button class="cancel">閉じる</button></div>';
   openSheet(html);
   if ($('stG')) { $('stG').onclick = () => showStats('game'); $('stT').onclick = () => showStats('total'); }
   $('btnCopyStats').onclick = () => {
-    const lines = [st.teamNames[st.myTeam] + ' 打撃成績' + (total ? '（通算）' : ''), '選手　' + (total ? '試合 ' : '') + '打数 安打 打率 打点 得点 盗塁'];
-    for (const r of rows) lines.push(r.name + '　' + (total ? r.games + ' ' : '') + r.ab + ' ' + r.h + ' ' + avg(r.h, r.ab) + ' ' + r.rbi + ' ' + r.runs + ' ' + r.steals);
+    const lines = [st.teamNames[st.myTeam] + ' 打撃成績' + (total ? '（通算）' : ''), '選手　' + (total ? '試合 ' : '') + '打数 安打 打率 打点 得点 盗塁 球数'];
+    for (const r of rows) lines.push(r.name + '　' + (total ? r.games + ' ' : '') + r.ab + ' ' + r.h + ' ' + avg(r.h, r.ab) + ' ' + r.rbi + ' ' + r.runs + ' ' + r.steals + ' ' + (r.pitches || '-'));
     copyText(lines.join('\n'));
   };
   $('sheetBody').querySelector('.cancel').onclick = closeSheet;
@@ -1536,7 +1794,7 @@ function b64enc(s) { const b = new TextEncoder().encode(s); let out = ''; for (l
 function b64dec(s) { const bin = atob(s); const b = new Uint8Array(bin.length); for (let i = 0; i < bin.length; i++) b[i] = bin.charCodeAt(i); return new TextDecoder().decode(b); }
 const HANDOFF_PREFIX = 'YAKYU2:';
 function exportText() {
-  const payload = { v: 2, config: data.config, roster: data.roster, lineupIds: data.lineupIds, benchIds: data.benchIds, events: data.events, live: data.live || null };
+  const payload = { v: 2, config: data.config, roster: data.roster, lineupIds: data.lineupIds, benchIds: data.benchIds, gamePos: data.gamePos || {}, events: data.events, live: data.live || null };
   return HANDOFF_PREFIX + b64enc(JSON.stringify(payload));
 }
 function showExport() {
@@ -1566,6 +1824,7 @@ function showImport() {
     data.roster = p.roster;
     data.lineupIds = p.lineupIds || [];
     data.benchIds = p.benchIds || [];
+    data.gamePos = p.gamePos || {};
     data.events = p.events;
     data.live = p.live || null;
     save(); recompute(); closeSheet();
@@ -1635,16 +1894,18 @@ document.querySelectorAll('.tabs button').forEach(b => b.onclick = () => {
   document.querySelectorAll('.view').forEach(x => x.classList.remove('act'));
   b.classList.add('act');
   $('view-' + b.dataset.view).classList.add('act');
+  document.body.dataset.tab = b.dataset.view;   // 右下の「戻る」は設定タブだけに出す
   window.scrollTo(0, 0);
   if (b.dataset.view === 'watch') { const l = $('logList'); l.lastElementChild && l.lastElementChild.scrollIntoView({ block: 'end' }); }
 });
 $('btnBall').onclick = () => commit({ type: 'pitch', kind: 'ball' });
 $('btnStrike').onclick = () => commit({ type: 'pitch', kind: 'strike' });
 $('btnFoul').onclick = () => commit({ type: 'pitch', kind: 'foul' });
-$('btnUndo').onclick = () => {
-  if (!data.events.length) { toast('取り消す記録がありません'); return; }
-  data.events.pop(); save(); recompute(); toast('直前の記録を取り消しました');
-};
+$('btnBack1').onclick = undo;
+$('btnBack2').onclick = undo;
+$('btnFwd1').onclick = redo;
+$('btnFwd2').onclick = redo;
+document.body.dataset.tab = 'input';
 $('btnSub').onclick = startSub;
 $('btnForceChange').onclick = () => { if (confirm('3アウト前ですが攻守交代を記録しますか？')) commit({ type: 'force_change' }); };
 $('btnGameEnd').onclick = startGameEnd;
@@ -1660,6 +1921,21 @@ for (const [id, key] of [['setGameName', 'gameName'], ['setRound', 'round'], ['s
 $('setFirst').addEventListener('change', () => { data.config.myTeamBatsFirst = $('setFirst').value === '1'; save(); recompute(); });
 $('setInnings').addEventListener('change', () => { data.config.innings = +$('setInnings').value; save(); recompute(); });
 $('setDispMode').addEventListener('change', () => { data.config.displayMode = $('setDispMode').value; save(); recompute(); });
+$('psOpp').addEventListener('change', () => { const ps = getPS(); ps.opp = Math.max(0, Math.floor(+$('psOpp').value || 0)); setPS(ps); });
+$('btnPsAdd').onclick = () => {
+  const nm = $('psWho').value, n = Math.floor(+$('psNum').value || 0);
+  if (!nm) { toast('先に選手を登録してください'); return; }
+  const ps = getPS();
+  if (n > 0) ps.my[nm] = n; else delete ps.my[nm];
+  $('psNum').value = '';
+  setPS(ps);
+  toast(n > 0 ? nm + '：' + n + '球から数えます' : nm + '：0球から数えます');
+};
+$('btnPsToday').onclick = () => {
+  const sum = sameDayPitches(); if (!sum) { toast('今日の前の試合がありません'); return; }
+  const ps = getPS(); Object.assign(ps.my, sum); setPS(ps);
+  toast('今日の前の試合の球数を入れました：' + Object.keys(sum).map(k => k + ' ' + sum[k] + '球').join('・'));
+};
 $('btnAddPlayer').onclick = () => {
   const num = $('addNum').value.trim(), name = $('addName').value.trim(), pos = $('addPos').value.trim();
   if (!name) { toast('選手名を入れてください'); return; }
@@ -1670,19 +1946,21 @@ $('btnAddPlayer').onclick = () => {
   save(); recompute();
 };
 $('btnNewGame').onclick = () => {
-  if (!confirm('今の試合を「過去の試合」へ保存して、新しい試合を始めますか？（選手名簿・スタメンは残ります）')) return;
+  if (!confirm('今の試合を「過去の試合」へ保存して、新しい試合を始めますか？（選手名簿・スタメンは残ります。守備は名簿の守備に戻ります）')) return;
   if (data.events.length) {
     const gst = E.reduce(engineCfg(), data.events);
     data.games.unshift({
       savedAt: new Date().toISOString(),
       config: Object.assign({}, data.config),
-      lineup: lineupPlayers().map(p => ({ num: p.num, name: p.name, pos: p.pos })),
+      lineup: lineupPlayers().map(p => ({ num: p.num, name: p.name, pos: posOf(p) })),
       events: data.events,
       totals: gst.totals, teamNames: gst.teamNames,
     });
     if (data.games.length > 50) data.games.pop(); // 念のための上限
   }
   data.events = [];
+  data.gamePos = {};   // 守備は試合ごと。次の試合は名簿の守備から
+  data.config.pitchStart = { my: {}, opp: 0 };   // 投球数のスタートも試合ごと（2試合目は「同じ日の前の試合から」で入れられる）
   save(); recompute();
   toast(data.games.length ? '前の試合を保存して、新しい試合を始めました' : '新しい試合を始めました');
 };
