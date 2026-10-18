@@ -309,7 +309,7 @@ body.viewer #view-input, body.viewer #view-setting { display: none !important; }
       <button id="modeEasy">かんたん表示</button>
       <button id="modeTerm">野球用語表示</button>
     </div>
-    <div class="watchbtns"><button id="btnPast" class="statsbtn" style="display:none">過去の試合</button><button id="btnStats" class="statsbtn">成績</button></div>
+    <div class="watchbtns"><button id="btnPast" class="statsbtn">過去の試合</button><button id="btnStats" class="statsbtn">成績</button></div>
   </div>
   <div id="logList"></div>
   <div class="sharebar"><button id="btnShare">LINEに送る速報文を作る</button></div>
@@ -1325,7 +1325,6 @@ const DIR_BTNS = [
 // ==== レンダリング ====
 function render() {
   renderBoard(); renderInput(); renderLog(); renderSetting();
-  $('btnPast').style.display = pastGames().length ? '' : 'none';   // 過去の試合がある時だけ（観戦の人にも）
 }
 
 function renderBoard() {
@@ -1529,7 +1528,8 @@ function pastTitle(g) {
 }
 function showPastList() {
   const gs = pastGames();
-  if (!gs.length) { toast('過去の試合はまだありません'); return; }
+  // ボタンはいつも出しとく（とと 2026-10-18「過去の試合ボタンがどこにあるかわからん」＝無い時に隠しとったので見つからんかった）
+  if (!gs.length) { toast(LIVE_ROOM ? '過去の試合はまだ届いていません（記録係のアプリから次に送られると見られます）' : '過去の試合はまだありません（「新しい試合」を始めると、前の試合がここに残ります）'); return; }
   let html = '<h2>過去の試合</h2><ul class="plist">';
   html += gs.map((g, i) => '<li><span class="nm" style="font-weight:400">' + esc(pastTitle(g)) + (g.config && g.config.gameName ? '<br><span class="ps">' + esc(g.config.gameName + (g.config.round ? '　' + g.config.round : '')) + '</span>' : '') + '</span><button data-pg="' + i + '">見る</button></li>').join('');
   html += '</ul><div class="sheetbtns"><button class="cancel">閉じる</button></div>';
@@ -2163,6 +2163,8 @@ $('btnWipe').onclick = () => {
 
 recompute();
 if (LIVE_ROOM) startViewer();
+// 配信の途中で新しい版に開き直した時も、過去の試合をすぐ送る（前の版で始めた配信には載っとらんため）
+else if (data.live) { historyDirty = true; schedulePush(); }
 
 // オフライン対応（ホスティング版のみ・ファイル版では何もしない）
 if ('serviceWorker' in navigator && location.protocol === 'https:') {
