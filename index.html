@@ -143,6 +143,9 @@ h2 { font-size: 1.05rem; letter-spacing: .03em; line-height: 1.4; }
 .frow { display: flex; align-items: center; gap: var(--s2); margin-bottom: var(--s2); }
 .frow label { font-size: .85rem; color: var(--sub); min-width: 5.5em; }
 .frow input, .frow select { flex: 1; min-width: 0; }
+/* 選ぶ欄＋「その他」の時だけ出る入力欄（縦に並べる） */
+.combo { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 6px; }
+.combo select, .combo input { width: 100%; }
 .plist { list-style: none; }
 .plist li { display: flex; align-items: center; gap: var(--s2); padding: 6px 0; border-bottom: 1px solid var(--line); font-variant-numeric: tabular-nums; }
 .plist li:last-child { border-bottom: none; }
@@ -158,9 +161,15 @@ h2 { font-size: 1.05rem; letter-spacing: .03em; line-height: 1.4; }
 .poswarn:empty { display: none; }
 .addrow { display: flex; gap: var(--s2); margin-top: var(--s2); }
 .addrow input.n { width: 4em; }
-.addrow input.p { width: 5.5em; }
+.addrow input.p, .addrow select.p { width: 6.5em; flex: none; }
 .addrow select { flex: 1; min-width: 0; }
 .addrow input.nm { flex: 1; min-width: 0; }
+/* 選手登録は2段（上＝背番号・名前／下＝守備・追加）。1段やとスマホ幅で「背番号」と「追加」が切れた */
+.addrow.reg { flex-wrap: wrap; }
+.addrow.reg input.n { width: 5em; }
+.addrow.reg input.nm { flex: 1 1 calc(100% - 5em - var(--s2)); }
+.addrow.reg select.p { flex: 1 1 auto; width: auto; }
+.addrow.reg button { flex: none; min-width: 5em; }
 .dangerbtn { border-color: var(--red); color: var(--red); width: 100%; min-height: 44px; }
 .primarybtn { background: var(--green); color: #fff; border: none; width: 100%; min-height: 48px; font-weight: 700; font-size: 1rem; }
 
@@ -307,18 +316,19 @@ body.viewer #view-input, body.viewer #view-setting { display: none !important; }
 <section class="view" id="view-setting">
   <div class="card">
     <h2>試合</h2>
-    <div class="frow"><label>大会名</label><input id="setGameName" placeholder="○○杯△△カップ 8月11日"></div>
-    <div class="frow"><label>回戦</label><input id="setRound" placeholder="５日目 四回戦"></div>
-    <div class="frow"><label>開始時刻</label><input id="setStart" placeholder="11:50"></div>
-    <div class="frow"><label>自チーム</label><input id="setMyName" placeholder="自チーム名"></div>
-    <div class="frow"><label>相手</label><input id="setOppName" placeholder="相手チーム名"></div>
+    <!-- 手入力やなく基本は選ぶ（とと 2026-10-18「手入力のところは基本選択できるように」）。合わん時だけ「その他（入力する）」 -->
+    <div class="frow"><label>大会名</label><div class="combo" data-key="gameName"></div></div>
+    <div class="frow"><label>回戦</label><div class="combo" data-key="round"></div></div>
+    <div class="frow"><label>開始時刻</label><input id="setStart" type="time" step="300"></div>
+    <div class="frow"><label>自チーム</label><div class="combo" data-key="myTeamName"></div></div>
+    <div class="frow"><label>相手</label><div class="combo" data-key="oppName"></div></div>
     <div class="frow"><label>攻撃</label>
       <select id="setFirst"><option value="1">先攻</option><option value="0">後攻</option></select>
     </div>
     <div class="frow"><label>イニング</label>
       <select id="setInnings"><option value="5">5回制</option><option value="6">6回制</option><option value="7">7回制</option><option value="9">9回制</option></select>
     </div>
-    <div class="frow"><label>大会ルール</label><input id="setRules" placeholder="80分制・コールドあり など"></div>
+    <div class="frow"><label>大会ルール</label><div class="combo" data-key="rules"></div></div>
     <div class="frow"><label>表示モード</label>
       <select id="setDispMode"><option value="easy">かんたん表示</option><option value="term">野球用語表示</option></select>
     </div>
@@ -352,10 +362,10 @@ body.viewer #view-input, body.viewer #view-setting { display: none !important; }
   <div class="card">
     <h2>選手名簿（全選手・ずっと保存）</h2>
     <ul class="plist" id="rosterList"></ul>
-    <div class="addrow">
+    <div class="addrow reg">
       <input class="n" id="addNum" placeholder="背番号" inputmode="numeric">
       <input class="nm" id="addName" placeholder="選手名">
-      <input class="p" id="addPos" placeholder="守備">
+      <select class="p" id="addPos" aria-label="守備"></select>
       <button id="btnAddPlayer">追加</button>
     </div>
     <p style="font-size:.8rem;color:var(--sub)">追加した選手は自動でベンチ入りに入ります。名簿は試合を新しくしても消えません。</p>
@@ -1367,15 +1377,14 @@ function renderLog() {
 }
 
 function renderSetting() {
-  $('setGameName').value = data.config.gameName;
-  $('setRound').value = data.config.round;
-  $('setStart').value = data.config.startTime;
-  $('setMyName').value = data.config.myTeamName;
-  $('setOppName').value = data.config.oppName;
+  document.querySelectorAll('#view-setting .combo').forEach(renderCombo);
+  $('setStart').value = /^\d{1,2}:\d{2}$/.test(data.config.startTime || '') ? data.config.startTime.padStart(5, '0') : '';
   $('setFirst').value = data.config.myTeamBatsFirst ? '1' : '0';
   $('setInnings').value = String(data.config.innings);
-  $('setRules').value = data.config.rules;
   $('setDispMode').value = data.config.displayMode;
+  { const ap = $('addPos'), v = ap.value;   // 選手登録の守備（かんたん表示なら「ピッチャー」等。選びかけの値は残す）
+    ap.innerHTML = '<option value="">守備なし</option>' + POS_OPTS.map(o => '<option value="' + esc(o) + '">' + esc(posLabel(o, data.config.displayMode)) + '</option>').join('');
+    ap.value = v; }
   $('setPitchCount').value = pcOn() ? '1' : '0';
   $('psCard').style.display = pcOn() ? '' : 'none';   // 数えん時はスタートの数も要らん
   const lu = $('lineupList');
@@ -1621,6 +1630,42 @@ function subInCandidates(kind) {
 function posSelect(first) {
   return '<select id="subPos"><option value="">' + esc(first) + '</option>'
     + POS_OPTS.map(o => '<option value="' + esc(o) + '">' + esc(posLabel(o, data.config.displayMode)) + '</option>').join('') + '</select>';
+}
+
+// ==== 選ぶ欄（とと 2026-10-18「手入力のところは基本選択できるように」） ====
+// 一番上＝未設定、次に よく使うもの・前の試合で使ったもの、最後に「その他（入力する）」。その他を選んだ時だけ入力欄が出る。
+const COMBO_PRESETS = {
+  round: ['1回戦', '2回戦', '3回戦', '4回戦', '5回戦', '準々決勝', '準決勝', '決勝', '練習試合'],
+  rules: ['時間制限なし', '60分制', '70分制', '80分制', '90分制', '70分制・コールドあり', '80分制・コールドあり', '90分制・コールドあり'],
+};
+const COMBO_OTHER = '__other';
+const comboTyping = {};   // 「その他」を選んで、まだ入れ終わっとらん欄
+function comboOptions(key) {
+  const seen = new Set(), out = [];
+  const add = (v) => { v = (v || '').trim(); if (v && !seen.has(v)) { seen.add(v); out.push(v); } };
+  (COMBO_PRESETS[key] || []).forEach(add);
+  (data.games || []).forEach(g => add((g.config || {})[key]));   // 前の試合で使ったもの（新しい順）
+  return out.slice(0, 30);
+}
+function renderCombo(box) {
+  const key = box.dataset.key, cur = (data.config[key] || '').trim(), opts = comboOptions(key);
+  const custom = !!cur && opts.indexOf(cur) < 0;
+  const typing = custom || comboTyping[key] || !opts.length;   // 選ぶものが無い時は最初から入力欄
+  let h = '';
+  if (opts.length) {
+    h += '<select aria-label="' + esc(key) + '"><option value="">（未設定）</option>'
+      + opts.map(o => '<option value="' + esc(o) + '"' + (o === cur ? ' selected' : '') + '>' + esc(o) + '</option>').join('')
+      + '<option value="' + COMBO_OTHER + '"' + (typing ? ' selected' : '') + '>その他（入力する）</option></select>';
+  }
+  if (typing) h += '<input value="' + esc(custom ? cur : '') + '" placeholder="' + esc(opts.length ? '入力する' : ({ gameName: '○○杯 8月11日', myTeamName: '自チーム名', oppName: '相手チーム名' }[key] || '入力する')) + '">';
+  box.innerHTML = h;
+  const sel = box.querySelector('select'), inp = box.querySelector('input');
+  if (sel) sel.onchange = () => {
+    if (sel.value === COMBO_OTHER) { comboTyping[key] = true; renderCombo(box); const i = box.querySelector('input'); if (i) i.focus(); return; }
+    delete comboTyping[key];
+    data.config[key] = sel.value; save(); recompute();
+  };
+  if (inp) inp.onchange = () => { delete comboTyping[key]; data.config[key] = inp.value.trim(); save(); recompute(); };
 }
 
 function startSub() { subQueue = []; subKindNow = 'pinch_hit'; renderSubSheet(); }
@@ -1971,7 +2016,7 @@ $('modeEasy').onclick = () => { data.config.displayMode = 'easy'; save(); recomp
 $('modeTerm').onclick = () => { data.config.displayMode = 'term'; save(); recompute(); };
 $('btnShare').onclick = showShare;
 $('btnStats').onclick = showStats;
-for (const [id, key] of [['setGameName', 'gameName'], ['setRound', 'round'], ['setStart', 'startTime'], ['setMyName', 'myTeamName'], ['setOppName', 'oppName'], ['setRules', 'rules']]) {
+for (const [id, key] of [['setStart', 'startTime']]) {
   $(id).addEventListener('change', () => { data.config[key] = $(id).value; save(); recompute(); });
 }
 $('setFirst').addEventListener('change', () => { data.config.myTeamBatsFirst = $('setFirst').value === '1'; save(); recompute(); });
