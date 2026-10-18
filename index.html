@@ -105,9 +105,12 @@ h2 { font-size: 1.05rem; letter-spacing: .03em; line-height: 1.4; }
 .gamecard { background: var(--surface); border-radius: var(--r-card); padding: var(--s3); margin-bottom: var(--s3); box-shadow: 0 1px 2px rgba(28,42,36,.05), 0 4px 12px rgba(28,42,36,.05); }
 .gamecard .gname { font-weight: 700; font-size: 1.05rem; letter-spacing: .02em; line-height: 1.5; }
 .gamecard .gsub { font-size: .85rem; color: var(--sub); margin-top: 2px; }
-.watchtop { display: flex; gap: var(--s2); margin-bottom: var(--s3); }
-.watchtop .modepill { flex: 1; margin-bottom: 0; }
+.watchtop { display: flex; flex-wrap: wrap; gap: var(--s2); margin-bottom: var(--s3); }
+.watchtop .modepill { flex: 1 1 14em; margin-bottom: 0; }   /* 狭い時は表示の切替を1段目、ボタンを2段目に（「過去の試合」を足したら切替が2行に潰れた） */
+.watchtop .watchbtns { flex: 1 1 auto; justify-content: flex-end; }
+.watchtop .watchbtns .statsbtn { flex: 1; max-width: 10em; }
 .statsbtn { min-width: 76px; border-radius: 999px; font-weight: 700; color: var(--green-deep); }
+.watchbtns { display: flex; gap: var(--s2); }
 .fieldlink { font-size: .8rem; color: var(--green-deep); font-weight: 700; margin-top: var(--s1); }
 .fieldlink::after { content: ' ▸'; }
 .statstbl { width: 100%; border-collapse: collapse; font-variant-numeric: tabular-nums; }
@@ -306,7 +309,7 @@ body.viewer #view-input, body.viewer #view-setting { display: none !important; }
       <button id="modeEasy">かんたん表示</button>
       <button id="modeTerm">野球用語表示</button>
     </div>
-    <button id="btnStats" class="statsbtn">成績</button>
+    <div class="watchbtns"><button id="btnPast" class="statsbtn" style="display:none">過去の試合</button><button id="btnStats" class="statsbtn">成績</button></div>
   </div>
   <div id="logList"></div>
   <div class="sharebar"><button id="btnShare">LINEに送る速報文を作る</button></div>
@@ -1043,7 +1046,10 @@ function posOf(p) { return (data.gamePos && data.gamePos[p.id]) || p.pos || ''; 
 function posLabel(pos, mode) { return mode === 'easy' ? E.posEasy(pos) : (pos || ''); }
 const POS_OPTS = ['投', '捕', '一', '二', '三', '遊', '左', '中', '右'];
 // 投球数を数えて出すか（とと 2026-10-18「押し忘れがあると気になるので、オンオフを付けて。既定はオフ」）
-function pcOn() { return !!(data && data.config && data.config.pitchCount); }
+function pcOn() {
+  if (LIVE_ROOM) return !!(REMOTE && REMOTE.config && REMOTE.config.pitchCount);   // 観戦の人は記録係の設定どおり
+  return !!(data && data.config && data.config.pitchCount);
+}
 // 投球数のスタート（同じ日の2試合目など）。config.pitchStart = { my: {選手名: 球数}, opp: 球数 }
 // 入れ子のオブジェクトを使い回すと「戻る」の写しまで書き換わるので、読む時も書く時も新しく作る
 function getPS() { const ps = data.config.pitchStart || {}; return { my: Object.assign({}, ps.my || {}), opp: Math.max(0, +ps.opp || 0) }; }
@@ -1166,13 +1172,23 @@ function schedulePush() {
   clearTimeout(pushTimer);
   pushTimer = setTimeout(pushLive, 700);
 }
+// ★配信は「変わる所だけ」を送る（PATCH）。過去の試合（state/history）は重いので毎回は送らず、
+//   配信開始・試合の切り替え・過去の試合の削除の時だけ送る（とと 2026-10-18「観戦の人も過去の試合を見れるように」）。
+//   前は部屋を丸ごと置き換える PUT やったので、そのままやと毎回の記録で過去の試合が消えてしまう
+let historyDirty = false;
+function patchBody(stateObj) {
+  const body = { secret: data.live.secret };
+  for (const k of Object.keys(stateObj)) body['state/' + k] = stateObj[k] === undefined ? null : stateObj[k];
+  return body;
+}
 async function pushLive(extraState) {
   if (!data.live) return;
-  const body = { secret: data.live.secret, state: Object.assign(liveState(), extraState || {}) };
+  const body = patchBody(Object.assign(liveState(), { ended: null }, extraState || {}));
   try {
-    const res = await fetch(FB_DB + '/rooms/' + data.live.roomId + '.json', { method: 'PUT', body: JSON.stringify(body) });
+    const res = await fetch(FB_DB + '/rooms/' + data.live.roomId + '.json', { method: 'PATCH', body: JSON.stringify(body) });
     if (!res.ok) throw new Error('http ' + res.status);
     setLiveStatus('配信中（同期OK）', true);
+    if (historyDirty && !(extraState && extraState.ended)) pushHistory();
     return true;
   } catch (e) {
     setLiveStatus('同期待ち（電波が戻り次第送ります）', false);
@@ -1180,6 +1196,28 @@ async function pushLive(extraState) {
     pushRetryTimer = setTimeout(pushLive, 20000);
     return false;
   }
+}
+// 観戦の人に見せる過去の試合（新しい方から15試合）。名前は登録名と背番号だけ（今の試合と同じ扱い）
+const HISTORY_MAX = 15;
+function compactHistory() {
+  return (data.games || []).slice(0, HISTORY_MAX).map(g => ({
+    savedAt: g.savedAt || '',
+    config: (({ gameName, round, startTime, myTeamName, oppName, myTeamBatsFirst, innings, rules, pitchCount, pitchStart }) =>
+      ({ gameName, round, startTime, myTeamName, oppName, myTeamBatsFirst, innings, rules, pitchCount: pitchCount === undefined ? null : pitchCount, pitchStart: pitchStart || null }))(g.config || {}),
+    lineup: (g.lineup || []).map(pl => ({ num: pl.num, name: pl.name, pos: pl.pos || '' })),
+    events: g.events || [],
+    totals: g.totals || null, teamNames: g.teamNames || null,
+  }));
+}
+async function pushHistory() {
+  if (!data.live) return false;
+  historyDirty = true;
+  try {
+    const res = await fetch(FB_DB + '/rooms/' + data.live.roomId + '.json', { method: 'PATCH', body: JSON.stringify(patchBody({ history: compactHistory() })) });
+    if (!res.ok) throw new Error('http ' + res.status);
+    historyDirty = false;
+    return true;
+  } catch (e) { return false; }   // 電波が戻って次に送れた時（pushLive の成功時）に送り直す
 }
 function setLiveStatus(msg, ok) {
   const el = $('liveStatus');
@@ -1218,12 +1256,25 @@ function startViewer() {
   };
   try {
     const es = new EventSource(url);
+    // 届いた変更を手元の写しに当てる（全部を取り直すと、過去の試合まで毎回取り直して重い）
+    const setAt = (path, val) => {
+      const keys = path.split('/').filter(Boolean);
+      if (!keys.length) { REMOTE = val; return; }
+      if (!REMOTE || typeof REMOTE !== 'object') REMOTE = {};
+      let o = REMOTE;
+      for (let i = 0; i < keys.length - 1; i++) { if (!o[keys[i]] || typeof o[keys[i]] !== 'object') o[keys[i]] = {}; o = o[keys[i]]; }
+      if (val === null) delete o[keys[keys.length - 1]]; else o[keys[keys.length - 1]] = val;
+    };
     es.addEventListener('put', e => {
       const m = JSON.parse(e.data);
       if (m.path === '/') applyRemote(m.data);
-      else poll(); // 部分更新は取り直す(通常は全置換なので来ない)
+      else { setAt(m.path, m.data); applyRemote(REMOTE); }
     });
-    es.addEventListener('patch', poll);
+    es.addEventListener('patch', e => {
+      const m = JSON.parse(e.data);
+      for (const k of Object.keys(m.data || {})) setAt((m.path === '/' ? '' : m.path) + '/' + k, m.data[k]);
+      applyRemote(REMOTE);
+    });
     es.onerror = () => { if (!pollTimer) pollTimer = setInterval(poll, 15000); };
   } catch (e) {
     pollTimer = setInterval(poll, 15000);
@@ -1274,6 +1325,7 @@ const DIR_BTNS = [
 // ==== レンダリング ====
 function render() {
   renderBoard(); renderInput(); renderLog(); renderSetting();
+  $('btnPast').style.display = pastGames().length ? '' : 'none';   // 過去の試合がある時だけ（観戦の人にも）
 }
 
 function renderBoard() {
@@ -1463,22 +1515,40 @@ function lineupOp(a, i) {
   if (a === 'tobenchro') data.benchIds.push(i); // i=id
   if (a === 'delro' && confirm('この選手を名簿から削除しますか？')) data.roster = data.roster.filter(p => p.id !== i);
   if (a === 'viewgame') { showPastGame(+i); return; }
-  if (a === 'delgame') { if (confirm('この試合の記録を削除しますか？')) data.games.splice(+i, 1); else return; }
+  if (a === 'delgame') { if (confirm('この試合の記録を削除しますか？')) { data.games.splice(+i, 1); if (data.live) historyDirty = true; } else return; }
   save(); recompute();
 }
 
 // ==== 過去の試合の閲覧（読み取り専用） ====
-function showPastGame(i) {
-  const g = data.games[i];
+// 記録係＝このスマホの記録／観戦の人＝配信で届いた分（とと 2026-10-18「観戦側の人も過去の試合を見れるように」）
+function pastGames() { return LIVE_ROOM ? ((REMOTE && Array.isArray(REMOTE.history)) ? REMOTE.history.filter(Boolean) : []) : (data.games || []); }
+function pastTitle(g) {
+  const d = (g.savedAt || '').slice(0, 10);
+  const tn = g.teamNames, tt = g.totals;
+  return d + '　' + (tn && tt ? tn.away + ' ' + tt.away + '-' + tt.home + ' ' + tn.home : '試合');
+}
+function showPastList() {
+  const gs = pastGames();
+  if (!gs.length) { toast('過去の試合はまだありません'); return; }
+  let html = '<h2>過去の試合</h2><ul class="plist">';
+  html += gs.map((g, i) => '<li><span class="nm" style="font-weight:400">' + esc(pastTitle(g)) + (g.config && g.config.gameName ? '<br><span class="ps">' + esc(g.config.gameName + (g.config.round ? '　' + g.config.round : '')) + '</span>' : '') + '</span><button data-pg="' + i + '">見る</button></li>').join('');
+  html += '</ul><div class="sheetbtns"><button class="cancel">閉じる</button></div>';
+  openSheet(html);
+  $('sheetBody').querySelectorAll('button[data-pg]').forEach(b => b.onclick = () => showPastGame(+b.dataset.pg, true));
+  $('sheetBody').querySelector('.cancel').onclick = closeSheet;
+}
+function showPastGame(i, fromList) {
+  const g = pastGames()[i];
   if (!g) return;
+  const pcShow = (g.config && g.config.pitchCount != null) ? !!g.config.pitchCount : pcOn();   // その試合を記録した時の設定（無い古い試合は今の設定）
   const cfg = Object.assign({}, g.config, { lineup: g.lineup || [] });
   const gst = E.reduce(cfg, g.events || []);
   const mode = data.config.displayMode;
   let html = '<h2>' + esc((g.savedAt || '').slice(0, 10)) + '　' + esc(gst.teamNames.away) + ' ' + gst.totals.away + ' - ' + gst.totals.home + ' ' + esc(gst.teamNames.home) + '</h2>';
   const rows = E.stats(gst);
   if (rows.length) {
-    html += '<table class="statstbl"><thead><tr><th class="nm">選手</th><th>打数</th><th>安打</th><th>打点</th><th>得点</th><th>盗塁</th>' + (pcOn() ? '<th>球数</th>' : '') + '</tr></thead><tbody>';
-    for (const r of rows) html += '<tr><td class="nm">' + esc(r.name) + '</td><td>' + r.ab + '</td><td class="' + (r.h > 0 ? 'hot' : '') + '">' + r.h + '</td><td>' + r.rbi + '</td><td>' + r.runs + '</td><td>' + r.steals + '</td>' + (pcOn() ? '<td>' + (r.pitches ? r.pitches : '') + '</td>' : '') + '</tr>';
+    html += '<table class="statstbl"><thead><tr><th class="nm">選手</th><th>打数</th><th>安打</th><th>打点</th><th>得点</th><th>盗塁</th>' + (pcShow ? '<th>球数</th>' : '') + '</tr></thead><tbody>';
+    for (const r of rows) html += '<tr><td class="nm">' + esc(r.name) + '</td><td>' + r.ab + '</td><td class="' + (r.h > 0 ? 'hot' : '') + '">' + r.h + '</td><td>' + r.rbi + '</td><td>' + r.runs + '</td><td>' + r.steals + '</td>' + (pcShow ? '<td>' + (r.pitches ? r.pitches : '') + '</td>' : '') + '</tr>';
     html += '</tbody></table>';
   }
   html += '<div style="margin-top:16px">';
@@ -1492,8 +1562,9 @@ function showPastGame(i) {
     const who = en.kind === 'pa' ? esc(en.batter.text) + '　' : '';
     html += '<div style="padding:4px 0;border-bottom:1px solid var(--line)"><span style="color:var(--sub);font-size:.8rem">' + who + '</span>' + esc(mode === 'term' ? en.term : en.easy) + '</div>';
   }
-  html += '</div><div class="sheetbtns"><button class="cancel">閉じる</button></div>';
+  html += '</div><div class="sheetbtns">' + (fromList ? '<button id="pgBack">一覧へ戻る</button>' : '') + '<button class="cancel">閉じる</button></div>';
   openSheet(html);
+  if (fromList) $('pgBack').onclick = showPastList;
   $('sheetBody').querySelector('.cancel').onclick = closeSheet;
 }
 
@@ -1855,7 +1926,7 @@ function showPlayDetail(i) {
 // ==== 個人成績（手書き実況では追えなかった、アプリならではの表） ====
 function totalStatsRows() {
   // 通算 = 過去の試合すべて + 今の試合
-  const lists = data.games.map(g => E.stats(E.reduce(Object.assign({}, g.config, { lineup: g.lineup || [] }), g.events || [])));
+  const lists = pastGames().map(g => E.stats(E.reduce(Object.assign({}, DEFAULT_CONFIG, g.config, { lineup: g.lineup || [] }), g.events || [])));
   lists.push(E.stats(st));
   return E.statsMerge(lists);
 }
@@ -1868,10 +1939,10 @@ function showStats(scope) {
   scope = scope || 'game';
   const total = scope === 'total';
   const rows = total ? totalStatsRows() : E.stats(st);
-  if (!rows.length && !total && !LIVE_ROOM && totalStatsRows().length) { showStats('total'); return; } // 今の試合が0打席でも通算があれば見せる
+  if (!rows.length && !total && pastGames().length && totalStatsRows().length) { showStats('total'); return; } // 今の試合が0打席でも通算があれば見せる
   if (!rows.length) { toast('まだ打席の記録がありません'); return; }
   let html = '<h2>' + esc(st.teamNames[st.myTeam]) + '　打撃成績</h2>';
-  if (!LIVE_ROOM) { // 観戦モードでは通算(自端末の記録)は出さない
+  if (pastGames().length) { // 通算＝過去の試合＋今の試合（観戦の人は配信で届いた過去の試合で出す）
     html += '<div class="modepill" style="margin-bottom:16px"><button id="stG" class="' + (total ? '' : 'act') + '">この試合</button><button id="stT" class="' + (total ? 'act' : '') + '">通算</button></div>';
   }
   html += '<table class="statstbl"><thead><tr><th class="nm">選手</th>' + (total ? '<th>試合</th>' : '') + '<th>打数</th><th>安打</th><th>打率</th><th>打点</th><th>得点</th><th>盗塁</th>' + (pcOn() ? '<th>球数</th>' : '') + '</tr></thead><tbody>';
@@ -2016,6 +2087,7 @@ $('modeEasy').onclick = () => { data.config.displayMode = 'easy'; save(); recomp
 $('modeTerm').onclick = () => { data.config.displayMode = 'term'; save(); recompute(); };
 $('btnShare').onclick = showShare;
 $('btnStats').onclick = showStats;
+$('btnPast').onclick = showPastList;
 for (const [id, key] of [['setStart', 'startTime']]) {
   $(id).addEventListener('change', () => { data.config[key] = $(id).value; save(); recompute(); });
 }
@@ -2059,6 +2131,7 @@ $('btnNewGame').onclick = () => {
       totals: gst.totals, teamNames: gst.teamNames,
     });
     if (data.games.length > 50) data.games.pop(); // 念のための上限
+    if (data.live) historyDirty = true;   // 配信中なら、観戦の人の「過去の試合」にも足す（次の送信で一緒に送る）
   }
   data.events = [];
   data.gamePos = {};   // 守備は試合ごと。次の試合は名簿の守備から
@@ -2071,13 +2144,14 @@ $('btnImport').onclick = showImport;
 $('btnLiveStart').onclick = async () => {
   data.live = { roomId: 'r' + rnd(), secret: rnd() + rnd() };
   save(); recompute();
+  historyDirty = true;   // 過去の試合も一緒に（pushLive が成功したら続けて送る）
   const ok = await pushLive();
   toast(ok ? '配信を開始しました。観戦リンクをLINEで共有してください' : '開始できませんでした（電波かサーバー設定を確認）');
 };
 $('btnLiveCopy').onclick = () => copyText(liveUrl());
 $('btnLiveStop').onclick = async () => {
   if (!confirm('配信を終了しますか？（サーバー上の試合データは消えます。スマホの記録は残ります）')) return;
-  await pushLive({ ended: true, events: [], lineup: [] }); // 中身を空にして終了印を残す
+  await pushLive({ ended: true, events: [], lineup: [], history: null }); // 中身を空にして終了印を残す（過去の試合も消す）
   data.live = null; save(); recompute();
   toast('配信を終了しました');
 };
