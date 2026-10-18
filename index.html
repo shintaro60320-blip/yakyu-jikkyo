@@ -54,6 +54,8 @@ h2 { font-size: 1.05rem; letter-spacing: .03em; line-height: 1.4; }
 .board th.pc, .board td.pc { width: 1%; white-space: nowrap; border-left: 1px solid rgba(157,191,174,.25); padding: 3px 0 3px 5px; }
 .board th.pc { font-size: .65rem; }
 .board td.pc { font-size: .8rem; font-weight: 700; color: #cfe3d8; font-variant-numeric: tabular-nums; }
+/* タップで直せる印：点線の下線だけ（光らせん）。指で押しやすいよう縦にも少し広げる */
+.board td.pc.tap { cursor: pointer; text-decoration: underline dotted rgba(207,227,216,.6); text-underline-offset: 3px; padding-top: 6px; padding-bottom: 6px; }
 .statusbar { display: flex; align-items: center; gap: var(--s3); margin-top: var(--s2); }
 .statusbar .inning { font-size: 1.15rem; font-weight: 800; letter-spacing: .04em; white-space: nowrap; }
 .dots { display: flex; gap: 5px; align-items: center; }
@@ -320,6 +322,9 @@ body.viewer #view-input, body.viewer #view-setting { display: none !important; }
     <div class="frow"><label>表示モード</label>
       <select id="setDispMode"><option value="easy">かんたん表示</option><option value="term">野球用語表示</option></select>
     </div>
+    <div class="frow"><label>投球数</label>
+      <select id="setPitchCount"><option value="0">数えない（表示しない）</option><option value="1">数える（表示する）</option></select>
+    </div>
   </div>
   <div class="card">
     <h2>スタメン（打順）</h2>
@@ -332,7 +337,7 @@ body.viewer #view-input, body.viewer #view-setting { display: none !important; }
     <ul class="plist" id="benchList"></ul>
     <p style="font-size:.8rem;color:var(--sub)">「選手交代」で出られるのはベンチ入りの選手です。</p>
   </div>
-  <div class="card">
+  <div class="card" id="psCard">
     <h2>投球数のスタート（同じ日の2試合目など）</h2>
     <p style="font-size:.8rem;color:var(--sub);margin-bottom:8px">前の試合で投げた球数を入れておくと、その数から数えます。得点盤の「球数」はその日の合計です。</p>
     <div class="frow"><label>相手投手</label><input id="psOpp" type="number" min="0" inputmode="numeric" placeholder="0"></div>
@@ -689,6 +694,20 @@ body.viewer #view-input, body.viewer #view-setting { display: none !important; }
         continue;
       }
 
+      // 投球数の手直し（とと 2026-10-18「押し忘れた時に修正する術がない」）：その日の合計を直接入れる。
+      // スタートの数（前の試合の分）はそのままで、この試合の分を「合計−スタート」に置き直す。実況のログには出さん
+      if (ev.type === 'pitch_fix') {
+        const total = Math.max(0, Math.round(+ev.total || 0));
+        if (ev.side === 'opp') st.oppPitches = Math.max(0, total - oppStart);
+        else {
+          const nm = ev.name || NO_PITCHER;
+          let e = st.pitchers.find(x => x.name === nm);
+          if (!e) { e = { name: nm, num: ev.num || '', pitches: 0, start: myStart(nm) }; st.pitchers.push(e); }
+          e.pitches = Math.max(0, total - myStart(nm));
+        }
+        continue;
+      }
+
       if (ev.type === 'pa') {
         const def = PA_RESULTS[ev.result];
         if (!def) { st.warnings.push('不明な打席結果: ' + ev.result); continue; }
@@ -970,7 +989,7 @@ const KEY_V1 = 'yakyu_jikkyo_v1';
 // ==== 永続データ ====
 // v2: 選手は「名簿(roster)」に固定登録し、試合ごとにスタメン(lineupIds)・ベンチ入り(benchIds)を選ぶ。
 //     試合を新しく始めると、前の試合は games に自動保存される（選手・記録が消えない構造）。
-const DEFAULT_CONFIG = { gameName: '', round: '', startTime: '', myTeamName: '', oppName: '', myTeamBatsFirst: true, innings: 5, rules: '', displayMode: 'easy', inputMode: 'term' };
+const DEFAULT_CONFIG = { gameName: '', round: '', startTime: '', myTeamName: '', oppName: '', myTeamBatsFirst: true, innings: 5, rules: '', displayMode: 'easy', inputMode: 'term', pitchCount: false };   // pitchCount＝投球数を数えて出すか（とと 2026-10-18 既定はオフ）
 // 「戻る」の履歴（とと 2026-10-12「入力ミスをしたときに一つ前に戻れる・何個か戻れる」）
 // 保存のたびに直前の状態を積む。記録・選手・スタメン・守備・設定・過去の試合が対象。
 // 見た目の切り替え（かんたん/用語）と配信の鍵は戻さん（鍵を戻すと配信が途切れる）。
@@ -1013,6 +1032,8 @@ function posOf(p) { return (data.gamePos && data.gamePos[p.id]) || p.pos || ''; 
 // 守備の見せ方：かんたん表示なら「ピッチャー」、野球用語なら「投」（とと 2026-10-12）
 function posLabel(pos, mode) { return mode === 'easy' ? E.posEasy(pos) : (pos || ''); }
 const POS_OPTS = ['投', '捕', '一', '二', '三', '遊', '左', '中', '右'];
+// 投球数を数えて出すか（とと 2026-10-18「押し忘れがあると気になるので、オンオフを付けて。既定はオフ」）
+function pcOn() { return !!(data && data.config && data.config.pitchCount); }
 // 投球数のスタート（同じ日の2試合目など）。config.pitchStart = { my: {選手名: 球数}, opp: 球数 }
 // 入れ子のオブジェクトを使い回すと「戻る」の写しまで書き換わるので、読む時も書く時も新しく作る
 function getPS() { const ps = data.config.pitchStart || {}; return { my: Object.assign({}, ps.my || {}), opp: Math.max(0, +ps.opp || 0) }; }
@@ -1122,6 +1143,7 @@ function liveState() {
       gameName: data.config.gameName, round: data.config.round, startTime: data.config.startTime,
       myTeamName: data.config.myTeamName, oppName: data.config.oppName,
       myTeamBatsFirst: data.config.myTeamBatsFirst, innings: data.config.innings, rules: data.config.rules,
+      pitchCount: !!data.config.pitchCount, pitchStart: data.config.pitchCount ? data.config.pitchStart : undefined,   // 球数を出すか（記録係と同じ見え方に）
     },
     lineup: lineupPlayers().map(p => ({ num: p.num, name: p.name })), // 登録名+背番号のみ(守備・連絡先等は送らない)
     events: data.events,
@@ -1248,7 +1270,7 @@ function renderBoard() {
   const n = Math.max(data.config.innings, st.scores.away.length, st.scores.home.length);
   let head = '<tr><th></th>';
   for (let i = 1; i <= n; i++) head += '<th>' + i + '</th>';
-  head += '<th>計</th><th class="pc">球数</th></tr>';
+  head += '<th>計</th>' + (pcOn() ? '<th class="pc">球数</th>' : '') + '</tr>';
   const row = (t) => {
     let cells = '<td class="name">' + esc(st.teamNames[t] || (t === 'away' ? '先攻' : '後攻')) + '</td>';
     for (let i = 0; i < n; i++) {
@@ -1259,14 +1281,18 @@ function renderBoard() {
     cells += '<td class="total">' + st.totals[t] + '</td>';
     // 投球数（とと 2026-10-12「得点盤の一番右に」）：自チームの行に、いまの自チームの投手の数
     // 数＝その日の合計（スタートの数＋この試合）。自チームの行＝自チームの投手、相手の行＝相手投手
-    if (t === st.myTeam) {
+    // ★数字を直接タップすると手で直せる（とと 2026-10-18「押し忘れた時に修正する術がない」）。観戦する人は直せん
+    const tap = LIVE_ROOM ? '' : ' tap';
+    if (!pcOn()) { /* 数えん設定の時は列ごと出さん */ }
+    else if (t === st.myTeam) {
       const pc = st.pitcher ? st.pitcher.total : 0;
       const who = st.pitcher ? st.pitcher.name : '';
-      cells += '<td class="pc" title="' + esc(who ? who + 'の投球数' : '投球数') + '">' + pc + '</td>';   // 名前は出さん（自チームの投手は見れば分かる・とと 2026-10-12）
-    } else cells += '<td class="pc" title="相手投手の投球数">' + st.oppTotal + '</td>';
+      cells += '<td class="pc' + tap + '" data-pc="my" title="' + esc(who ? who + 'の投球数' : '投球数') + '">' + pc + '</td>';   // 名前は出さん（自チームの投手は見れば分かる・とと 2026-10-12）
+    } else cells += '<td class="pc' + tap + '" data-pc="opp" title="相手投手の投球数">' + st.oppTotal + '</td>';
     return '<tr>' + cells + '</tr>';
   };
   $('lineScore').innerHTML = head + row('away') + row('home');
+  if (!LIVE_ROOM) $('lineScore').querySelectorAll('td.pc.tap').forEach(td => td.onclick = () => startPitchFix(td.dataset.pc));
   $('inningLabel').textContent = st.finished ? '試合終了' : st.inning + '回' + (st.half === 'top' ? '表' : '裏');
   $('outDots').innerHTML = '<span class="lbl">アウト</span>' + [0, 1].map(i => '<span class="dot' + (st.outs > i ? ' on' : '') + '"></span>').join('');
   $('bsDots').innerHTML = '<span class="lbl">B</span>' + [0, 1, 2].map(i => '<span class="dot' + (st.balls > i ? ' on b' : '') + '"></span>').join('')
@@ -1350,6 +1376,8 @@ function renderSetting() {
   $('setInnings').value = String(data.config.innings);
   $('setRules').value = data.config.rules;
   $('setDispMode').value = data.config.displayMode;
+  $('setPitchCount').value = pcOn() ? '1' : '0';
+  $('psCard').style.display = pcOn() ? '' : 'none';   // 数えん時はスタートの数も要らん
   const lu = $('lineupList');
   // 投球数のスタート
   const PSc = getPS();
@@ -1440,8 +1468,8 @@ function showPastGame(i) {
   let html = '<h2>' + esc((g.savedAt || '').slice(0, 10)) + '　' + esc(gst.teamNames.away) + ' ' + gst.totals.away + ' - ' + gst.totals.home + ' ' + esc(gst.teamNames.home) + '</h2>';
   const rows = E.stats(gst);
   if (rows.length) {
-    html += '<table class="statstbl"><thead><tr><th class="nm">選手</th><th>打数</th><th>安打</th><th>打点</th><th>得点</th><th>盗塁</th><th>球数</th></tr></thead><tbody>';
-    for (const r of rows) html += '<tr><td class="nm">' + esc(r.name) + '</td><td>' + r.ab + '</td><td class="' + (r.h > 0 ? 'hot' : '') + '">' + r.h + '</td><td>' + r.rbi + '</td><td>' + r.runs + '</td><td>' + r.steals + '</td>' + '<td>' + (r.pitches ? r.pitches : '') + '</td>' + '</tr>';
+    html += '<table class="statstbl"><thead><tr><th class="nm">選手</th><th>打数</th><th>安打</th><th>打点</th><th>得点</th><th>盗塁</th>' + (pcOn() ? '<th>球数</th>' : '') + '</tr></thead><tbody>';
+    for (const r of rows) html += '<tr><td class="nm">' + esc(r.name) + '</td><td>' + r.ab + '</td><td class="' + (r.h > 0 ? 'hot' : '') + '">' + r.h + '</td><td>' + r.rbi + '</td><td>' + r.runs + '</td><td>' + r.steals + '</td>' + (pcOn() ? '<td>' + (r.pitches ? r.pitches : '') + '</td>' : '') + '</tr>';
     html += '</tbody></table>';
   }
   html += '<div style="margin-top:16px">';
@@ -1588,6 +1616,13 @@ function subInCandidates(kind) {
   return benchPlayers().filter(p => !onField.has(p.name + '#' + p.num)).map(p => ({ p, label: p.name + '（#' + p.num + '）' }));
 }
 
+// 守備を選ぶドロップダウン（とと 2026-10-18「手入力やなく、スタメンと同じように選んで入れたい」）。
+//   スマホでは押すと選択の画面が出る。一番上は「選ばん」＝空（交代なら退く選手の守備のまま）
+function posSelect(first) {
+  return '<select id="subPos"><option value="">' + esc(first) + '</option>'
+    + POS_OPTS.map(o => '<option value="' + esc(o) + '">' + esc(posLabel(o, data.config.displayMode)) + '</option>').join('') + '</select>';
+}
+
 function startSub() { subQueue = []; subKindNow = 'pinch_hit'; renderSubSheet(); }
 
 function renderSubSheet() {
@@ -1595,7 +1630,7 @@ function renderSubSheet() {
   html += '<div class="frow"><label>種類</label><select id="subKind">' + SUB_KIND_LIST.map(k => '<option value="' + k[0] + '"' + (k[0] === subKindNow ? ' selected' : '') + '>' + k[1] + '</option>').join('') + '</select></div>';
   if (subKindNow === 'pos_change') {
     html += '<div class="frow"><label>選手</label><select id="subOut">' + st.lineup.map((p, i) => '<option value="' + i + '">' + (i + 1) + '番 ' + esc(p.name) + '（今：' + esc(posLabel(p.pos, data.config.inputMode) || 'なし') + '）</option>').join('') + '</select></div>';
-    html += '<div class="frow"><label>新しい守備</label><input id="subPos" placeholder="投・遊・右 など"></div>';
+    html += '<div class="frow"><label>新しい守備</label>' + posSelect('選んでください') + '</div>';
   } else {
     const cands = subInCandidates(subKindNow);
     if (subKindNow === 'pinch_run') {
@@ -1605,7 +1640,7 @@ function renderSubSheet() {
     html += '<div class="frow"><label>退く選手</label><select id="subOut">' + st.lineup.map((p, i) => '<option value="' + i + '">' + (i + 1) + '番 ' + esc(p.name) + '</option>').join('') + '</select></div>';
     html += '<div class="frow"><label>出る選手</label><select id="subIn">' + cands.map((c, i) => '<option value="' + i + '">' + esc(c.label) + '</option>').join('') + '</select></div>';
     if (!cands.length) html += '<p class="sub">出られる選手がいません（' + (subKindNow === 'reentry' ? '退いた選手がまだいません' : 'ベンチに選手を追加してください') + '）</p>';
-    html += '<div class="frow"><label>守備位置</label><input id="subPos" placeholder="そのまま なら空欄"></div>';
+    html += '<div class="frow"><label>守備位置</label>' + posSelect('そのまま（退く選手の守備）') + '</div>';
   }
   if (subQueue.length) {
     html += '<div class="advrow"><div class="who">まとめて記録する交代（' + subQueue.length + '件）</div><ul class="plist">'
@@ -1630,7 +1665,7 @@ function addSubFromForm() {
     const p = st.lineup[+$('subOut').value];
     const pos = $('subPos').value.trim();
     if (!p) { toast('選手を選んでください'); return false; }
-    if (!pos) { toast('新しい守備位置を入れてください'); return false; }
+    if (!pos) { toast('新しい守備を選んでください'); return false; }
     subQueue.push({ kind: 'pos_change', name: p.name, pos, label: '守備変更 ' + pos + ' ' + p.name });
     return true;
   }
@@ -1688,6 +1723,31 @@ function startAdjust() {
   $('sheetBody').querySelector('.go').onclick = () => {
     closeSheet();
     commit({ type: 'adjust', team: $('adjTeam').value, inning: +$('adjInning').value, delta: +$('adjDelta').value });
+  };
+  $('sheetBody').querySelector('.cancel').onclick = closeSheet;
+}
+
+// ==== 投球数の手直し（とと 2026-10-18）：得点盤の球数をタップ→正しい数（その日の合計）を入れる ====
+function startPitchFix(side) {
+  const my = side === 'my';
+  if (my && !st.pitcher) { toast('自チームの投手がいません（守備が「投」の選手）'); return; }
+  const cur = my ? st.pitcher.total : st.oppTotal;
+  const who = my ? st.pitcher.name : '相手投手';
+  let html = '<h2>投球数を直す（' + esc(who) + '）</h2>';
+  html += '<p class="sub">押し忘れた時などに、正しい数を入れてください。その日の合計の数です。直した後も、1球ごとに足されていきます。</p>';
+  html += '<div class="frow"><label>投球数</label><input id="pfNum" type="number" min="0" max="300" inputmode="numeric" value="' + cur + '"></div>';
+  html += '<div class="sheetbtns"><button class="go">直す</button><button class="cancel">やめる</button></div>';
+  openSheet(html);
+  const inp = $('pfNum'); inp.focus(); inp.select();
+  $('sheetBody').querySelector('.go').onclick = () => {
+    const v = Math.round(+inp.value);
+    if (!isFinite(v) || v < 0 || v > 300 || inp.value.trim() === '') { toast('0〜300の数を入れてください'); return; }
+    closeSheet();
+    if (v === cur) return;
+    const ev = { type: 'pitch_fix', side: my ? 'my' : 'opp', total: v };
+    if (my) { ev.name = st.pitcher.name; ev.num = st.pitcher.num; }
+    commit(ev);
+    toast(who + 'の投球数を ' + v + ' に直しました');
   };
   $('sheetBody').querySelector('.cancel').onclick = closeSheet;
 }
@@ -1769,19 +1829,19 @@ function showStats(scope) {
   if (!LIVE_ROOM) { // 観戦モードでは通算(自端末の記録)は出さない
     html += '<div class="modepill" style="margin-bottom:16px"><button id="stG" class="' + (total ? '' : 'act') + '">この試合</button><button id="stT" class="' + (total ? 'act' : '') + '">通算</button></div>';
   }
-  html += '<table class="statstbl"><thead><tr><th class="nm">選手</th>' + (total ? '<th>試合</th>' : '') + '<th>打数</th><th>安打</th><th>打率</th><th>打点</th><th>得点</th><th>盗塁</th><th>球数</th></tr></thead><tbody>';
+  html += '<table class="statstbl"><thead><tr><th class="nm">選手</th>' + (total ? '<th>試合</th>' : '') + '<th>打数</th><th>安打</th><th>打率</th><th>打点</th><th>得点</th><th>盗塁</th>' + (pcOn() ? '<th>球数</th>' : '') + '</tr></thead><tbody>';
   for (const r of rows) {
     html += '<tr><td class="nm">' + esc(r.name) + '</td>' + (total ? '<td>' + r.games + '</td>' : '')
-      + '<td>' + r.ab + '</td><td class="' + (r.h > 0 ? 'hot' : '') + '">' + r.h + '</td><td>' + avg(r.h, r.ab) + '</td><td>' + r.rbi + '</td><td>' + r.runs + '</td><td>' + r.steals + '</td>' + '<td>' + (r.pitches ? r.pitches : '') + '</td>' + '</tr>';
+      + '<td>' + r.ab + '</td><td class="' + (r.h > 0 ? 'hot' : '') + '">' + r.h + '</td><td>' + avg(r.h, r.ab) + '</td><td>' + r.rbi + '</td><td>' + r.runs + '</td><td>' + r.steals + '</td>' + (pcOn() ? '<td>' + (r.pitches ? r.pitches : '') + '</td>' : '') + '</tr>';
   }
   html += '</tbody></table>';
-  html += '<p class="sub" style="margin-top:8px">四球・死球・犠打・犠飛は打数に数えません（野球の公式ルールと同じ）。球数＝投げた球の数（相手の攻撃中）' + (total ? '。通算は過去の試合＋今の試合の合計' : '') + '</p>';
+  html += '<p class="sub" style="margin-top:8px">四球・死球・犠打・犠飛は打数に数えません（野球の公式ルールと同じ）' + (pcOn() ? '。球数＝投げた球の数（相手の攻撃中）' : '') + (total ? '。通算は過去の試合＋今の試合の合計' : '') + '</p>';
   html += '<div class="sheetbtns"><button class="go" id="btnCopyStats">成績をコピー</button><button class="cancel">閉じる</button></div>';
   openSheet(html);
   if ($('stG')) { $('stG').onclick = () => showStats('game'); $('stT').onclick = () => showStats('total'); }
   $('btnCopyStats').onclick = () => {
-    const lines = [st.teamNames[st.myTeam] + ' 打撃成績' + (total ? '（通算）' : ''), '選手　' + (total ? '試合 ' : '') + '打数 安打 打率 打点 得点 盗塁 球数'];
-    for (const r of rows) lines.push(r.name + '　' + (total ? r.games + ' ' : '') + r.ab + ' ' + r.h + ' ' + avg(r.h, r.ab) + ' ' + r.rbi + ' ' + r.runs + ' ' + r.steals + ' ' + (r.pitches || '-'));
+    const lines = [st.teamNames[st.myTeam] + ' 打撃成績' + (total ? '（通算）' : ''), '選手　' + (total ? '試合 ' : '') + '打数 安打 打率 打点 得点 盗塁' + (pcOn() ? ' 球数' : '')];
+    for (const r of rows) lines.push(r.name + '　' + (total ? r.games + ' ' : '') + r.ab + ' ' + r.h + ' ' + avg(r.h, r.ab) + ' ' + r.rbi + ' ' + r.runs + ' ' + r.steals + (pcOn() ? ' ' + (r.pitches || '-') : ''));
     copyText(lines.join('\n'));
   };
   $('sheetBody').querySelector('.cancel').onclick = closeSheet;
@@ -1917,6 +1977,7 @@ for (const [id, key] of [['setGameName', 'gameName'], ['setRound', 'round'], ['s
 $('setFirst').addEventListener('change', () => { data.config.myTeamBatsFirst = $('setFirst').value === '1'; save(); recompute(); });
 $('setInnings').addEventListener('change', () => { data.config.innings = +$('setInnings').value; save(); recompute(); });
 $('setDispMode').addEventListener('change', () => { data.config.displayMode = $('setDispMode').value; save(); recompute(); });
+$('setPitchCount').addEventListener('change', () => { data.config.pitchCount = $('setPitchCount').value === '1'; save(); recompute(); });
 $('psOpp').addEventListener('change', () => { const ps = getPS(); ps.opp = Math.max(0, Math.floor(+$('psOpp').value || 0)); setPS(ps); });
 $('btnPsAdd').onclick = () => {
   const nm = $('psWho').value, n = Math.floor(+$('psNum').value || 0);
