@@ -381,6 +381,12 @@ body.viewer #view-input, body.viewer #view-setting { display: none !important; }
     </div>
     <div id="liveOn" style="display:none">
       <p style="font-weight:700;color:var(--green-deep)" id="liveStatus">配信中</p>
+      <!-- 送るタイミング（利用者の声 2026-10-18「通信量が少ない人もいる。1プレーごとだと通信がずっと続く」） -->
+      <div class="frow"><label>送るタイミング</label>
+        <select id="setSendMode"><option value="play">1プレーごと</option><option value="change">攻守交代ごと</option><option value="end">試合終了の時だけ</option></select>
+      </div>
+      <p class="sub" id="sendModeNote" style="margin:-4px 0 8px"></p>
+      <button id="btnLiveNow" style="width:100%;min-height:44px;margin-bottom:12px">今すぐ送る</button>
       <textarea class="share" id="liveUrlBox" readonly style="min-height:3.2em"></textarea>
       <div class="rowbtns">
         <button id="btnLiveCopy">観戦リンクをコピー</button>
@@ -1002,7 +1008,7 @@ const KEY_V1 = 'yakyu_jikkyo_v1';
 // ==== 永続データ ====
 // v2: 選手は「名簿(roster)」に固定登録し、試合ごとにスタメン(lineupIds)・ベンチ入り(benchIds)を選ぶ。
 //     試合を新しく始めると、前の試合は games に自動保存される（選手・記録が消えない構造）。
-const DEFAULT_CONFIG = { gameName: '', round: '', startTime: '', myTeamName: '', oppName: '', myTeamBatsFirst: true, innings: 5, rules: '', displayMode: 'easy', inputMode: 'term', pitchCount: false };   // pitchCount＝投球数を数えて出すか（とと 2026-10-18 既定はオフ）
+const DEFAULT_CONFIG = { gameName: '', round: '', startTime: '', myTeamName: '', oppName: '', myTeamBatsFirst: true, innings: 5, rules: '', displayMode: 'easy', inputMode: 'term', pitchCount: false, sendMode: 'play' };   // sendMode＝配信を送るタイミング play/change/end（とと 2026-10-18）   // pitchCount＝投球数を数えて出すか（とと 2026-10-18 既定はオフ）
 // 「戻る」の履歴（とと 2026-10-12「入力ミスをしたときに一つ前に戻れる・何個か戻れる」）
 // 保存のたびに直前の状態を積む。記録・選手・スタメン・守備・設定・過去の試合が対象。
 // 見た目の切り替え（かんたん/用語）と配信の鍵は戻さん（鍵を戻すと配信が途切れる）。
@@ -1163,14 +1169,33 @@ function liveState() {
     },
     lineup: lineupPlayers().map(p => ({ num: p.num, name: p.name })), // 登録名+背番号のみ(守備・連絡先等は送らない)
     events: data.events,
+    sendMode: sendModeNow(),
     updatedAt: Date.now(),
   };
 }
-let pushTimer = null, pushRetryTimer = null;
+// ★送るタイミング（利用者の声 2026-10-18「通信量が少ない人もいる。1プレーごとだと通信がずっと続く」）
+//   play＝1プレーごと／change＝攻守交代のたび（3アウト・試合終了）／end＝試合終了の時だけ。どれでも「今すぐ送る」で送れる
+const SEND_MODES = { play: '1プレーごとに送ります', change: '攻守交代のたびに送ります（3アウトになった時・試合終了の時）', end: '試合終了を記録した時に送ります' };
+function sendModeNow() { return SEND_MODES[data.config.sendMode] ? data.config.sendMode : 'play'; }
+let pushTimer = null, pushRetryTimer = null, lastAutoKey = null;
 function schedulePush() {
   if (!data.live || LIVE_ROOM) return;
   clearTimeout(pushTimer);
-  pushTimer = setTimeout(pushLive, 700);
+  pushTimer = setTimeout(autoPush, 700);
+}
+// 「攻守交代ごと」は回・表裏・終了が変わった時、「試合終了の時だけ」は終了が付いた（外れた）時に送る
+function autoKey() {
+  const mode = sendModeNow();
+  if (mode === 'play') return null;
+  const r = E.reduce(engineCfg(), data.events);
+  return mode === 'change' ? r.inning + '-' + r.half + '-' + (r.finished ? 1 : 0) : (r.finished ? 'end' : 'playing');
+}
+function autoPush() {
+  if (sendModeNow() === 'play') { pushLive(); return; }
+  const key = autoKey();
+  if (key === lastAutoKey) return;
+  lastAutoKey = key;
+  pushLive();
 }
 // ★配信は「変わる所だけ」を送る（PATCH）。過去の試合（state/history）は重いので毎回は送らず、
 //   配信開始・試合の切り替え・過去の試合の削除の時だけ送る（とと 2026-10-18「観戦の人も過去の試合を見れるように」）。
@@ -1181,19 +1206,48 @@ function patchBody(stateObj) {
   for (const k of Object.keys(stateObj)) body['state/' + k] = stateObj[k] === undefined ? null : stateObj[k];
   return body;
 }
+// ★増えた所だけ送る（利用者の声 2026-10-18 通信量）：前は送るたびに試合の記録を最初から全部送り直しとったので、
+//   試合の後半ほど1回が重かった。今はサーバーに送り済みの中身を覚えておき、変わった項目・増えたプレーだけを送る。
+//   覚えが無い時（開き直した・別のスマホへ引き継いだ）は一度だけ全部送る
+let sentState = null;   // { key: JSON } 送り済み。events は1プレーずつ
+function diffBody(stateObj) {
+  const body = { secret: data.live.secret }, next = {};
+  for (const k of Object.keys(stateObj)) {
+    const v = stateObj[k] === undefined ? null : stateObj[k];
+    if (k === 'events' && Array.isArray(v)) {
+      const evs = v.map(e => JSON.stringify(e));
+      next.events = evs;
+      const old = sentState && sentState.events;
+      if (!old) { body['state/events'] = v.length ? v : null; continue; }
+      for (let i = 0; i < evs.length; i++) if (old[i] !== evs[i]) body['state/events/' + i] = v[i];
+      for (let i = evs.length; i < old.length; i++) body['state/events/' + i] = null;   // 戻るで減った分
+      continue;
+    }
+    const j = JSON.stringify(v);
+    next[k] = j;
+    if (k === 'updatedAt' || !sentState || sentState[k] !== j) body['state/' + k] = v;
+  }
+  return { body, next };
+}
 async function pushLive(extraState) {
   if (!data.live) return;
-  const body = patchBody(Object.assign(liveState(), { ended: null }, extraState || {}));
+  const { body, next } = diffBody(Object.assign(liveState(), { ended: null }, extraState || {}));
+  // 時刻のほかに変わった所が無ければ送らん（見た目だけの切替などで、通信をむだに使わんため）
+  if (!Object.keys(body).some(k => k !== 'secret' && k !== 'state/updatedAt')) {
+    if (historyDirty) pushHistory();
+    return true;
+  }
   try {
     const res = await fetch(FB_DB + '/rooms/' + data.live.roomId + '.json', { method: 'PATCH', body: JSON.stringify(body) });
     if (!res.ok) throw new Error('http ' + res.status);
-    setLiveStatus('配信中（同期OK）', true);
+    sentState = Object.assign({}, sentState || {}, next);
+    setLiveStatus('配信中（同期OK・' + new Date().toTimeString().slice(0, 5) + ' に送信）', true);
     if (historyDirty && !(extraState && extraState.ended)) pushHistory();
     return true;
   } catch (e) {
     setLiveStatus('同期待ち（電波が戻り次第送ります）', false);
     clearTimeout(pushRetryTimer);
-    pushRetryTimer = setTimeout(pushLive, 20000);
+    pushRetryTimer = setTimeout(() => pushLive(), 20000);
     return false;
   }
 }
@@ -1233,7 +1287,7 @@ function applyRemote(state) {
   b.style.display = '';
   if (!state) b.textContent = 'この配信は見つかりません（終了したか、リンクが違います）';
   else if (state.ended) b.textContent = 'この試合の配信は終了しました';
-  else b.textContent = 'ライブ観戦中：記録が入ると自動で更新されます';
+  else b.textContent = 'ライブ観戦中：' + ({ change: '攻守交代のたびに更新されます', end: '試合が終わったら結果が届きます' }[state.sendMode] || '記録が入ると自動で更新されます');
   recompute();
 }
 function startViewer() {
@@ -1287,7 +1341,7 @@ let st = null;
 function engineCfg() { return Object.assign({}, data.config, { lineup: lineupPlayers().map(p => ({ num: p.num, name: p.name, pos: posOf(p) })) }); }
 function recompute() {
   if (LIVE_ROOM) { // ライブ観戦: 受信した試合データで描画（自分の記録には触らない）
-    if (REMOTE && REMOTE.config) st = E.reduce(Object.assign({}, DEFAULT_CONFIG, REMOTE.config, { lineup: REMOTE.lineup || [] }), REMOTE.events || []);
+    if (REMOTE && REMOTE.config) st = E.reduce(Object.assign({}, DEFAULT_CONFIG, REMOTE.config, { lineup: toList(REMOTE.lineup) }), toList(REMOTE.events));
     else st = E.reduce(Object.assign({}, DEFAULT_CONFIG, { lineup: [] }), []);
     render();
     return;
@@ -1491,6 +1545,8 @@ function renderSetting() {
     return '<li><span class="nm">' + esc(p.name) + '</span><span class="ps">#' + esc(String(p.num)) + ' ' + esc(posLabel(p.pos, data.config.displayMode)) + '・' + state + '</span>' + btns + '</li>';
   }).join('') || '<li style="color:var(--sub)">下の欄から選手を登録してください</li>';
   $('liveOff').style.display = data.live ? 'none' : '';
+  $('setSendMode').value = sendModeNow();
+  $('sendModeNote').textContent = SEND_MODES[sendModeNow()] + '。間で送りたい時は「今すぐ送る」。';
   $('liveOn').style.display = data.live ? '' : 'none';
   if (data.live) $('liveUrlBox').value = liveUrl();
   const ga = $('gamesList');
@@ -1520,7 +1576,13 @@ function lineupOp(a, i) {
 
 // ==== 過去の試合の閲覧（読み取り専用） ====
 // 記録係＝このスマホの記録／観戦の人＝配信で届いた分（とと 2026-10-18「観戦側の人も過去の試合を見れるように」）
-function pastGames() { return LIVE_ROOM ? ((REMOTE && Array.isArray(REMOTE.history)) ? REMOTE.history.filter(Boolean) : []) : (data.games || []); }
+function pastGames() { return LIVE_ROOM ? (REMOTE ? toList(REMOTE.history) : []) : (data.games || []); }
+// サーバーから届いた並び（配列・番号付きの入れ物・抜けあり）を、番号順の配列に揃える
+function toList(x) {
+  if (!x) return [];
+  if (Array.isArray(x)) return x.filter(v => v != null);
+  return Object.keys(x).filter(k => /^\d+$/.test(k)).sort((a, b) => a - b).map(k => x[k]).filter(v => v != null);
+}
 function pastTitle(g) {
   const d = (g.savedAt || '').slice(0, 10);
   const tn = g.teamNames, tt = g.totals;
@@ -2145,10 +2207,13 @@ $('btnLiveStart').onclick = async () => {
   data.live = { roomId: 'r' + rnd(), secret: rnd() + rnd() };
   save(); recompute();
   historyDirty = true;   // 過去の試合も一緒に（pushLive が成功したら続けて送る）
+  sentState = null; lastAutoKey = autoKey();   // 新しい部屋なので全部送る（今の場面は送ったことにする）
   const ok = await pushLive();
   toast(ok ? '配信を開始しました。観戦リンクをLINEで共有してください' : '開始できませんでした（電波かサーバー設定を確認）');
 };
 $('btnLiveCopy').onclick = () => copyText(liveUrl());
+$('btnLiveNow').onclick = async () => { const ok = await pushLive(); toast(ok ? '送りました' : '送れませんでした（電波が戻り次第送ります）'); };
+$('setSendMode').addEventListener('change', () => { data.config.sendMode = $('setSendMode').value; save(); lastAutoKey = autoKey(); recompute(); pushLive(); });   // 切り替えたら今の状態を一度送る
 $('btnLiveStop').onclick = async () => {
   if (!confirm('配信を終了しますか？（サーバー上の試合データは消えます。スマホの記録は残ります）')) return;
   await pushLive({ ended: true, events: [], lineup: [], history: null }); // 中身を空にして終了印を残す（過去の試合も消す）
