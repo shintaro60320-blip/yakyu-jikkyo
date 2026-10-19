@@ -375,17 +375,17 @@ body.viewer #view-input, body.viewer #view-setting { display: none !important; }
   </div>
   <div class="card">
     <h2>ライブ配信（リアルタイム観戦）</h2>
+    <!-- 送るタイミング（利用者の声 2026-10-18 通信量）。配信の前でも途中でも選べる（とと 2026-10-19） -->
+    <div class="frow"><label>送るタイミング</label>
+      <select id="setSendMode"><option value="change">攻守交代ごと</option><option value="play">1プレーごと</option><option value="end">試合終了の時だけ</option></select>
+    </div>
+    <p class="sub" id="sendModeNote" style="margin:-4px 0 12px"></p>
     <div id="liveOff">
       <button class="primarybtn" id="btnLiveStart">配信を開始する</button>
-      <p style="font-size:.8rem;color:var(--sub);margin-top:8px">観戦用のリンクができます。リンクを開いた人の画面は、記録するたびに自動で更新されます。サーバーに送るのは登録名・背番号・プレー内容だけです。</p>
+      <p style="font-size:.8rem;color:var(--sub);margin-top:8px">観戦用のリンクができます。リンクを開いた人の画面は、上の「送るタイミング」で自動で更新されます（配信の途中でも変えられます）。サーバーに送るのは登録名・背番号・プレー内容だけです。</p>
     </div>
     <div id="liveOn" style="display:none">
       <p style="font-weight:700;color:var(--green-deep)" id="liveStatus">配信中</p>
-      <!-- 送るタイミング（利用者の声 2026-10-18「通信量が少ない人もいる。1プレーごとだと通信がずっと続く」） -->
-      <div class="frow"><label>送るタイミング</label>
-        <select id="setSendMode"><option value="play">1プレーごと</option><option value="change">攻守交代ごと</option><option value="end">試合終了の時だけ</option></select>
-      </div>
-      <p class="sub" id="sendModeNote" style="margin:-4px 0 8px"></p>
       <button id="btnLiveNow" style="width:100%;min-height:44px;margin-bottom:12px">今すぐ送る</button>
       <textarea class="share" id="liveUrlBox" readonly style="min-height:3.2em"></textarea>
       <div class="rowbtns">
@@ -1008,7 +1008,7 @@ const KEY_V1 = 'yakyu_jikkyo_v1';
 // ==== 永続データ ====
 // v2: 選手は「名簿(roster)」に固定登録し、試合ごとにスタメン(lineupIds)・ベンチ入り(benchIds)を選ぶ。
 //     試合を新しく始めると、前の試合は games に自動保存される（選手・記録が消えない構造）。
-const DEFAULT_CONFIG = { gameName: '', round: '', startTime: '', myTeamName: '', oppName: '', myTeamBatsFirst: true, innings: 5, rules: '', displayMode: 'easy', inputMode: 'term', pitchCount: false, sendMode: 'play' };   // sendMode＝配信を送るタイミング play/change/end（とと 2026-10-18）   // pitchCount＝投球数を数えて出すか（とと 2026-10-18 既定はオフ）
+const DEFAULT_CONFIG = { gameName: '', round: '', startTime: '', myTeamName: '', oppName: '', myTeamBatsFirst: true, innings: 5, rules: '', displayMode: 'easy', inputMode: 'term', pitchCount: false, sendMode: 'change' };   // sendMode＝配信を送るタイミング play/change/end（とと 2026-10-18）   // pitchCount＝投球数を数えて出すか（とと 2026-10-18 既定はオフ）
 // 「戻る」の履歴（とと 2026-10-12「入力ミスをしたときに一つ前に戻れる・何個か戻れる」）
 // 保存のたびに直前の状態を積む。記録・選手・スタメン・守備・設定・過去の試合が対象。
 // 見た目の切り替え（かんたん/用語）と配信の鍵は戻さん（鍵を戻すと配信が途切れる）。
@@ -1176,7 +1176,8 @@ function liveState() {
 // ★送るタイミング（利用者の声 2026-10-18「通信量が少ない人もいる。1プレーごとだと通信がずっと続く」）
 //   play＝1プレーごと／change＝攻守交代のたび（3アウト・試合終了）／end＝試合終了の時だけ。どれでも「今すぐ送る」で送れる
 const SEND_MODES = { play: '1プレーごとに送ります', change: '攻守交代のたびに送ります（3アウトになった時・試合終了の時）', end: '試合終了を記録した時に送ります' };
-function sendModeNow() { return SEND_MODES[data.config.sendMode] ? data.config.sendMode : 'play'; }
+// 既定は「攻守交代ごと」（とと 2026-10-19）。自分で選んだ時（sendModeChosen）だけその値を使う＝前の版で既定の play が残っとっても攻守交代ごとになる
+function sendModeNow() { return data.config.sendModeChosen && SEND_MODES[data.config.sendMode] ? data.config.sendMode : 'change'; }
 let pushTimer = null, pushRetryTimer = null, lastAutoKey = null;
 function schedulePush() {
   if (!data.live || LIVE_ROOM) return;
@@ -1546,7 +1547,7 @@ function renderSetting() {
   }).join('') || '<li style="color:var(--sub)">下の欄から選手を登録してください</li>';
   $('liveOff').style.display = data.live ? 'none' : '';
   $('setSendMode').value = sendModeNow();
-  $('sendModeNote').textContent = SEND_MODES[sendModeNow()] + '。間で送りたい時は「今すぐ送る」。';
+  $('sendModeNote').textContent = SEND_MODES[sendModeNow()] + (data.live ? '。間で送りたい時は「今すぐ送る」。' : '。');
   $('liveOn').style.display = data.live ? '' : 'none';
   if (data.live) $('liveUrlBox').value = liveUrl();
   const ga = $('gamesList');
@@ -2213,7 +2214,7 @@ $('btnLiveStart').onclick = async () => {
 };
 $('btnLiveCopy').onclick = () => copyText(liveUrl());
 $('btnLiveNow').onclick = async () => { const ok = await pushLive(); toast(ok ? '送りました' : '送れませんでした（電波が戻り次第送ります）'); };
-$('setSendMode').addEventListener('change', () => { data.config.sendMode = $('setSendMode').value; save(); lastAutoKey = autoKey(); recompute(); pushLive(); });   // 切り替えたら今の状態を一度送る
+$('setSendMode').addEventListener('change', () => { data.config.sendMode = $('setSendMode').value; data.config.sendModeChosen = true; save(); lastAutoKey = autoKey(); recompute(); if (data.live) pushLive(); });   // 切り替えたら今の状態を一度送る
 $('btnLiveStop').onclick = async () => {
   if (!confirm('配信を終了しますか？（サーバー上の試合データは消えます。スマホの記録は残ります）')) return;
   await pushLive({ ended: true, events: [], lineup: [], history: null }); // 中身を空にして終了印を残す（過去の試合も消す）
