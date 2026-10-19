@@ -608,6 +608,7 @@ body.viewer #view-input, body.viewer #view-setting { display: none !important; }
       pitchers: [],       // 自チームの投手ごとの投球数 [{name,num,pitches,start}]（登板順・pitches＝この試合の分）
       curPitcher: null,   // いまマウンドにおる自チームの投手 {name,num}
       oppPitches: 0,      // 相手投手の投球数（この試合の分。相手の選手名は持たんので1つにまとめる）
+      pitchLines: [],     // 自チームの投手ごとの アウト数・失点（失点率の元。登板順）
     };
     const myIsAway = !!config.myTeamBatsFirst;
 
@@ -620,6 +621,15 @@ body.viewer #view-input, body.viewer #view-setting { display: none !important; }
     const myStart = (name) => Math.max(0, +((PS.my || {})[name]) || 0);
     const oppStart = Math.max(0, +PS.opp || 0);
     const setPitcher = (pl) => { st.curPitcher = pl ? { name: pl.name, num: pl.num } : null; };
+    // ★失点率（とと 2026-10-19「失点率だけあればいい」）：自チームが守っとる間のアウトと失点を投手ごとに数える。
+    //   失点は「その走者を出した投手」の失点（途中で投手が替わっても、前の投手が出した走者がかえった点は前の投手）。
+    //   エラーで入った点も含む（自責点の判断はせん＝少年野球ではエラーが多く、人によって数字が変わるため）
+    const pitchLine = (name, num) => {
+      let e = st.pitchLines.find(x => x.name === name);
+      if (!e) { e = { name: name, num: num || '', outs: 0, runs: 0 }; st.pitchLines.push(e); }
+      return e;
+    };
+    const curPitchName = () => (st.curPitcher ? st.curPitcher.name : NO_PITCHER);
     const countPitch = () => {
       if (isMyAtBat()) { st.oppPitches++; return; }   // 自チームの攻撃中＝相手の投手の球
       const cp = st.curPitcher || { name: NO_PITCHER, num: '' };
@@ -668,20 +678,25 @@ body.viewer #view-input, body.viewer #view-setting { display: none !important; }
       // 3塁→2塁→1塁→打者 の順に処理して衝突を防ぐ
       let runs = 0, outs = 0;
       const nb = { 1: st.bases[1], 2: st.bases[2], 3: st.bases[3] };
-      const scorers = [], outRunners = [], moved = [];
+      const scorers = [], outRunners = [], moved = [], runPits = [];   // runPits＝かえった走者を出した投手（失点率用）
       const move = (from, dest) => {
         const runner = nb[from];
         if (!runner || !dest) return; // 0 = そのまま
         nb[from] = null;
-        if (dest === 4) { runs++; scorers.push(runner.label); moved.push({ from, to: 4, label: runner.label }); }
+        if (dest === 4) { runs++; scorers.push(runner.label); runPits.push(runner.pit || curPitchName()); moved.push({ from, to: 4, label: runner.label }); }
         else if (dest === -1) { outs++; outRunners.push({ from, label: runner.label }); }
         else { nb[dest] = runner; moved.push({ from, to: dest, label: runner.label }); }
       };
       move(3, adv.r3); move(2, adv.r2); move(1, adv.r1);
-      if (adv.batter === 4) { runs++; scorers.push(runnerLabelForBatter); }
+      if (adv.batter === 4) { runs++; scorers.push(runnerLabelForBatter); runPits.push(curPitchName()); }
       else if (adv.batter === -1) outs++;
-      else if (adv.batter >= 1) nb[adv.batter] = { label: runnerLabelForBatter };
+      else if (adv.batter >= 1) nb[adv.batter] = { label: runnerLabelForBatter, pit: isMyAtBat() ? null : curPitchName() };
       st.bases = nb;
+      // 自チームが守っとる間は、アウトを今の投手に・失点を走者を出した投手に付ける
+      if (!isMyAtBat()) {
+        if (outs) pitchLine(curPitchName(), st.curPitcher && st.curPitcher.num).outs += outs;
+        for (const nm of runPits) pitchLine(nm).runs++;
+      }
       // 同一塁に2人はいない（moveの順序で上書きされない設計だが念のため検査）
       return { runs, outs, scorers, outRunners, moved };
     }
@@ -816,7 +831,7 @@ body.viewer #view-input, body.viewer #view-setting { display: none !important; }
         // 「誰から誰へ」を必ず残す
         if (ev.kind === 'pinch_run' && ev.base && st.bases[ev.base]) {
           const from = st.bases[ev.base].label;
-          st.bases[ev.base] = { label: ev.inPlayer.name };
+          st.bases[ev.base] = { label: ev.inPlayer.name, pit: st.bases[ev.base].pit };   // 代走でも、その走者を出した投手は同じ
           replaceLineup(st, ev.outPlayer, ev.inPlayer, ev.pos);
           syncPitcherAfterSub(ev);
           addLog({ kind: 'sub', subKind: ev.kind, term: def.term + '：' + from + '→' + ev.inPlayer.name, easy: def.easy + '：' + from + 'に代わって' + ev.inPlayer.name + '（' + ev.base + '塁）' });
@@ -967,6 +982,25 @@ body.viewer #view-input, body.viewer #view-setting { display: none !important; }
   }
 
   // ---- 通算成績（複数試合の成績表をマージ） -----------------------------
+  // 投手の成績（失点率）。perGame＝何回あたりで出すか（大会の回数）。投手が決まっとらん分は出さん
+  function pitchStats(st, perGame) {
+    const n = perGame || st.inningsSetting || 7;
+    return (st.pitchLines || []).filter(x => x.name !== NO_PITCHER && (x.outs || x.runs)).map(x => pitchRow(x.name, x.outs, x.runs, n, 1));
+  }
+  function pitchRow(name, outs, runs, n, games) {
+    const ip = Math.floor(outs / 3) + (outs % 3 ? ' ' + (outs % 3) + '/3' : '');
+    return { name, outs, runs, games, ip: ip, rate: outs ? Math.round(runs * n * 3 / outs * 100) / 100 : null };
+  }
+  function pitchStatsMerge(lists, perGame) {
+    const m = new Map();
+    for (const rows of lists) for (const r of rows) {
+      const t = m.get(r.name) || { name: r.name, outs: 0, runs: 0, games: 0 };
+      t.outs += r.outs; t.runs += r.runs; t.games++;
+      m.set(r.name, t);
+    }
+    return Array.from(m.values()).map(t => pitchRow(t.name, t.outs, t.runs, perGame || 7, t.games));
+  }
+
   function statsMerge(rowsLists) {
     const m = new Map();
     for (const rows of rowsLists) {
@@ -993,7 +1027,7 @@ body.viewer #view-input, body.viewer #view-setting { display: none !important; }
 
   return {
     DIR, PA_RESULTS, RUN_KINDS, SUB_KINDS, END_REASONS,
-    reduce, defaultAdvances, situationText, lineText, reportText, stats, statsMerge, posEasy, isPitcherPos,
+    reduce, defaultAdvances, situationText, lineText, reportText, stats, statsMerge, pitchStats, pitchStatsMerge, posEasy, isPitcherPos,
   };
 }));
 
@@ -1614,6 +1648,7 @@ function showPastGame(i, fromList) {
     for (const r of rows) html += '<tr><td class="nm">' + esc(r.name) + '</td><td>' + r.ab + '</td><td class="' + (r.h > 0 ? 'hot' : '') + '">' + r.h + '</td><td>' + r.rbi + '</td><td>' + r.runs + '</td><td>' + r.steals + '</td>' + (pcShow ? '<td>' + (r.pitches ? r.pitches : '') + '</td>' : '') + '</tr>';
     html += '</tbody></table>';
   }
+  html += pitchTable(E.pitchStats(gst, gst.inningsSetting || 7), false, gst.inningsSetting || 7);
   html += '<div style="margin-top:16px">';
   let cur = '';
   for (const en of gst.log) {
@@ -1993,6 +2028,21 @@ function totalStatsRows() {
   lists.push(E.stats(st));
   return E.statsMerge(lists);
 }
+// ★投手の成績＝失点率（とと 2026-10-19「失点率だけあればいい」）。打席の結果だけの記録でも正確に出る
+function pitchTable(prow, total, n) {
+  if (!prow.length) return '';
+  const rate = (r) => r.rate == null ? '－' : r.rate.toFixed(2);
+  let h = '<h3 style="margin:16px 0 8px;font-size:.95rem">投手</h3><table class="statstbl"><thead><tr><th class="nm">投手</th>' + (total ? '<th>試合</th>' : '') + '<th>投球回</th><th>失点</th><th>失点率</th></tr></thead><tbody>';
+  for (const r of prow) h += '<tr><td class="nm">' + esc(r.name) + '</td>' + (total ? '<td>' + r.games + '</td>' : '') + '<td>' + esc(r.ip) + '</td><td>' + r.runs + '</td><td>' + rate(r) + '</td></tr>';
+  h += '</tbody></table><p class="sub" style="margin-top:8px">失点率＝' + n + '回あたりの失点（エラーで入った点も含む）。投手が替わった後でも、前の投手が出した走者がかえった点は前の投手の失点です。</p>';
+  return h;
+}
+function cfgOfGame(g) { return Object.assign({}, DEFAULT_CONFIG, g.config, { lineup: g.lineup || [] }); }
+function pitchRows(total) {
+  const n = st.inningsSetting || 7;
+  if (!total) return E.pitchStats(st, n);
+  return E.pitchStatsMerge(pastGames().map(g => E.pitchStats(E.reduce(cfgOfGame(g), g.events || []), n)).concat([E.pitchStats(st, n)]), n);
+}
 function avg(h, ab) {
   if (!ab) return '－';
   const n = Math.round(h / ab * 1000);
@@ -2002,9 +2052,10 @@ function showStats(scope) {
   scope = scope || 'game';
   const total = scope === 'total';
   const rows = total ? totalStatsRows() : E.stats(st);
+  const prow = pitchRows(total);
   if (!rows.length && !total && pastGames().length && totalStatsRows().length) { showStats('total'); return; } // 今の試合が0打席でも通算があれば見せる
-  if (!rows.length) { toast('まだ打席の記録がありません'); return; }
-  let html = '<h2>' + esc(st.teamNames[st.myTeam]) + '　打撃成績</h2>';
+  if (!rows.length && !prow.length) { toast('まだ打席の記録がありません'); return; }
+  let html = '<h2>' + esc(st.teamNames[st.myTeam]) + '　成績</h2>';
   if (pastGames().length) { // 通算＝過去の試合＋今の試合（観戦の人は配信で届いた過去の試合で出す）
     html += '<div class="modepill" style="margin-bottom:16px"><button id="stG" class="' + (total ? '' : 'act') + '">この試合</button><button id="stT" class="' + (total ? 'act' : '') + '">通算</button></div>';
   }
@@ -2015,12 +2066,17 @@ function showStats(scope) {
   }
   html += '</tbody></table>';
   html += '<p class="sub" style="margin-top:8px">四球・死球・犠打・犠飛は打数に数えません（野球の公式ルールと同じ）' + (pcOn() ? '。球数＝投げた球の数（相手の攻撃中）' : '') + (total ? '。通算は過去の試合＋今の試合の合計' : '') + '</p>';
+  html += pitchTable(prow, total, st.inningsSetting || 7);
   html += '<div class="sheetbtns"><button class="go" id="btnCopyStats">成績をコピー</button><button class="cancel">閉じる</button></div>';
   openSheet(html);
   if ($('stG')) { $('stG').onclick = () => showStats('game'); $('stT').onclick = () => showStats('total'); }
   $('btnCopyStats').onclick = () => {
     const lines = [st.teamNames[st.myTeam] + ' 打撃成績' + (total ? '（通算）' : ''), '選手　' + (total ? '試合 ' : '') + '打数 安打 打率 打点 得点 盗塁' + (pcOn() ? ' 球数' : '')];
     for (const r of rows) lines.push(r.name + '　' + (total ? r.games + ' ' : '') + r.ab + ' ' + r.h + ' ' + avg(r.h, r.ab) + ' ' + r.rbi + ' ' + r.runs + ' ' + r.steals + (pcOn() ? ' ' + (r.pitches || '-') : ''));
+    if (prow.length) {
+      lines.push('', '投手　' + (total ? '試合 ' : '') + '投球回 失点 失点率（' + (st.inningsSetting || 7) + '回あたり）');
+      for (const r of prow) lines.push(r.name + '　' + (total ? r.games + ' ' : '') + r.ip + ' ' + r.runs + ' ' + (r.rate == null ? '-' : r.rate.toFixed(2)));
+    }
     copyText(lines.join('\n'));
   };
   $('sheetBody').querySelector('.cancel').onclick = closeSheet;
