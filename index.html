@@ -155,6 +155,7 @@ h2 { font-size: 1.05rem; letter-spacing: .03em; line-height: 1.4; }
 .plist .pn { min-width: 2.2em; text-align: right; color: var(--sub); }
 .plist .nm { flex: 1; font-weight: 700; }
 .plist .ps { color: var(--sub); font-size: .85rem; }
+.plist .mpos { font-weight: 700; color: var(--green-deep); white-space: nowrap; }
 .plist button { padding: 6px 10px; font-size: .85rem; min-height: 36px; }
 #lineupList li { flex-wrap: wrap; row-gap: 4px; }
 #lineupList .ctl { flex-basis: 100%; min-width: 0; display: flex; align-items: center; gap: var(--s2); padding-left: calc(2.2em + var(--s2)); }
@@ -291,6 +292,7 @@ body.viewer #view-input, body.viewer #view-setting { display: none !important; }
       <button id="btnGameEnd">試合終了</button>
     </div>
     <div class="rowbtns" style="margin-top:8px">
+      <button id="btnMembers2">今のメンバー</button>
       <button id="btnAdjust">得点補正</button>
     </div>
   </div>
@@ -309,7 +311,7 @@ body.viewer #view-input, body.viewer #view-setting { display: none !important; }
       <button id="modeEasy">かんたん表示</button>
       <button id="modeTerm">野球用語表示</button>
     </div>
-    <div class="watchbtns"><button id="btnPast" class="statsbtn">過去の試合</button><button id="btnStats" class="statsbtn">成績</button></div>
+    <div class="watchbtns"><button id="btnMembers" class="statsbtn">メンバー</button><button id="btnPast" class="statsbtn">過去の試合</button><button id="btnStats" class="statsbtn">成績</button></div>
   </div>
   <div id="logList"></div>
   <div class="sharebar"><button id="btnShare">LINEに送る速報文を作る</button></div>
@@ -339,8 +341,12 @@ body.viewer #view-input, body.viewer #view-setting { display: none !important; }
       <select id="setPitchCount"><option value="0">数えない（表示しない）</option><option value="1">数える（表示する）</option></select>
     </div>
   </div>
+  <div class="card" id="nowCard" style="display:none">
+    <h2>今の打順と守備（交代を反映）</h2>
+    <div id="nowList"></div>
+  </div>
   <div class="card">
-    <h2>スタメン（打順）</h2>
+    <h2 id="lineupTitle">スタメン（打順）</h2>
     <ul class="plist" id="lineupList"></ul>
     <p class="poswarn" id="posWarn" role="status"></p>
     <p style="font-size:.8rem;color:var(--sub)">▲▼で打順を入れ替え。守備はこの試合だけのもの（最初は名簿の守備が入ります）。試合が始まったら変更は「選手交代」で。</p>
@@ -382,7 +388,7 @@ body.viewer #view-input, body.viewer #view-setting { display: none !important; }
     <p class="sub" id="sendModeNote" style="margin:-4px 0 12px"></p>
     <div id="liveOff">
       <button class="primarybtn" id="btnLiveStart">配信を開始する</button>
-      <p style="font-size:.8rem;color:var(--sub);margin-top:8px">観戦用のリンクができます。リンクを開いた人の画面は、上の「送るタイミング」で自動で更新されます（配信の途中でも変えられます）。サーバーに送るのは登録名・背番号・プレー内容だけです。</p>
+      <p style="font-size:.8rem;color:var(--sub);margin-top:8px">観戦用のリンクができます。リンクを開いた人の画面は、上の「送るタイミング」で自動で更新されます（配信の途中でも変えられます）。サーバーに送るのは登録名・背番号・守備・プレー内容だけです。</p>
     </div>
     <div id="liveOn" style="display:none">
       <p style="font-weight:700;color:var(--green-deep)" id="liveStatus">配信中</p>
@@ -1100,7 +1106,7 @@ function setPS(ps) { data.config.pitchStart = { my: Object.assign({}, ps.my), op
 function sameDayPitches() {
   const ymdOf = (d) => d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
   const today = ymdOf(new Date());
-  const games = (data.games || []).filter(g => ymdOf(new Date(g.savedAt || 0)) === today)
+  const games = (data.games || []).filter(g => ymdOf(new Date(g.savedAt || 0)) === today && !(data.curGameId && g.gid === data.curGameId))   // 自動保存した今の試合は「前の試合」に入れん
     .sort((a, b) => String(a.savedAt).localeCompare(String(b.savedAt)));
   const carry = {};
   for (const g of games) {
@@ -1128,8 +1134,10 @@ function updateUndoBtn() {
 // 2つの状態の差を「何の操作か」の名前にする（newer＝新しい方・older＝古い方）。戻る／進むの案内で共用
 function describeChange(newer, older) {
   const ng = (newer.games || []).length, og = (older.games || []).length;
-  if (ng !== og) return ng > og ? '「新しい試合」' : '過去の試合の削除';
   const ne = newer.events || [], oe = older.events || [];
+  // 試合終了の自動保存（2026-11-08）でも過去の試合の数が変わるので、記録が同じ時・記録が空になった時だけ「新しい試合」等と呼ぶ
+  if (ng !== og && (JSON.stringify(ne) === JSON.stringify(oe) || (ng > og && !ne.length))) return ng > og ? '「新しい試合」' : '過去の試合の削除';
+  if (!ne.length && oe.length && (newer.curGameId || null) !== (older.curGameId || null)) return '「新しい試合」';   // 自動保存済みの試合から新しい試合へ（過去の試合の数は変わらん）
   if (JSON.stringify(ne) !== JSON.stringify(oe)) {
     if (ne.length === oe.length + 1) {
       const last = ne[ne.length - 1];
@@ -1201,7 +1209,9 @@ function liveState() {
       myTeamBatsFirst: data.config.myTeamBatsFirst, innings: data.config.innings, rules: data.config.rules,
       pitchCount: !!data.config.pitchCount, pitchStart: data.config.pitchCount ? data.config.pitchStart : undefined,   // 球数を出すか（記録係と同じ見え方に）
     },
-    lineup: lineupPlayers().map(p => ({ num: p.num, name: p.name })), // 登録名+背番号のみ(守備・連絡先等は送らない)
+    // 登録名＋背番号＋この試合の守備（連絡先等は送らない）。守備は観戦の人の「今のメンバー」に要る（2026-11-08。過去の試合には前から入っとる）
+    lineup: lineupPlayers().map(p => ({ num: p.num, name: p.name, pos: posOf(p) })),
+    gameId: data.curGameId || null,   // 自動保存した今の試合を、観戦の人の「通算」で二重に数えんため
     events: data.events,
     sendMode: sendModeNow(),
     updatedAt: Date.now(),
@@ -1290,6 +1300,7 @@ async function pushLive(extraState) {
 const HISTORY_MAX = 15;
 function compactHistory() {
   return (data.games || []).slice(0, HISTORY_MAX).map(g => ({
+    gid: g.gid || null,
     savedAt: g.savedAt || '',
     config: (({ gameName, round, startTime, myTeamName, oppName, myTeamBatsFirst, innings, rules, pitchCount, pitchStart }) =>
       ({ gameName, round, startTime, myTeamName, oppName, myTeamBatsFirst, innings, rules, pitchCount: pitchCount === undefined ? null : pitchCount, pitchStart: pitchStart || null }))(g.config || {}),
@@ -1384,7 +1395,39 @@ function recompute() {
   st = E.reduce(engineCfg(), data.events);
   render();
 }
-function commit(ev) { data.events.push(ev); save(); recompute(); }
+// ★試合終了で自動保存（2026-11-08 利用者の声「試合終了ボタンでも保存になるように」）
+//   前は「新しい試合を始める」を押すまで過去の試合に入らんかった。今は試合終了を記録した時点で過去の試合に入る。
+//   今の試合に番号（curGameId）を付けて、同じ番号の行を書き直す＝後で「新しい試合」を押しても二重にならん。
+//   「戻る」で試合終了を取り消すと、過去の試合も元に戻る（戻るの写しに過去の試合も入っとるため）
+function curGid() { if (!data.curGameId) data.curGameId = 'g' + rnd(); return data.curGameId; }
+function storeCurrentGame() {
+  if (!data.events.length) return false;
+  const gid = curGid();
+  const gst = E.reduce(engineCfg(), data.events);
+  const i = data.games.findIndex(g => g.gid === gid);
+  const entry = {
+    gid,
+    savedAt: i >= 0 ? data.games[i].savedAt : new Date().toISOString(),
+    config: Object.assign({}, data.config),
+    lineup: lineupPlayers().map(p => ({ num: p.num, name: p.name, pos: posOf(p) })),
+    events: data.events.slice(),
+    totals: gst.totals, teamNames: gst.teamNames,
+  };
+  if (i >= 0) data.games[i] = entry;
+  else { data.games.unshift(entry); if (data.games.length > 50) data.games.pop(); }   // 50＝念のための上限
+  if (data.live) historyDirty = true;   // 配信中なら、観戦の人の「過去の試合」にも（次の送信で一緒に送る）
+  return i < 0;
+}
+// 今の試合の番号（観戦の人は配信で届いた番号）
+function nowGid() { return LIVE_ROOM ? (REMOTE && REMOTE.gameId) || null : data.curGameId || null; }
+// 過去の試合のうち、今の試合（自動保存した分）を除いたもの＝「通算」で今の試合と二重に数えんため
+function pastOnly() { const cur = nowGid(); return pastGames().filter(g => !cur || g.gid !== cur); }
+function commit(ev) {
+  data.events.push(ev);
+  const added = E.reduce(engineCfg(), data.events).finished ? storeCurrentGame() : false;   // 終わった後の補正なども書き直す
+  save(); recompute();
+  if (added && ev.type === 'game_end') toast('試合を保存しました（「過去の試合」に入りました）');
+}
 
 // ==== 用語ボタン定義 ====
 const NEED_DIR = { single: 1, double: 1, triple: 1, hr: 1, go: 1, fo: 1, liner: 1, foul_fly: 1, error: 1, sac_fly: 1, dp: 0, fc: 0 };
@@ -1541,6 +1584,10 @@ function renderSetting() {
     const ps = getPS(); delete ps.my[b.dataset.psdel]; setPS(ps);
   });
   const playing = data.events.length > 0;   // 試合が始まったら守備の変更は「選手交代」→守備変更で
+  // 試合中は「今の打順と守備」を上に出す（スタメンの欄は試合前の並びのまま＝交代が反映されんため）
+  $('nowCard').style.display = playing && st.lineup.length ? '' : 'none';
+  $('nowList').innerHTML = playing ? membersHtml() : '';
+  $('lineupTitle').textContent = playing ? 'スタメン（試合開始の時の打順）' : 'スタメン（打順）';
   lu.innerHTML = lineupPlayers().map((p, i) => {
     const cur = posOf(p), home = p.pos || '';
     const opts = POS_OPTS.slice();
@@ -1587,7 +1634,7 @@ function renderSetting() {
   const ga = $('gamesList');
   ga.innerHTML = data.games.map((g, i) => {
     const d = (g.savedAt || '').slice(0, 10);
-    return '<li><span class="nm">' + esc(d) + '　' + esc(g.teamNames ? g.teamNames.away + ' ' + g.totals.away + '-' + g.totals.home + ' ' + g.teamNames.home : '試合') + '</span>'
+    return '<li><span class="nm">' + esc(d) + '　' + esc(g.teamNames ? g.teamNames.away + ' ' + g.totals.away + '-' + g.totals.home + ' ' + g.teamNames.home : '試合') + (g.gid && g.gid === data.curGameId ? ' <span class="ps">（今の試合）</span>' : '') + '</span>'
       + '<button data-a="viewgame" data-i="' + i + '">見る</button><button data-a="delgame" data-i="' + i + '">削除</button></li>';
   }).join('') || '<li style="color:var(--sub)">まだありません（新しい試合を始めると前の試合がここに残ります）</li>';
   document.querySelectorAll('#view-setting .plist button').forEach(b =>
@@ -1609,6 +1656,24 @@ function lineupOp(a, i) {
   save(); recompute();
 }
 
+// ==== 今のメンバー（2026-11-08 利用者の声「交代した後の、今のメンバーの守備が見たい」） ====
+// 選手交代・守備の入れ替えを反映した打順と守備。記録係も観戦の人も見られる
+function membersHtml() {
+  const mode = data.config.displayMode;
+  let h = '<ul class="plist">' + st.lineup.map((p, i) =>
+    '<li><span class="pn">' + (i + 1) + '番</span><span class="nm">' + esc(p.name) + ' <span class="ps">#' + esc(String(p.num)) + '</span></span>'
+    + '<span class="mpos">' + esc(posLabel(p.pos, mode) || '守備なし') + '</span></li>').join('') + '</ul>';
+  if (st.benchOut.length) h += '<p class="sub" style="margin-top:8px">交代で退いた選手：' + st.benchOut.map(p => esc(p.name) + '（#' + esc(String(p.num)) + '）').join('・') + '</p>';
+  return h;
+}
+function showMembers() {
+  if (!st.lineup.length) { toast(LIVE_ROOM ? 'メンバーはまだ届いていません' : '先に「選手・設定」でスタメンを選んでください'); return; }
+  openSheet('<h2>' + esc(st.teamNames[st.myTeam]) + '　今のメンバー</h2>'
+    + '<p class="sub" style="margin-bottom:8px">選手交代と守備の入れ替えを反映した、今の打順と守備です。</p>'
+    + membersHtml() + '<div class="sheetbtns"><button class="cancel">閉じる</button></div>');
+  $('sheetBody').querySelector('.cancel').onclick = closeSheet;
+}
+
 // ==== 過去の試合の閲覧（読み取り専用） ====
 // 記録係＝このスマホの記録／観戦の人＝配信で届いた分（とと 2026-10-18「観戦側の人も過去の試合を見れるように」）
 function pastGames() { return LIVE_ROOM ? (REMOTE ? toList(REMOTE.history) : []) : (data.games || []); }
@@ -1628,7 +1693,7 @@ function showPastList() {
   // ボタンはいつも出しとく（とと 2026-10-18「過去の試合ボタンがどこにあるかわからん」＝無い時に隠しとったので見つからんかった）
   if (!gs.length) { toast(LIVE_ROOM ? '過去の試合はまだ届いていません（記録係のアプリから次に送られると見られます）' : '過去の試合はまだありません（「新しい試合」を始めると、前の試合がここに残ります）'); return; }
   let html = '<h2>過去の試合</h2><ul class="plist">';
-  html += gs.map((g, i) => '<li><span class="nm" style="font-weight:400">' + esc(pastTitle(g)) + (g.config && g.config.gameName ? '<br><span class="ps">' + esc(g.config.gameName + (g.config.round ? '　' + g.config.round : '')) + '</span>' : '') + '</span><button data-pg="' + i + '">見る</button></li>').join('');
+  html += gs.map((g, i) => '<li><span class="nm" style="font-weight:400">' + esc(pastTitle(g)) + (g.gid && g.gid === nowGid() ? ' <span class="ps">（今の試合）</span>' : '') + (g.config && g.config.gameName ? '<br><span class="ps">' + esc(g.config.gameName + (g.config.round ? '　' + g.config.round : '')) + '</span>' : '') + '</span><button data-pg="' + i + '">見る</button></li>').join('');
   html += '</ul><div class="sheetbtns"><button class="cancel">閉じる</button></div>';
   openSheet(html);
   $('sheetBody').querySelectorAll('button[data-pg]').forEach(b => b.onclick = () => showPastGame(+b.dataset.pg, true));
@@ -2024,7 +2089,7 @@ function showPlayDetail(i) {
 // ==== 個人成績（手書き実況では追えなかった、アプリならではの表） ====
 function totalStatsRows() {
   // 通算 = 過去の試合すべて + 今の試合
-  const lists = pastGames().map(g => E.stats(E.reduce(Object.assign({}, DEFAULT_CONFIG, g.config, { lineup: g.lineup || [] }), g.events || [])));
+  const lists = pastOnly().map(g => E.stats(E.reduce(Object.assign({}, DEFAULT_CONFIG, g.config, { lineup: g.lineup || [] }), g.events || [])));
   lists.push(E.stats(st));
   return E.statsMerge(lists);
 }
@@ -2041,7 +2106,7 @@ function cfgOfGame(g) { return Object.assign({}, DEFAULT_CONFIG, g.config, { lin
 function pitchRows(total) {
   const n = st.inningsSetting || 7;
   if (!total) return E.pitchStats(st, n);
-  return E.pitchStatsMerge(pastGames().map(g => E.pitchStats(E.reduce(cfgOfGame(g), g.events || []), n)).concat([E.pitchStats(st, n)]), n);
+  return E.pitchStatsMerge(pastOnly().map(g => E.pitchStats(E.reduce(cfgOfGame(g), g.events || []), n)).concat([E.pitchStats(st, n)]), n);
 }
 function avg(h, ab) {
   if (!ab) return '－';
@@ -2053,10 +2118,10 @@ function showStats(scope) {
   const total = scope === 'total';
   const rows = total ? totalStatsRows() : E.stats(st);
   const prow = pitchRows(total);
-  if (!rows.length && !total && pastGames().length && totalStatsRows().length) { showStats('total'); return; } // 今の試合が0打席でも通算があれば見せる
+  if (!rows.length && !total && pastOnly().length && totalStatsRows().length) { showStats('total'); return; } // 今の試合が0打席でも通算があれば見せる
   if (!rows.length && !prow.length) { toast('まだ打席の記録がありません'); return; }
   let html = '<h2>' + esc(st.teamNames[st.myTeam]) + '　成績</h2>';
-  if (pastGames().length) { // 通算＝過去の試合＋今の試合（観戦の人は配信で届いた過去の試合で出す）
+  if (pastOnly().length) { // 通算＝過去の試合＋今の試合（観戦の人は配信で届いた過去の試合で出す）
     html += '<div class="modepill" style="margin-bottom:16px"><button id="stG" class="' + (total ? '' : 'act') + '">この試合</button><button id="stT" class="' + (total ? 'act' : '') + '">通算</button></div>';
   }
   html += '<table class="statstbl"><thead><tr><th class="nm">選手</th>' + (total ? '<th>試合</th>' : '') + '<th>打数</th><th>安打</th><th>打率</th><th>打点</th><th>得点</th><th>盗塁</th>' + (pcOn() ? '<th>球数</th>' : '') + '</tr></thead><tbody>';
@@ -2087,7 +2152,7 @@ function b64enc(s) { const b = new TextEncoder().encode(s); let out = ''; for (l
 function b64dec(s) { const bin = atob(s); const b = new Uint8Array(bin.length); for (let i = 0; i < bin.length; i++) b[i] = bin.charCodeAt(i); return new TextDecoder().decode(b); }
 const HANDOFF_PREFIX = 'YAKYU2:';
 function exportText() {
-  const payload = { v: 2, config: data.config, roster: data.roster, lineupIds: data.lineupIds, benchIds: data.benchIds, gamePos: data.gamePos || {}, events: data.events, live: data.live || null };
+  const payload = { v: 2, config: data.config, roster: data.roster, lineupIds: data.lineupIds, benchIds: data.benchIds, gamePos: data.gamePos || {}, events: data.events, curGameId: data.curGameId || null, live: data.live || null };
   return HANDOFF_PREFIX + b64enc(JSON.stringify(payload));
 }
 function showExport() {
@@ -2119,6 +2184,7 @@ function showImport() {
     data.benchIds = p.benchIds || [];
     data.gamePos = p.gamePos || {};
     data.events = p.events;
+    data.curGameId = p.curGameId || null;
     data.live = p.live || null;
     save(); recompute(); closeSheet();
     if (data.live) { pushLive(); toast('読み込みました。配信も引き継いでいます'); }
@@ -2206,6 +2272,8 @@ $('modeEasy').onclick = () => { data.config.displayMode = 'easy'; save(); recomp
 $('modeTerm').onclick = () => { data.config.displayMode = 'term'; save(); recompute(); };
 $('btnShare').onclick = showShare;
 $('btnStats').onclick = showStats;
+$('btnMembers').onclick = showMembers;
+$('btnMembers2').onclick = showMembers;
 $('btnPast').onclick = showPastList;
 for (const [id, key] of [['setStart', 'startTime']]) {
   $(id).addEventListener('change', () => { data.config[key] = $(id).value; save(); recompute(); });
@@ -2240,18 +2308,8 @@ $('btnAddPlayer').onclick = () => {
 };
 $('btnNewGame').onclick = () => {
   if (!confirm('今の試合を「過去の試合」へ保存して、新しい試合を始めますか？（選手名簿・スタメンは残ります。守備は名簿の守備に戻ります）')) return;
-  if (data.events.length) {
-    const gst = E.reduce(engineCfg(), data.events);
-    data.games.unshift({
-      savedAt: new Date().toISOString(),
-      config: Object.assign({}, data.config),
-      lineup: lineupPlayers().map(p => ({ num: p.num, name: p.name, pos: posOf(p) })),
-      events: data.events,
-      totals: gst.totals, teamNames: gst.teamNames,
-    });
-    if (data.games.length > 50) data.games.pop(); // 念のための上限
-    if (data.live) historyDirty = true;   // 配信中なら、観戦の人の「過去の試合」にも足す（次の送信で一緒に送る）
-  }
+  storeCurrentGame();   // 試合終了で自動保存しとった時は、その行を書き直す（二重にならん）
+  data.curGameId = null;   // 次の試合は新しい番号
   data.events = [];
   data.gamePos = {};   // 守備は試合ごと。次の試合は名簿の守備から
   data.config.pitchStart = { my: {}, opp: 0 };   // 投球数のスタートも試合ごと（2試合目は「同じ日の前の試合から」で入れられる）
