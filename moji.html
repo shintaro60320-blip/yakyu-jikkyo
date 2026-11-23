@@ -177,7 +177,7 @@ const Auth = {
 };
 
 // 部屋の写しと言葉の辞書を手元に持ち、変わったら描き直す
-let ROOM = null, DICT = {};
+let ROOM = null, DICT = {}, LOADED = false;   // LOADED＝サーバーから最初の返事が来たか（来る前に「見つかりません」と出さんため）
 function setAt(obj, path, val) {
   const keys = path.split('/').filter(Boolean);
   if (!keys.length) return val;
@@ -250,7 +250,7 @@ const api = {
   },
   watch(room) {
     if (DEMO) { demo.subs.push(db => { ROOM = (db.moji || {})[room] || null; DICT = db.mojiDict || {}; render(); }); demo.emit(); return; }
-    stream('moji/' + room, v => { ROOM = v; render(); });
+    stream('moji/' + room, v => { ROOM = v; LOADED = true; render(); });
     stream('mojiDict', v => { DICT = v || {}; render(); });
   },
 };
@@ -302,7 +302,7 @@ function render() {
 
   if (IS_SENDER && !S.room) { renderStart(); return; }
   if (!ROOM) {
-    main.innerHTML = '<div class="empty">' + (IS_SENDER ? 'つないでいます…' : 'この実況は見つかりません（終わったか、リンクが違います）') + '</div>';
+    main.innerHTML = '<div class="empty">' + (IS_SENDER ? 'つないでいます…' : (LOADED || DEMO ? 'この実況は見つかりません（リンクが違うかもしれません）' : '読み込んでいます…')) + '</div>';
     return;
   }
   const atBottom = window.innerHeight + window.scrollY >= document.body.scrollHeight - 80;
