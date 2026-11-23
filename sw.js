@@ -1,6 +1,6 @@
 // 球場実況 オフライン対応（ネット優先・失敗したらキャッシュ＝球場の弱い電波でも一度開けば動く）
-const CACHE = 'yakyu-v1';
-const ASSETS = ['./', './index.html', './manifest.webmanifest', './icon-192.png', './icon-512.png', './icon-180.png'];
+const CACHE = 'yakyu-v2';
+const ASSETS = ['./', './index.html', './manifest.webmanifest', './icon-192.png', './icon-512.png', './icon-180.png', './moji.html', './yasashii.js'];
 
 self.addEventListener('install', e => {
   self.skipWaiting();
@@ -8,15 +8,18 @@ self.addEventListener('install', e => {
 });
 
 self.addEventListener('activate', e => {
+  // 同じサイト（shintaro60320-blip.github.io）に他のアプリも同居しとるので、消すのは自分の古い箱（yakyu-）だけ
   e.waitUntil(
     caches.keys()
-      .then(ks => Promise.all(ks.filter(k => k !== CACHE).map(k => caches.delete(k))))
+      .then(ks => Promise.all(ks.filter(k => k.startsWith('yakyu-') && k !== CACHE).map(k => caches.delete(k))))
       .then(() => self.clients.claim())
   );
 });
 
 self.addEventListener('fetch', e => {
   if (e.request.method !== 'GET') return;
+  // よそのサーバー（Firebase の生中継・ログイン）は触らん。生中継をしまい込もうとすると届かんくなる
+  if (new URL(e.request.url).origin !== self.location.origin) return;
   e.respondWith(
     fetch(e.request).then(r => {
       const copy = r.clone();

@@ -1,0 +1,422 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#1f5c39">
+<link rel="icon" href="icon-192.png">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="icon-180.png">
+<title>文字で実況｜球場実況</title>
+<style>
+/* 球場実況（index.html）と同じトークン：屋外の直射日光でも読める高コントラスト・ライト基調 */
+:root {
+  --bg: #f4f5f2; --surface: #ffffff; --ink: #1c2a24; --sub: #4c5c54; --line: #dde3dd;
+  --green: #2e7d4f; --green-deep: #1f5c39; --green-pale: #e8f2ec;
+  --amber: #b45309; --amber-pale: #fdf3e3; --red: #b3362a;
+  --s1: 4px; --s2: 8px; --s3: 16px; --s4: 24px;
+  --r-card: 12px; --r-btn: 8px;
+}
+* { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+html { font-size: 16px; }
+body {
+  font-family: "Noto Sans JP", "Hiragino Kaku Gothic ProN", "Yu Gothic Medium", Meiryo, sans-serif;
+  background: var(--bg); color: var(--ink); line-height: 1.7;
+  max-width: 560px; margin: 0 auto; min-height: 100dvh;
+  display: flex; flex-direction: column;
+}
+button { font-family: inherit; font-size: 1rem; color: var(--ink); background: var(--surface); border: 1px solid var(--line); border-bottom-width: 2px; border-radius: var(--r-btn); cursor: pointer; min-height: 44px; padding: 0 var(--s3); }
+button:active { transform: translateY(1px); }
+button.primary { background: var(--green-deep); border-color: var(--green-deep); color: #fff; font-weight: 700; }
+button:disabled { opacity: .5; }
+input, textarea { font-family: inherit; font-size: 1rem; color: var(--ink); background: var(--surface); border: 1px solid var(--line); border-radius: var(--r-btn); padding: 10px 12px; width: 100%; }
+
+header { background: radial-gradient(150% 120% at 50% -40%, #1d4a30 0%, #143823 55%, #0e2b1a 100%); color: #fff; padding: var(--s2) var(--s3) var(--s3); position: sticky; top: 0; z-index: 5; }
+header .row { display: flex; align-items: center; gap: var(--s2); }
+header h1 { font-size: 1.05rem; letter-spacing: .04em; flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+header .back { color: #cfe3d8; font-size: .85rem; text-decoration: none; white-space: nowrap; }
+.status { font-size: .78rem; color: #9dbfae; margin-top: 2px; }
+.status.warn { color: #ffd75e; }
+
+/* そのまま／やさしい言葉 の切り替え（この画面でいちばん大事な操作） */
+.seg { display: flex; background: rgba(255,255,255,.1); border-radius: 10px; padding: 3px; margin-top: var(--s2); }
+.seg button { flex: 1; background: transparent; border: 0; color: #cfe3d8; font-weight: 700; min-height: 40px; border-radius: 8px; padding: 0 var(--s2); }
+.seg button.on { background: #fff; color: var(--green-deep); }
+
+main { flex: 1; padding: var(--s3); display: flex; flex-direction: column; gap: var(--s2); }
+.card { background: var(--surface); border: 1px solid var(--line); border-radius: var(--r-card); padding: var(--s3); }
+.card h2 { font-size: 1rem; margin-bottom: var(--s2); }
+.card p { color: var(--sub); font-size: .9rem; }
+.card .btns { display: flex; gap: var(--s2); margin-top: var(--s2); flex-wrap: wrap; }
+.card .btns button { flex: 1; }
+.link { font-size: .8rem; color: var(--sub); word-break: break-all; background: var(--bg); border-radius: 6px; padding: 6px 8px; margin-top: var(--s2); }
+
+/* 吹き出し：打つ人＝右・見る人＝左（LINE と同じ感覚） */
+.msgs { display: flex; flex-direction: column; gap: 10px; }
+.msg { display: flex; flex-direction: column; max-width: 88%; }
+.msg.me { align-self: flex-end; align-items: flex-end; }
+.bubble { background: var(--surface); border: 1px solid var(--line); border-radius: 14px 14px 14px 4px; padding: 8px 12px; white-space: pre-wrap; word-break: break-word; font-size: 1rem; }
+.msg.me .bubble { background: var(--green-pale); border-color: #cfe3d8; border-radius: 14px 14px 4px 14px; }
+/* やさしい言葉：1プレー＝1かたまり。誰が（小さく）→何をした（大きく）→今の状況（色つきの小さい行） */
+.msg.easy { max-width: 100%; width: 100%; }
+.msg.easy .bubble { white-space: normal; padding: 4px 14px; width: 100%; }
+.e-raw { white-space: pre-wrap; font-size: .8rem; color: var(--sub); line-height: 1.55; padding: 8px 0 6px; }
+.e-inning { font-weight: 800; font-size: 1rem; color: var(--green-deep); letter-spacing: .04em; padding: 10px 0 2px; border-top: 1px solid var(--line); }
+.e-inning:first-child { border-top: 0; }
+.e-play { padding: 9px 0; border-top: 1px dashed var(--line); }
+.e-inning + .e-play, .e-play:first-child { border-top: 0; }
+.e-who { font-size: .78rem; font-weight: 700; color: var(--sub); letter-spacing: .03em; }
+.e-what { font-size: 1.05rem; font-weight: 700; line-height: 1.5; white-space: pre-line; }
+.e-note { display: inline-block; font-size: .78rem; font-weight: 400; color: var(--sub); margin-left: 4px; }
+.e-note.out { color: var(--red); font-weight: 700; }
+.e-score { display: inline-block; font-size: .8rem; font-weight: 800; color: #fff; background: var(--amber); border-radius: 10px; padding: 0 8px; margin-left: 4px; vertical-align: 2px; }
+.e-sit { font-size: .85rem; color: var(--green-deep); margin-top: 2px; }
+.e-sit .e-note { margin-left: 2px; }
+.meta { font-size: .72rem; color: var(--sub); margin: 2px 6px 0; }
+.meta .ai { color: var(--amber); }
+.empty { text-align: center; color: var(--sub); font-size: .9rem; padding: var(--s4) 0; }
+.ended { text-align: center; color: var(--sub); font-size: .85rem; border-top: 1px dashed var(--line); padding-top: var(--s2); margin-top: var(--s2); }
+
+/* 打つ欄：画面の下に固定 */
+.composer { position: sticky; bottom: 0; background: var(--bg); border-top: 1px solid var(--line); padding: var(--s2) var(--s3) calc(var(--s2) + env(safe-area-inset-bottom)); display: flex; gap: var(--s2); align-items: flex-end; }
+.composer textarea { resize: none; min-height: 44px; max-height: 40vh; line-height: 1.5; }
+.composer button { flex: none; }
+.tools { display: flex; gap: var(--s2); padding: 0 var(--s3) var(--s2); }
+.tools button { font-size: .85rem; min-height: 36px; flex: 1; }
+
+/* 自分の吹き出しを押した時の選択（下から出る） */
+.sheet { position: fixed; inset: 0; background: rgba(28,42,36,.35); display: none; align-items: flex-end; justify-content: center; z-index: 30; }
+.sheet.on { display: flex; }
+.sheet-box { background: var(--surface); width: 100%; max-width: 560px; border-radius: 16px 16px 0 0; padding: var(--s3) var(--s3) calc(var(--s3) + env(safe-area-inset-bottom)); display: flex; flex-direction: column; gap: var(--s2); }
+.sheet-box .danger { color: var(--red); }
+.toast { position: fixed; left: 50%; bottom: 96px; transform: translateX(-50%); background: var(--ink); color: #fff; padding: 8px 16px; border-radius: 20px; font-size: .9rem; opacity: 0; transition: opacity .2s; pointer-events: none; max-width: 90%; text-align: center; z-index: 20; }
+.toast.on { opacity: 1; }
+@media (prefers-reduced-motion: reduce) { .toast { transition: none; } }
+</style>
+</head>
+<body>
+<header>
+  <div class="row">
+    <h1 id="title">文字で実況</h1>
+    <a class="back" id="backLink" href="./">ボタンで記録 ›</a>
+  </div>
+  <div class="status" id="status"></div>
+  <div class="seg" id="seg" role="group" aria-label="表示のしかた">
+    <button data-mode="raw">そのまま</button>
+    <button data-mode="easy">やさしい言葉</button>
+  </div>
+</header>
+
+<main id="main"></main>
+
+<div id="senderBottom" style="display:none">
+  <div class="tools">
+    <button id="shareBtn">観戦リンクを LINE に送る</button>
+    <button id="endBtn">実況を終える</button>
+  </div>
+  <form class="composer" id="composer">
+    <textarea id="input" rows="1" placeholder="いつもの書き方で打って「送る」" aria-label="実況の文"></textarea>
+    <button class="primary" id="sendBtn" type="submit">送る</button>
+  </form>
+</div>
+
+<div class="sheet" id="sheet">
+  <div class="sheet-box">
+    <button class="primary" data-sheet="copy">写して直す（打つ欄に入れる）</button>
+    <button data-sheet="del" class="danger">取り消す（見る人の画面からも消す）</button>
+    <button data-sheet="cancel">やめる</button>
+  </div>
+</div>
+<div class="toast" id="toast"></div>
+
+<script src="yasashii.js"></script>
+<script>
+'use strict';
+// ==== 設定 ====
+// Firebase：公開の Web キー（秘密ではない。書き込みの守りはルールと匿名ログインで行う）
+const FB_DB = 'https://yakyu-jikkyo-default-rtdb.firebaseio.com';
+const FB_KEY = 'AIzaSyDQMjYtr3RdcinM9NrGVjT7ExCRGhOE4dw';   // Firebase の「ウェブアプリの設定」の apiKey（ページに載せる前提の公開用の番号。秘密の鍵ではない・守りはデータベースの決まりで掛ける）
+const STORE = 'yakyu_moji_v1';
+const PARAMS = new URLSearchParams(location.search);
+const ROOM_VIEW = PARAMS.get('moji');           // 見る人：?moji=部屋
+const DEMO = PARAMS.get('demo') === '1';        // 手元の試し：サーバーを使わず、同じブラウザのタブどうしでやりとりする
+
+const $ = id => document.getElementById(id);
+function loadStore() { try { return JSON.parse(localStorage.getItem(STORE)) || {}; } catch (e) { return {}; } }
+function saveStore() { try { localStorage.setItem(STORE, JSON.stringify(S)); } catch (e) {} }
+const S = loadStore();          // { room, title, uid, refresh, view }
+let toastTimer = null;
+function toast(msg) { const t = $('toast'); t.textContent = msg; t.classList.add('on'); clearTimeout(toastTimer); toastTimer = setTimeout(() => t.classList.remove('on'), 2600); }
+function esc(s) { return String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]); }
+function rnd() { let s = ''; while (s.length < 18) s += Math.random().toString(36).slice(2); return s.slice(0, 18); }
+function hhmm(t) { const d = new Date(t); return isNaN(d) ? '' : d.toTimeString().slice(0, 5); }
+function setStatus(msg, warn) { const el = $('status'); el.textContent = msg || ''; el.classList.toggle('warn', !!warn); }
+
+// ==== サーバーとのやりとり（本番＝Firebase／試し＝このブラウザの中） ====
+// 本番：匿名ログイン（名前もメールも要らん。この端末に「部屋を作った人」の印だけ残る）
+const Auth = {
+  token: null, exp: 0,
+  async get() {
+    if (this.token && Date.now() < this.exp - 60000) return this.token;
+    if (!FB_KEY) throw new Error('nokey');
+    let r;
+    if (S.refresh) {
+      r = await fetch('https://securetoken.googleapis.com/v1/token?key=' + FB_KEY, { method: 'POST', headers: { 'Content-Type': 'application/x-www-form-urlencoded' }, body: 'grant_type=refresh_token&refresh_token=' + encodeURIComponent(S.refresh) });
+      if (r.ok) { const j = await r.json(); return this.keep(j.id_token, j.refresh_token, j.user_id, j.expires_in); }
+    }
+    r = await fetch('https://identitytoolkit.googleapis.com/v1/accounts:signUp?key=' + FB_KEY, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ returnSecureToken: true }) });
+    if (!r.ok) throw new Error('auth ' + r.status);
+    const j = await r.json();
+    return this.keep(j.idToken, j.refreshToken, j.localId, j.expiresIn);
+  },
+  keep(tok, refresh, uid, sec) {
+    this.token = tok; this.exp = Date.now() + Number(sec || 3600) * 1000;
+    S.refresh = refresh; S.uid = uid; saveStore();
+    return tok;
+  },
+};
+
+// 部屋の写しと言葉の辞書を手元に持ち、変わったら描き直す
+let ROOM = null, DICT = {};
+function setAt(obj, path, val) {
+  const keys = path.split('/').filter(Boolean);
+  if (!keys.length) return val;
+  if (!obj || typeof obj !== 'object') obj = {};
+  let o = obj;
+  for (let i = 0; i < keys.length - 1; i++) { if (!o[keys[i]] || typeof o[keys[i]] !== 'object') o[keys[i]] = {}; o = o[keys[i]]; }
+  if (val === null) delete o[keys[keys.length - 1]]; else o[keys[keys.length - 1]] = val;
+  return obj;
+}
+// Firebase の流しっぱなしの読み出し（届いた変わり目を写しに当てる）。つながらん時は15秒ごとに取りに行く
+function stream(path, onData) {
+  let copy = null, poll = null;
+  const url = FB_DB + '/' + path + '.json';
+  const pull = async () => { try { const r = await fetch(url); if (r.ok) { copy = await r.json(); onData(copy); setStatus(''); } } catch (e) { setStatus('電波が戻るのを待っています…', true); } };
+  try {
+    const es = new EventSource(url);
+    es.addEventListener('put', e => { const m = JSON.parse(e.data); copy = setAt(copy, m.path, m.data); onData(copy); setStatus(''); });
+    es.addEventListener('patch', e => { const m = JSON.parse(e.data); for (const k of Object.keys(m.data || {})) copy = setAt(copy, (m.path === '/' ? '' : m.path) + '/' + k, m.data[k]); onData(copy); });
+    es.onerror = () => { setStatus('電波が戻るのを待っています…', true); if (!poll) poll = setInterval(pull, 15000); };
+    es.onopen = () => { if (poll) { clearInterval(poll); poll = null; } };
+  } catch (e) { poll = setInterval(pull, 15000); pull(); }
+}
+async function fbWrite(method, path, body) {
+  const tok = await Auth.get();
+  const r = await fetch(FB_DB + '/' + path + '.json?auth=' + encodeURIComponent(tok), { method, body: body === undefined ? undefined : JSON.stringify(body) });
+  if (!r.ok) throw new Error('http ' + r.status);
+  return r.json();
+}
+
+// 試し：同じブラウザのタブどうしでやりとり（localStorage）。AI のかわりに「［試し］言葉」を1.5秒後に覚える
+const DEMO_KEY = 'yakyu_moji_demo_db';
+const demo = {
+  db() { try { return JSON.parse(localStorage.getItem(DEMO_KEY)) || {}; } catch (e) { return {}; } },
+  save(db) { localStorage.setItem(DEMO_KEY, JSON.stringify(db)); this.emit(); },
+  subs: [],
+  emit() { const db = this.db(); this.subs.forEach(f => f(db)); },
+};
+if (DEMO) window.addEventListener('storage', e => { if (e.key === DEMO_KEY) demo.emit(); });
+
+const api = {
+  async create(title) {
+    const room = 'm' + rnd();
+    if (DEMO) { const db = demo.db(); db.moji = db.moji || {}; db.moji[room] = { owner: 'demo', info: { title, at: Date.now() } }; demo.save(db); return room; }
+    await Auth.get();
+    await fbWrite('PUT', 'moji/' + room, { owner: S.uid, info: { title, at: { '.sv': 'timestamp' } } });
+    return room;
+  },
+  async send(room, t) {
+    if (DEMO) {
+      const db = demo.db(); const id = 'd' + Date.now().toString(36) + rnd().slice(0, 4);
+      db.moji[room].msgs = db.moji[room].msgs || {}; db.moji[room].msgs[id] = { t, at: Date.now() }; demo.save(db);
+      setTimeout(() => {   // サーバーの AI のまね
+        const d = demo.db(); d.mojiDict = d.mojiDict || {};
+        const unk = Y.convert(t, Y.fromDict(d.mojiDict)).unknown.slice(0, 8);
+        unk.forEach(w => { d.mojiDict[Y.dictKey(w)] = { from: w, to: '［試し］' + w, at: Date.now() }; });
+        d.moji[room].ai = d.moji[room].ai || {}; d.moji[room].ai[id] = unk.length ? 'done' : 'none'; demo.save(d);
+      }, 1500);
+      return id;
+    }
+    const r = await fbWrite('POST', 'moji/' + room + '/msgs', { t, at: { '.sv': 'timestamp' } });
+    return r.name;
+  },
+  async remove(room, id) {
+    if (DEMO) { const db = demo.db(); delete db.moji[room].msgs[id]; demo.save(db); return; }
+    await fbWrite('DELETE', 'moji/' + room + '/msgs/' + id);
+  },
+  async end(room) {
+    if (DEMO) { const db = demo.db(); db.moji[room].info.ended = Date.now(); demo.save(db); return; }
+    await fbWrite('PATCH', 'moji/' + room + '/info', { ended: { '.sv': 'timestamp' } });
+  },
+  watch(room) {
+    if (DEMO) { demo.subs.push(db => { ROOM = (db.moji || {})[room] || null; DICT = db.mojiDict || {}; render(); }); demo.emit(); return; }
+    stream('moji/' + room, v => { ROOM = v; render(); });
+    stream('mojiDict', v => { DICT = v || {}; render(); });
+  },
+};
+
+// ==== 表示 ====
+const IS_SENDER = !ROOM_VIEW;
+const roomId = () => ROOM_VIEW || S.room;
+function viewMode() { return S.view === 'raw' ? 'raw' : 'easy'; }   // 既定＝やさしい言葉（分からん人のための画面なので）
+function setView(m) { S.view = m; saveStore(); render(); }
+document.querySelectorAll('#seg button').forEach(b => b.addEventListener('click', () => setView(b.dataset.mode)));
+
+function msgList() {
+  const m = (ROOM && ROOM.msgs) || {};
+  return Object.keys(m).map(id => Object.assign({ id }, m[id])).filter(x => typeof x.t === 'string').sort((a, b) => (a.at || 0) - (b.at || 0) || (a.id < b.id ? -1 : 1));
+}
+// 吹き出しの中身。そのまま＝打った文のまま／やさしい言葉＝1行ずつ「誰が・何をした・点・今の状況」に分けて並べる
+function shownHtml(x) {
+  if (viewMode() === 'raw') return { html: esc(x.t), easy: false, note: '' };
+  const learned = Y.fromDict(DICT);
+  const ai = ROOM && ROOM.ai && ROOM.ai[x.id];
+  const fresh = Date.now() - (x.at || 0) < 60000;
+  const unknown = Y.convert(x.t, learned).unknown;
+  let h = '', raw = [];
+  const flushRaw = () => { if (raw.length) { h += '<div class="e-raw">' + esc(raw.join('\n')) + '</div>'; raw = []; } };
+  for (const r of Y.layout(x.t, learned)) {
+    if (r.type === 'raw') { raw.push(r.text); continue; }
+    flushRaw();
+    if (r.type === 'heading') { h += '<div class="e-inning">' + esc(r.text) + '</div>'; continue; }
+    h += '<div class="e-play">'
+      + (r.who ? '<div class="e-who">' + esc(r.who) + '</div>' : '')
+      + (r.what ? '<div class="e-what">' + whatHtml(r.what) + (r.score ? ' <span class="e-score">＋' + esc(r.score) + '</span>' : '') + '</div>'
+               : (r.score ? '<div class="e-what"><span class="e-score">＋' + esc(r.score) + '</span></div>' : ''))
+      + (r.sit ? '<div class="e-sit">' + whatHtml(r.sit) + '</div>' : '')
+      + '</div>';
+  }
+  flushRaw();
+  return { html: h, easy: true, note: unknown.length && !ai && fresh ? '言葉を調べています…' : '' };
+}
+// かっこの中の説明は小さく・薄く（本筋の言葉が目に入るように）。「アウト」は赤
+function whatHtml(s) {
+  return esc(s).replace(/（([^（）]*)）/g, (m, inner) => '<small class="e-note' + (/アウト/.test(inner) && inner.length <= 12 ? ' out' : '') + '">' + inner + '</small>');
+}
+
+function render() {
+  document.querySelectorAll('#seg button').forEach(b => b.classList.toggle('on', b.dataset.mode === viewMode()));
+  const info = (ROOM && ROOM.info) || {};
+  $('title').textContent = info.title || '文字で実況';
+  const main = $('main');
+
+  if (IS_SENDER && !S.room) { renderStart(); return; }
+  if (!ROOM) {
+    main.innerHTML = '<div class="empty">' + (IS_SENDER ? 'つないでいます…' : 'この実況は見つかりません（終わったか、リンクが違います）') + '</div>';
+    return;
+  }
+  const atBottom = window.innerHeight + window.scrollY >= document.body.scrollHeight - 80;
+  const list = msgList();
+  let h = '';
+  if (IS_SENDER && !list.length) {
+    h += '<div class="card"><h2>観戦リンクを LINE に貼ってください</h2>'
+      + '<p>貼るのは最初の1回だけです。あとはここに、いつもの書き方で打って「送る」を押すだけで、見る人のスマホに届きます。</p>'
+      + '<div class="link">' + esc(viewUrl()) + '</div>'
+      + '<div class="btns"><button class="primary" data-act="share">LINE に送る</button><button data-act="copy">コピー</button></div></div>';
+  }
+  if (!IS_SENDER && !list.length) h += '<div class="empty">まだ実況は届いていません。届くと自動で出ます。</div>';
+  h += '<div class="msgs">';
+  for (const x of list) {
+    const s = shownHtml(x);
+    h += '<div class="msg' + (IS_SENDER ? ' me' : '') + (s.easy ? ' easy' : '') + '" data-id="' + esc(x.id) + '">'
+      + '<div class="bubble">' + s.html + '</div>'
+      + '<div class="meta">' + hhmm(x.at) + (s.note ? ' <span class="ai">' + s.note + '</span>' : '') + '</div></div>';
+  }
+  h += '</div>';
+  if (info.ended) h += '<div class="ended">この実況は終わりました（' + hhmm(info.ended) + '）</div>';
+  main.innerHTML = h;
+  if (IS_SENDER) {
+    $('senderBottom').style.display = info.ended ? 'none' : '';
+    if (info.ended) main.insertAdjacentHTML('beforeend', '<div class="card"><div class="btns"><button class="primary" data-act="new">新しい実況を始める</button></div></div>');
+  }
+  if (atBottom) window.scrollTo(0, document.body.scrollHeight);
+}
+
+function renderStart() {
+  $('senderBottom').style.display = 'none';
+  $('main').innerHTML = '<div class="card"><h2>文字で実況を始める</h2>'
+    + '<p>LINE と同じように、打って送るだけの実況です。選手の登録はいりません。見る人は「そのまま」と「やさしい言葉」を選べます。</p>'
+    + '<label style="display:block;margin-top:12px;font-size:.9rem;color:var(--sub)">見出し（なくてもよい）</label>'
+    + '<input id="titleIn" maxlength="60" placeholder="例：若葉カップ 4回戦 vs 西ノ島">'
+    + '<div class="btns"><button class="primary" data-act="start">始める</button></div></div>'
+    + (FB_KEY || DEMO ? '' : '<p class="empty">まだ準備中です（サーバーの設定が済んでいません）</p>');
+}
+
+function viewUrl() { return location.origin + location.pathname + '?moji=' + roomId() + (DEMO ? '&demo=1' : ''); }
+function shareText() { const t = (ROOM && ROOM.info && ROOM.info.title) || '試合'; return t + ' の実況はこちら（開くと自動で更新されます）\n' + viewUrl(); }
+function share() { location.href = 'https://line.me/R/share?text=' + encodeURIComponent(shareText()); }
+async function copyLink() { try { await navigator.clipboard.writeText(shareText()); toast('コピーしました'); } catch (e) { toast('コピーできませんでした。リンクを長押ししてコピーしてください'); } }
+
+$('main').addEventListener('click', async e => {
+  const act = e.target.closest('[data-act]');
+  if (act) {
+    const a = act.dataset.act;
+    if (a === 'share') share();
+    else if (a === 'copy') copyLink();
+    else if (a === 'new') { if (confirm('新しい実況を始めますか？（前の実況は、見る人のリンクからは引き続き読めます）')) { delete S.room; saveStore(); ROOM = null; render(); } }
+    else if (a === 'start') {
+      act.disabled = true;
+      try { S.room = await api.create(($('titleIn').value || '').trim()); saveStore(); api.watch(S.room); render(); }
+      catch (err) { act.disabled = false; toast(err.message === 'nokey' ? 'まだ準備中です（サーバーの設定が済んでいません）' : '始められませんでした。電波を確かめてもう一度どうぞ'); }
+    }
+    return;
+  }
+  // 打った人：自分の吹き出しを押すと「写して直す／取り消す」（LINE で前の文をコピーして直す・送信取消と同じ使い方）
+  const m = e.target.closest('.msg.me');
+  if (m && IS_SENDER) openSheet(m.dataset.id);
+});
+
+let sheetId = null;
+function openSheet(id) { sheetId = id; $('sheet').classList.add('on'); }
+function closeSheet() { sheetId = null; $('sheet').classList.remove('on'); }
+$('sheet').addEventListener('click', async e => {
+  const b = e.target.closest('[data-sheet]');
+  if (e.target === $('sheet') || (b && b.dataset.sheet === 'cancel')) { closeSheet(); return; }
+  if (!b) return;
+  const id = sheetId, x = msgList().find(v => v.id === id);
+  closeSheet();
+  if (!x) return;
+  if (b.dataset.sheet === 'copy') {
+    // 打つ欄に写す（打ちかけの文があれば、消さずにうしろへ足す）
+    input.value = input.value.trim() ? input.value.replace(/\s+$/, '') + '\n' + x.t : x.t;
+    grow(); input.focus();
+    try { localStorage.setItem(STORE + '_draft', input.value); } catch (e2) {}
+  } else if (b.dataset.sheet === 'del' && confirm('この文を取り消しますか？（見る人の画面からも消えます）')) {
+    try { await api.remove(S.room, id); } catch (err) { toast('取り消せませんでした。電波を確かめてください'); }
+  }
+});
+
+// ==== 打つ欄 ====
+const input = $('input');
+function grow() { input.style.height = 'auto'; input.style.height = Math.min(input.scrollHeight, window.innerHeight * 0.4) + 'px'; }
+input.addEventListener('input', () => { grow(); try { localStorage.setItem(STORE + '_draft', input.value); } catch (e) {} });
+$('composer').addEventListener('submit', async e => {
+  e.preventDefault();
+  const t = input.value.replace(/\s+$/, '');
+  if (!t.trim()) return;
+  if (t.length > 1000) { toast('1000文字までです。分けて送ってください'); return; }
+  $('sendBtn').disabled = true;
+  try {
+    await api.send(S.room, t);
+    input.value = ''; grow();
+    try { localStorage.removeItem(STORE + '_draft'); } catch (e2) {}
+    window.scrollTo(0, document.body.scrollHeight);
+  } catch (err) {
+    toast('送れませんでした。電波が戻ったらもう一度「送る」を押してください（打った文は残っています）');
+  } finally { $('sendBtn').disabled = false; }
+});
+$('shareBtn').addEventListener('click', share);
+$('endBtn').addEventListener('click', async () => {
+  if (!confirm('実況を終えますか？（見る人には「終わりました」と出ます。書いた文は残ります）')) return;
+  try { await api.end(S.room); } catch (e) { toast('終えられませんでした。電波を確かめてください'); }
+});
+
+// ==== 起動 ====
+if (!IS_SENDER) { $('backLink').style.display = 'none'; document.title = '実況を見る｜球場実況'; }
+try { const d = localStorage.getItem(STORE + '_draft'); if (d && IS_SENDER) { input.value = d; } } catch (e) {}
+if (roomId()) api.watch(roomId());
+render();
+setInterval(() => { if (ROOM) render(); }, 30000);   // 「言葉を調べています」を時間で消すため
+</script>
+</body>
+</html>
