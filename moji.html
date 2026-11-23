@@ -258,7 +258,10 @@ const api = {
 // ==== 表示 ====
 const IS_SENDER = !ROOM_VIEW;
 const roomId = () => ROOM_VIEW || S.room;
-function viewMode() { return S.view === 'raw' ? 'raw' : 'easy'; }   // 既定＝やさしい言葉（分からん人のための画面なので）
+// 打つ人の画面は、いつも打ったまま（切り替えも出さん＝とと 2026-11-23「実況者はいつもの打ち方をしたらいい。変な要素入れなくていい」）
+// 見る人の既定＝やさしい言葉（分からん人のための画面なので）
+function viewMode() { return IS_SENDER ? 'raw' : (S.view === 'raw' ? 'raw' : 'easy'); }
+if (IS_SENDER) $('seg').style.display = 'none';
 function setView(m) { S.view = m; saveStore(); render(); }
 document.querySelectorAll('#seg button').forEach(b => b.addEventListener('click', () => setView(b.dataset.mode)));
 
