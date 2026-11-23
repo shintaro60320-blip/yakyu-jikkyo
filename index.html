@@ -2353,7 +2353,7 @@ else if (data.live) { historyDirty = true; schedulePush(); }
 
 // オフライン対応（ホスティング版のみ・ファイル版では何もしない）
 if ('serviceWorker' in navigator && location.protocol === 'https:') {
-  navigator.serviceWorker.register('./sw.js').catch(() => {});
+  navigator.serviceWorker.register('./sw.js', { updateViaCache: 'none' }).catch(() => {});
 }
 </script>
 </body>
