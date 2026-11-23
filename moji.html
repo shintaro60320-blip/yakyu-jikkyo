@@ -420,6 +420,27 @@ try { const d = localStorage.getItem(STORE + '_draft'); if (d && IS_SENDER) { in
 if (roomId()) api.watch(roomId());
 render();
 setInterval(() => { if (ROOM) render(); }, 30000);   // 「言葉を調べています」を時間で消すため
+
+// 新しい版のお知らせ（とと 2026-11-23「更新された通知機能をつけて」）
+// サイトに新しい版が上がると sw.js が変わる（build.py が中身から名札を付け直す）→ 入れ替わったら上に帯を出す。押すと読み込み直して新しい版になる
+if ('serviceWorker' in navigator && location.protocol === 'https:') {
+  const hadSw = !!navigator.serviceWorker.controller;   // 初めて開いた時は入れ替わりやないので出さん
+  navigator.serviceWorker.register('./sw.js', { updateViaCache: 'none' }).then(reg => {
+    const check = () => reg.update().catch(() => {});
+    document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible') check(); });   // 画面に戻ってきた時に確かめる
+    setInterval(check, 30 * 60 * 1000);   // 開きっぱなしでも30分ごとに確かめる
+  }).catch(() => {});
+  navigator.serviceWorker.addEventListener('controllerchange', () => {
+    if (!hadSw || document.getElementById('updbar')) return;
+    const b = document.createElement('button');
+    b.id = 'updbar';
+    b.type = 'button';
+    b.textContent = '新しい版が届きました。ここを押すと切り替わります';
+    b.style.cssText = 'position:fixed;left:50%;transform:translateX(-50%);top:calc(env(safe-area-inset-top) + 10px);z-index:9999;max-width:calc(100% - 32px);width:max-content;padding:12px 16px;border:none;border-radius:12px;background:#b45309;color:#fff;font:700 .92rem/1.4 inherit;box-shadow:0 6px 20px rgba(0,0,0,.25);cursor:pointer';
+    b.onclick = () => location.reload();
+    document.body.appendChild(b);
+  });
+}
 </script>
 </body>
 </html>

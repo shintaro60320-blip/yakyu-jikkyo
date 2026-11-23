@@ -1,5 +1,5 @@
 // 球場実況 オフライン対応（ネット優先・失敗したらキャッシュ＝球場の弱い電波でも一度開けば動く）
-const CACHE = 'yakyu-v3';
+const CACHE = 'yakyu-a61208dcc0';
 const ASSETS = ['./', './index.html', './manifest.webmanifest', './icon-192.png', './icon-512.png', './icon-180.png', './moji.html', './yasashii.js'];
 
 self.addEventListener('install', e => {
