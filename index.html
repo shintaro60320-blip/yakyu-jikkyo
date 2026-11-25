@@ -1202,10 +1202,51 @@ function save() {
 }
 
 // ==== ライブ配信（Firebase Realtime Database・RESTのみでSDK不要） ====
-// 設計: 部屋コード=推測不可能な乱数 / 書き込みはsecret一致が必要(ルールで強制) / 観戦者はstateだけ読める
+// 設計: 部屋コード=推測不可能な乱数 / 書けるのは部屋を作った人（匿名ログインの持ち主）だけ(ルールで強制) / 観戦者はstateだけ読める
+// ★2026-11-25 守りの穴を塞いだ：前は「合言葉が前と同じか」だけを見とったので、部屋の一部分だけを書くと合言葉なしで通った。
+//   今は持ち主（owner＝匿名ログインの番号）で守る。持ち主の印が無い前の部屋・別のスマホへ引き継いだ部屋は、
+//   合言葉を出して持ち主になり、同時に合言葉を新しくする（ルール側で「合言葉が変わる時だけ」持ち主を替えられる）
 const FB_DB = 'https://yakyu-jikkyo-default-rtdb.firebaseio.com';
+const FB_KEY = 'AIzaSyDQMjYtr3RdcinM9NrGVjT7ExCRGhOE4dw';   // Firebase の「ウェブアプリの設定」の apiKey（ページに載せる前提の公開用の番号。秘密の鍵ではない・守りはデータベースの決まりで掛ける）
 const LIVE_ROOM = new URLSearchParams(location.search).get('live');
 function rnd() { let s = ''; while (s.length < 18) s += Math.random().toString(36).slice(2); return s.slice(0, 18); }
+// 匿名ログイン（名前もメールも要らん。この端末に「部屋を作った人」の印だけ残る）
+const LIVE_AUTH_KEY = 'yakyu_jikkyo_auth';
+const LiveAuth = {
+  token: null, exp: 0, uid: null,
+  store() { try { return JSON.parse(localStorage.getItem(LIVE_AUTH_KEY)) || {}; } catch (e) { return {}; } },
+  async get() {
+    if (this.token && Date.now() < this.exp - 60000) return this.token;
+    const st0 = this.store();
+    let r;
+    if (st0.refresh) {
+      r = await fetch('https://securetoken.googleapis.com/v1/token?key=' + FB_KEY, { method: 'POST', headers: { 'Content-Type': 'application/x-www-form-urlencoded' }, body: 'grant_type=refresh_token&refresh_token=' + encodeURIComponent(st0.refresh) });
+      if (r.ok) { const j = await r.json(); return this.keep(j.id_token, j.refresh_token, j.user_id, j.expires_in); }
+    }
+    r = await fetch('https://identitytoolkit.googleapis.com/v1/accounts:signUp?key=' + FB_KEY, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ returnSecureToken: true }) });
+    if (!r.ok) throw new Error('auth ' + r.status);
+    const j = await r.json();
+    return this.keep(j.idToken, j.refreshToken, j.localId, j.expiresIn);
+  },
+  keep(tok, refresh, uid, sec) {
+    this.token = tok; this.exp = Date.now() + Number(sec || 3600) * 1000; this.uid = uid;
+    try { localStorage.setItem(LIVE_AUTH_KEY, JSON.stringify({ refresh, uid })); } catch (e) {}
+    return tok;
+  },
+};
+// 部屋へ書く（PATCH）。断られたら一度だけ、合言葉を出して持ち主になり合言葉を新しくする
+async function roomWrite(body) {
+  const tok = await LiveAuth.get();
+  const url = FB_DB + '/rooms/' + data.live.roomId + '.json?auth=' + encodeURIComponent(tok);
+  let res = await fetch(url, { method: 'PATCH', body: JSON.stringify(Object.assign({}, body, { owner: LiveAuth.uid })) });
+  if (res.status === 401 || res.status === 403) {
+    const newSecret = rnd() + rnd();
+    res = await fetch(url, { method: 'PATCH', body: JSON.stringify(Object.assign({}, body, { owner: LiveAuth.uid, proof: data.live.secret, secret: newSecret })) });
+    if (res.ok) { data.live.secret = newSecret; save(); }
+  }
+  if (!res.ok) throw new Error('http ' + res.status);
+  return res;
+}
 function liveState() {
   return {
     config: {
@@ -1288,8 +1329,7 @@ async function pushLive(extraState) {
     return true;
   }
   try {
-    const res = await fetch(FB_DB + '/rooms/' + data.live.roomId + '.json', { method: 'PATCH', body: JSON.stringify(body) });
-    if (!res.ok) throw new Error('http ' + res.status);
+    await roomWrite(body);
     sentState = Object.assign({}, sentState || {}, next);
     setLiveStatus('配信中（同期OK・' + new Date().toTimeString().slice(0, 5) + ' に送信）', true);
     if (historyDirty && !(extraState && extraState.ended)) pushHistory();
@@ -1318,8 +1358,7 @@ async function pushHistory() {
   if (!data.live) return false;
   historyDirty = true;
   try {
-    const res = await fetch(FB_DB + '/rooms/' + data.live.roomId + '.json', { method: 'PATCH', body: JSON.stringify(patchBody({ history: compactHistory() })) });
-    if (!res.ok) throw new Error('http ' + res.status);
+    await roomWrite(patchBody({ history: compactHistory() }));
     historyDirty = false;
     return true;
   } catch (e) { return false; }   // 電波が戻って次に送れた時（pushLive の成功時）に送り直す
